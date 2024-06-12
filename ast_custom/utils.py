@@ -1,4 +1,4 @@
-from ast_parser import ASTParser
+from .ast_parser import ASTParser
 import re, os, json, ast
 
 def build_tree(root_folder, exclude_dirs_regex):

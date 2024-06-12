@@ -1,8 +1,9 @@
-import os
-import datetime
-import time
+import os,datetime,sys,time
 from autogen import AssistantAgent, UserProxyAgent
-from utils import build_tree_and_relationships, save_to_json
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), './../')))
+
+from ast_custom.utils import build_tree_and_relationships, save_to_json
 
 # Documentation Generation Code
 print("Starting the documentation generation process...")
