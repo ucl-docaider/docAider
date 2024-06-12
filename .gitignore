@@ -1,0 +1,8 @@
+# Environment
+.env*
+.venv*
+venv*
+env*
+
+# Cache
+.cache
