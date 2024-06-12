@@ -1,0 +1,63 @@
+{
+    "tree": {
+        "file2.py": {
+            "classes": {
+                "PolicySearch": [
+                    "__str__"
+                ]
+            },
+            "functions": [
+                "parse_content",
+                "__str__"
+            ]
+        },
+        "file1.py": {
+            "classes": {},
+            "functions": [
+                "manage_searches_view"
+            ]
+        }
+    },
+    "relationships": {
+        "file2.py": {
+            "parse_content": {
+                "internal": [],
+                "external": [
+                    "uuid4",
+                    "strip",
+                    "urlparse",
+                    "compile",
+                    "findall",
+                    "append",
+                    "str"
+                ]
+            },
+            "__str__": {
+                "internal": [],
+                "external": [
+                    "str"
+                ]
+            }
+        },
+        "file1.py": {
+            "manage_searches_view": {
+                "internal": [
+                    "parse_content"
+                ],
+                "external": [
+                    "read_csv",
+                    "order_by",
+                    "static",
+                    "redirect",
+                    "filter",
+                    "iterrows",
+                    "defaultdict",
+                    "render",
+                    "append",
+                    "dict",
+                    "str"
+                ]
+            }
+        }
+    }
+}

@@ -1,0 +1,37 @@
+**PolicySearch Model Documentation**
+
+The `PolicySearch` model is a Django model that represents a policy search query. It is designed to store information about a specific search query, including its name, keywords, and the account associated with it.
+
+**Attributes**
+
+* `auto_increment_id`: An automatically incrementing primary key field.
+* `created_at`: A DateTimeField representing when the policy search was created, with auto-now-add set to True.
+* `name`: A CharField that stores the name of the policy search query (up to 50 characters).
+* `keywords`: A TextField that stores a comma-separated string of keywords associated with the policy search query. It has a default value of an empty string and allows blank values.
+* `account`: A ForeignKey field that references the `Account` model, representing the account associated with this policy search.
+* `object_id`: A CharField that stores an object ID (up to 50 characters) associated with the policy search query. It has a default value of an empty string and allows blank values.
+* `progress`: An IntegerField that tracks the progress of the policy search query (with a default value of 0).
+* `unique_thread_id`: A CharField that stores a unique thread ID (up to 100 characters) associated with the policy search query. It has a default value of an empty string and allows null values.
+
+**Methods**
+
+* `__str__`: This method returns a string representation of the policy search query, including its name, account email, and creation date.
+
+**OrganisedData Model Documentation**
+
+The `OrganisedData` model is a Django model that represents organized data related to a policy search. It is designed to store information about the raw data associated with a specific policy search query.
+
+**Attributes**
+
+* `auto_increment_id`: An automatically incrementing primary key field.
+* `created_at`: A DateTimeField representing when the organized data was created, with auto-now-add set to True.
+* `name`: A CharField that stores the name of the organized data (up to 50 characters).
+* `object_id`: A CharField that stores an object ID (up to 50 characters) associated with the organized data. It has a default value of an empty string and allows blank values.
+* `raw_data`: A ForeignKey field that references the `PolicySearch` model, representing the policy search query associated with this organized data.
+* `account`: A ForeignKey field that references the `Account` model, representing the account associated with this organized data.
+
+**Methods**
+
+* `__str__`: This method returns a string representation of the organized data, including its name, account email, and creation date.
+
+These models provide a structure for storing information about policy searches and their associated organized data. They can be used in conjunction with Django's ORM to interact with the database and perform CRUD operations.
