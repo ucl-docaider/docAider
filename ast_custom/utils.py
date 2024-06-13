@@ -1,7 +1,35 @@
 from .ast_parser import ASTParser
 import re, os, json, ast
 
-def build_tree(root_folder, exclude_dirs_regex):
+def build_tree_and_relationships(root_folder, exclude_dirs_regex=r'env'):
+    """
+    Build the tree representation of the project's directory structure and the relationships between functions.
+
+    Args:
+        root_folder (str): The root folder of the project.
+        exclude_dirs_regex (str): Regular expression pattern to exclude specific directories from the tree and relationships.
+
+    Returns:
+        tuple: A tuple containing the tree representation, the relationships between functions, and a dictionary of file contents.
+    """
+    tree, function_set, file_contents = __build_tree(root_folder, exclude_dirs_regex)
+    relationships = __build_function_relationships(root_folder, function_set, exclude_dirs_regex)
+    return tree, relationships, file_contents
+
+# Save the tree and relationships to a JSON file
+def save_to_json(tree, relationships, output_file):
+    """
+    Save the tree and relationships to a JSON file.
+    """
+    data = {
+        "tree": tree,
+        "relationships": relationships
+    }
+    with open(output_file, 'w') as json_file:
+        json.dump(data, json_file, indent=4)
+
+
+def __build_tree(root_folder, exclude_dirs_regex):
     """
     Build a tree representation of the project's directory structure and extract functions and classes from Python files.
 
@@ -51,7 +79,7 @@ def build_tree(root_folder, exclude_dirs_regex):
     return tree, function_set, file_contents
 
 
-def build_function_relationships(root_folder, function_set, exclude_dirs_regex):
+def __build_function_relationships(root_folder, function_set, exclude_dirs_regex):
     """
     Build relationships between functions in the project.
 
@@ -96,30 +124,3 @@ def build_function_relationships(root_folder, function_set, exclude_dirs_regex):
                 relationships[relative_path] = calls
 
     return relationships
-
-def save_to_json(tree, relationships, output_file):
-    """
-    Save the tree and relationships to a JSON file.
-    """
-    data = {
-        "tree": tree,
-        "relationships": relationships
-    }
-    with open(output_file, 'w') as json_file:
-        json.dump(data, json_file, indent=4)
-
-
-def build_tree_and_relationships(root_folder, exclude_dirs_regex=r'env'):
-    """
-    Build the tree representation of the project's directory structure and the relationships between functions.
-
-    Args:
-        root_folder (str): The root folder of the project.
-        exclude_dirs_regex (str): Regular expression pattern to exclude specific directories from the tree and relationships.
-
-    Returns:
-        tuple: A tuple containing the tree representation, the relationships between functions, and a dictionary of file contents.
-    """
-    tree, function_set, file_contents = build_tree(root_folder, exclude_dirs_regex)
-    relationships = build_function_relationships(root_folder, function_set, exclude_dirs_regex)
-    return tree, relationships, file_contents
