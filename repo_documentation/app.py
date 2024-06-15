@@ -1,5 +1,6 @@
 import os,datetime,sys,time
 from autogen import AssistantAgent, UserProxyAgent
+from prompt import DOCUMENTATION_PROMPT, USR_PROMPT
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), './../')))
 
@@ -16,7 +17,7 @@ llm_config = {
 
 assistant = AssistantAgent(
   name="assistant",
-  system_message="You are a documentation generation assistant for Python programs",
+  system_message=USR_PROMPT,
   llm_config=llm_config,
   human_input_mode="NEVER"
 )
@@ -28,48 +29,6 @@ user = UserProxyAgent(
 
 # Profile (start)
 start_time = time.time()
-
-# Prompt template
-prompt_template = """
-Please provide a short and code level documentation for the following file content:
-
-File: {file_name}
-Content:
-{file_content}
-
-Consider the additional documentation for the functions and classes called within the file:
-{additional_docs}
-
-Below is a prompt template that you need to use for the GitHub documentation:
-Project Name
-1. Description
-A brief overview of what the project does, its purpose, and key features.
-
-2. Classes and Functions
-    - Class 1
-        -- Attributes
-            --- attribute1 (type): Description of the first attribute.
-            --- attribute2 (type): Description of the second attribute.
-        -- Functions
-            --- function_name(param1: type, param2: type) -> return_type
-                ---- Parameters:
-                    ----- param1 (type): Description of the first parameter.
-                    ----- param2 (type): Description of the second parameter.
-                ---- Returns:
-                    ----- return_type: Description of the return value.
-            --- Called_functions: List of functions called within this function and short description of what they do.
-                ---- function1: Description of what function1 does.
-                ---- function2: Description of what function2 does.   
-    - Function 1 (functions that do not belong to a class but are still present in the file)
-        -- Parameters:
-            --- param1 (type): Description of the first parameter.
-            --- param2 (type): Description of the second parameter.
-        -- Returns:
-            --- return_type: Description of the return value.
-        -- Called_functions: List of functions called within this function and a short description of what they do.
-            --- function1: Description of what function1 does.
-            --- function2: Description of what function2 does.
-"""
 
 # Generate documentation for each file in the project
 root_folder = './example_code'
@@ -101,9 +60,10 @@ def generate_function_doc(assistant, user, file_name, file_content, called_funct
                 additional_docs += f"\nFunction/Class {func}:\n{get_code_snippet(os.path.join(root_folder, path), func)}\n"
                 break
 
-    prompt_message = prompt_template.format(
+    prompt_message = DOCUMENTATION_PROMPT.format(
         file_name=file_name,
         file_content=file_content,
+        root_folder=root_folder,
         additional_docs=additional_docs
     )
 
