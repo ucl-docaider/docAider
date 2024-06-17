@@ -1,0 +1,3 @@
+pyautogen
+azure-core
+azure-search-documents
