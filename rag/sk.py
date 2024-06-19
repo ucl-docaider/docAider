@@ -9,7 +9,7 @@ kernel.add_service(
   AzureChatCompletion(
     deployment_name="", # TODO: Get the deployment name
     endpoint="", # TODO: Get the endpoint
-    api_key="349406d1910141df86718fd026485862"
+    api_key="" # TODO
   )
 )
 req_settings = kernel.get_prompt_execution_settings_from_service_id(service_id)
