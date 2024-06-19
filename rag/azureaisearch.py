@@ -6,13 +6,12 @@ from azure.search.documents.indexes.models import SearchIndex
 
 # Create a search client using environment variables
 search_client = SearchClient(
-  endpoint=os.environ["SEARCH_ENDPOINT"],
-  index_name="code-index",
-  credential=AzureKeyCredential(os.environ["AZURE_KEY_CREDENTIAL"])
+  endpoint=os.environ["SEARCH_ENDPOINT"], # Azure AI Search End Point
+  index_name="code-index", # Azure AI Search index name
+  credential=AzureKeyCredential(os.environ["AZURE_KEY_CREDENTIAL"]) # Azure AI Search API Key
 )
-
-# This part contructed a new search index and inject documents to the index
 """
+# This part contructed a new search index and inject documents to the index
 # Create an index
 index_config = {
   "client": SearchIndexClient(
@@ -42,8 +41,9 @@ result = search_client.upload_documents(documents=documents)
 print("Upload of new document succeeded: {}".format(result[0].succeeded))
 """
 
-# Ask the search client to return response for a search query
-results = search_client.search("I need a code snippet that adds three numbers")
+# Test the search function
+# Ask the search client to return response based on a search query
+results = search_client.search("I need a code snippet from id 2")
 print(f"Searching...")
 print(f"-------------------------------------")
 for result in list(results):
