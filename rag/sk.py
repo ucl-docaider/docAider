@@ -1,40 +1,32 @@
+import asyncio
 from semantic_kernel import Kernel
-from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
+from semantic_kernel.connectors.ai.ollama.services.ollama_chat_completion import OllamaChatCompletion
+from semantic_kernel.connectors.ai.ollama.services.ollama_text_embedding import OllamaTextEmbedding
 from semantic_kernel.prompt_template import PromptTemplateConfig
 
 kernel = Kernel()
 
-service_id="rag"
+service_id = "chat-gpt"
+# Add a chat completion service
 kernel.add_service(
-  AzureChatCompletion(
-    deployment_name="", # TODO: Get the deployment name
-    endpoint="", # TODO: Get the endpoint
-    api_key="" # TODO
+  service=OllamaChatCompletion(
+    service_id=service_id,
+    ai_model_id="llama3",
+    url="http://localhost:11434/api/chat"
   )
 )
-req_settings = kernel.get_prompt_execution_settings_from_service_id(service_id)
-req_settings.max_tokens = 2000
-req_settings.temperature = 0.7
-req_settings.top_p = 0.8
+# Add a text embedding service
+
 
 prompt = """
-1) A robot may not injure a human being or, through inaction,
-allow a human being to come to harm.
-
-2) A robot must obey orders given it by human beings except where
-such orders would conflict with the First Law.
-
-3) A robot must protect its own existence as long as such protection
-does not conflict with the First or Second Law.
-
-Give me the TLDR in exactly 5 words."""
+Who are you?
+"""
 
 # Prompt configuration
 prompt_template_config = PromptTemplateConfig(
   template=prompt,
   name="tldr",
   template_format="semantic-kernel",
-  execution_settings=req_settings,
 )
 
 # Register memory store using Azure AI Search 
@@ -47,6 +39,9 @@ function = kernel.add_function(
   prompt_template_config=prompt_template_config,
 )
 
-# Use `invoke` to get kernel response
-result = kernel.invoke(function)
-print(result)
+async def main():
+  result = await kernel.invoke(function)
+  print(result)
+
+if __name__ == "__main__":
+  asyncio.run(main())
