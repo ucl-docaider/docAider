@@ -1,98 +1,144 @@
-import os,datetime,sys,time
+import json
+import os
+import datetime
+import sys
+import time
 from autogen import AssistantAgent, UserProxyAgent
 from prompt import DOCUMENTATION_PROMPT, USR_PROMPT
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), './../')))
+sys.path.append(os.path.abspath(
+    os.path.join(os.path.dirname(__file__), './../')))
+from code2flow.code2flow import code2flow
 
-from ast_custom.utils import build_tree_and_relationships, save_to_json
+class RepoDocumentation():
+    __llm_config = {
+        "model": "llama3",
+        "base_url": "http://localhost:11434/v1",
+        "api_key": "ollama",
+    }
 
-# Documentation Generation Code
-print("Starting the documentation generation process...")
+    def __init__(self, root_folder, output_dir='code2flow_output'):
+        self.root_folder = root_folder
+        self.output_dir = output_dir
+        self.assistant = self._load_assistant_agent()
+        self.user = self._load_user_agent()
 
-llm_config = {
-  "model": "llama3",
-  "base_url": "http://localhost:11434/v1",
-  "api_key": "ollama",
-}
+    def _load_assistant_agent(self):
+        return AssistantAgent(
+            name="assistant",
+            system_message=USR_PROMPT,
+            llm_config=self.__llm_config,
+            human_input_mode="NEVER"
+        )
 
-assistant = AssistantAgent(
-  name="assistant",
-  system_message=USR_PROMPT,
-  llm_config=llm_config,
-  human_input_mode="NEVER"
-)
+    def _load_user_agent(self):
+        return UserProxyAgent(
+            name="user",
+            code_execution_config=False,
+        )
 
-user = UserProxyAgent(
-  name="user",
-  code_execution_config=False,
-)
+    def run(self):
+        print("Starting the documentation generation process...")
+        start_time = time.time()
 
-# Profile (start)
-start_time = time.time()
+        # 1. Generate graph (call_graph.json and cache.json)
+        self._generate_graph()
+        graph = self._load_json(f'{self.output_dir}/call_graph.json')
+        cache = self._load_json(f'{self.output_dir}/cache.json')
 
-# Generate documentation for each file in the project
-root_folder = './example_code'
-output_file = 'output.json'
+        # 2. Build mapping of a file to the functions called within them
+        file_to_calls = self._get_file_to_function_map(graph)
 
-tree, relationships, file_contents = build_tree_and_relationships(root_folder)
+        # 3. Generate documentation for each function
+        for file_path, calls in file_to_calls.items():
+            for call in calls:
+                # Skip external functions
+                if 'EXTERNAL' in call:
+                    print(f"Skipping external function: {call}")
+                    continue
 
-save_to_json(tree, relationships, output_file)
+                call = graph[call]
+                name = call['name']
+                source_code = call['content']
 
-def get_code_snippet(file_path, function_name):
-    with open(file_path, 'r') as file:
-        lines = file.readlines()
-    code_snippet = ""
-    inside_function = False
-    for line in lines:
-        if line.strip().startswith(f"def {function_name}(") or line.strip().startswith(f"class {function_name}("):
-            inside_function = True
-        if inside_function:
-            code_snippet += line
-            if line.strip() == "":
-                break
-    return code_snippet
+                # Core functionality to generate documentation
+                docs = self._generate_function_doc(
+                    file_path, source_code, call['callees'])
 
-def generate_function_doc(assistant, user, file_name, file_content, called_functions):
-    additional_docs = ""
-    for func in called_functions:
-        for path, content in file_contents.items():
-            if f"def {func}(" in content or f"class {func}(" in content:
-                additional_docs += f"\nFunction/Class {func}:\n{get_code_snippet(os.path.join(root_folder, path), func)}\n"
-                break
+                # Store the generated documentation in the cache (TODO: change impl)
+                cache[name]['version'] = 1
+                cache[name]['generated_on'] = datetime.datetime.now().strftime(
+                    '%Y-%m-%d %H:%M:%S')
+                cache[name]['source_code'] = source_code
+                cache[name]['generated_docs'] = docs
 
-    prompt_message = DOCUMENTATION_PROMPT.format(
-        file_name=file_name,
-        file_content=file_content,
-        root_folder=root_folder,
-        additional_docs=additional_docs
-    )
+        # 4. Write the generated documentation back to the cache file
+        self._write_json(f'{self.output_dir}/cache_generated.json', cache)
 
-    user.initiate_chat(
-        assistant,
-        message=prompt_message,
-        max_turns=1,
-        silent=True
-    )
+        total = round(time.time() - start_time, 3)
+        print(f"Total time taken to execute from initiate_chat: {total}s.")
 
-    return assistant.last_message()['content']
+    def _generate_graph(self):
+        code2flow(
+            raw_source_paths=self.root_folder,
+            output_dir=self.output_dir,
+            generate_json=True,
+            generate_image=True,
+            build_cache=True,
+        )
 
-for file_path in tree:
-    file_name = os.path.basename(file_path)
-    file_content = file_contents[file_path]
+    def _generate_function_doc(self, file_name, source_code, called_functions):
+        print(f"Generating documentation for {file_name}...")
+        additional_docs = ""
+        # TODO: Consider callees in docs generation
+        # for func in called_functions:
+        #     for path, content in file_contents.items():
+        #         if f"def {func}(" in content or f"class {func}(" in content:
+        #             additional_docs += f"\nFunction/Class {func}:\n{get_code_snippet(os.path.join(root_folder, path), func)}\n"
+        #             break
 
-    called_functions = []
-    for func, calls in relationships[file_path].items():
-        called_functions.extend(calls['internal'])
+        prompt_message = DOCUMENTATION_PROMPT.format(
+            file_name=file_name,
+            file_content=source_code,
+            root_folder=self.root_folder,
+            additional_docs=additional_docs
+        )
 
-    documentation = generate_function_doc(assistant, user, file_name, file_content, called_functions)
+        self.user.initiate_chat(
+            self.assistant,
+            message=prompt_message,
+            max_turns=1,
+            silent=True
+        )
+        # Return the last message from the assistant, which is the generated documentation
+        return self.assistant.last_message()['content']
 
-    # Write the documentation to a file at /docs_output/docs.md (add timestamp to the filename)
-    timestamp = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-    output_file = os.path.join("docs_output", f"docs_{file_name}_{timestamp}.md")
-    with open(output_file, "w") as f:
-        f.write(documentation)
-    print(f"Documentation written to {output_file}")
+    def _load_json(self, file_path):
+        with open(file_path, 'r') as f:
+            return json.load(f)
 
-# Profile (end)
-total = round(time.time() - start_time, 3)
-print(f"Total time taken to execute from initiate_chat: {total}s.")
+    def _write_json(self, file_path, data):
+        with open(file_path, 'w') as f:
+            json.dump(data, f, indent=4)
+
+    def _get_file_to_function_map(self, graph):
+        """
+        {
+            'file1.py': ['func1', 'func2'],
+            'file2.py': ['func3', 'func4'],
+            'EXTERNAL': ['EXTERNAL::dict', 'EXTERNAL::list'], 
+            ...
+        }
+        """
+        file_to_calls = {}
+        for method_name, call in graph.items():
+            file_name = call['file_name']
+            items = file_to_calls.get(file_name, [])
+            file_to_calls[file_name] = items + [method_name]
+        return file_to_calls
+
+
+repo_doc = RepoDocumentation(
+    root_folder='../code2flow/projects/simple',
+    output_dir='code2flow_output')
+repo_doc.run()
