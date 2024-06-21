@@ -1,0 +1,86 @@
+{
+    "EXTERNAL::print": {
+        "version": 0,
+        "generated_on": "",
+        "source_code": "",
+        "generated_docs": ""
+    },
+    "EXTERNAL::str": {
+        "version": 0,
+        "generated_on": "",
+        "source_code": "",
+        "generated_docs": ""
+    },
+    "EXTERNAL::uuid.uuid4": {
+        "version": 0,
+        "generated_on": "",
+        "source_code": "",
+        "generated_docs": ""
+    },
+    "a::A.__init__": {
+        "version": 1,
+        "generated_on": "2024-06-21 18:20:42",
+        "source_code": "\n\ndef __init__(self):\n    pass\n",
+        "generated_docs": "../code2flow/projects/simple\\a.py:\n\nThe function of ../code2flow/projects/simple\\a.py is initialization of the class. It sets up the initial state of the class with default values or no implementation at all.\n\n## Class: __init__\n\n### Attributes\n\n- There are no attributes in this class.\n\n### Functions \n\n- `__init__` ()\n    - Parameters:\n        -\n    - Returns:\n        - None\n- The function does not call any other functions."
+    },
+    "a::A.methodA1": {
+        "version": 1,
+        "generated_on": "2024-06-21 18:20:42",
+        "source_code": "\n\ndef methodA1(self):\n    str(uuid4())\n    print('Method 1 from class A')\n",
+        "generated_docs": "# ../code2flow/projects/simple\\a.py:\n\nThe function of ../code2flow/projects/simple\\a.py is a class containing a method. \n\n## Class 1: A\n\n### Attributes\n\n- No attributes are defined in this class.\n\n### Functions \n\n- `methodA1`(self) -> None\n    - Parameters:\n        - self: Instance of the class.\n    - Returns:\n        - None: Method does not return any value.\n    - Called_functions:\n        - uuid4(): Generates a random UUID and returns it. \n        - print('Method 1 from class A'): Prints 'Method 1 from class A' to the console.\n\nPlease note that no additional documentation is provided for the functions and classes called within this file as they are not present in this code snippet."
+    },
+    "a::A.methodA2": {
+        "version": 1,
+        "generated_on": "2024-06-21 18:20:42",
+        "source_code": "\n\ndef methodA2(self):\n    self.methodA1()\n",
+        "generated_docs": "# ../code2flow/projects/simple\\a.py:\n\nThe function of ../code2flow/projects/simple\\a.py is a method that calls another method named methodA1."
+    },
+    "a::methodA3": {
+        "version": 1,
+        "generated_on": "2024-06-21 18:20:43",
+        "source_code": "\n\ndef methodA3():\n    print('Method 3 from module A')\n",
+        "generated_docs": "# ../code2flow/projects/simple\\a.py:\n\nThe function of ../code2flow/projects/simple\\a.py is defining methodA3, which prints a specific message.\n\n## MethodA3\n\n### Description\nMethod 3 from module A, used for printing a message.\n\nNo attributes defined in this method."
+    },
+    "b::B.__init__": {
+        "version": 1,
+        "generated_on": "2024-06-21 18:20:43",
+        "source_code": "\n\ndef __init__(self):\n    self.a = A()\n",
+        "generated_docs": "# ../code2flow/projects/simple\\b.py: \nThe function of ../code2flow/projects/simple\\b.py is initializer method for a class. \n\n## Class: __init__\n\n### Attributes\n\n- `self.a` (`A`): Initializes an instance variable with the value from class A.\n\nThis module defines a constructor for initializing instances of its class."
+    },
+    "b::B.methodB1": {
+        "version": 1,
+        "generated_on": "2024-06-21 18:20:43",
+        "source_code": "\n\ndef methodB1(self):\n    print('Method 1 from class B')\n    self.a.methodA1()\n",
+        "generated_docs": "# ../code2flow/projects/simple\\b.py: \n\nThe function of this code is to implement a method from class B that prints a message and calls another method.\n\n## Class 1: MethodB1\n\n### Functions \n- `methodB1` (`self`) -> None\n    - Parameters:\n        -\n    - Returns:\n        - None\n- Called_functions:\n    - `a.methodA1`: Calls method A1 from class A, likely to perform some related functionality.\n\nPlease note that additional documentation for the functions and classes called within this file should be considered."
+    },
+    "b::B.methodB2": {
+        "version": 1,
+        "generated_on": "2024-06-21 18:20:43",
+        "source_code": "\n\ndef methodB2(self):\n    str(uuid.uuid4())\n    re.compile('')\n    print('Method 3 from class B')\n    methodA3()\n",
+        "generated_docs": "# ../code2flow/projects/simple\\b.py:\n\nThe function of ../code2flow/projects/simple\\b.py is to provide methodB2 from class B. \n\n## Class B: MethodB2\n\n### Functions \n\n- `methodB2`(): \n    - Parameters:\n        -\n    - Returns:\n        -\n\n    - Called_functions:\n        - `str(uuid.uuid4())`: A function that generates a random UUID.\n        - `re.compile('')`: A function that compiles an empty regular expression pattern."
+    },
+    "c::C.__init__": {
+        "version": 1,
+        "generated_on": "2024-06-21 18:20:43",
+        "source_code": "\n\ndef __init__(self):\n    self.a = A()\n    self.b = B()\n",
+        "generated_docs": "# ../code2flow/projects/simple/api/c.py:\n\nThe function of ../code2flow/projects/simple/api/c.py is Initialization of class c. \n\n## Class C\n\n### Attributes\n\n* `a` (`A`): Initializes an object from class A.\n* `b` (`B`): Initializes an object from class B.\n\n### Functions: None\n\nThere are no functions defined within this class."
+    },
+    "c::C.methodC1": {
+        "version": 1,
+        "generated_on": "2024-06-21 18:20:43",
+        "source_code": "\n\ndef methodC1(self):\n    print('Method 1 from class C')\n    self.a.methodA1()\n    self.b.methodB1()\n",
+        "generated_docs": "../code2flow/projects/simple\\api\\c.py: This module contains a class C, which provides an entry point for class A and B methods.\n\n## Class C\n\n### Methods\n- methodC1(self):\n    - Parameters:\n        - None\n    - Returns:\n        - None\n    - Description: Prints 'Method 1 from class C' followed by calling the methodA1 of class A and methodB1 of class B.\n    - Called_functions:\n        - methodA1 of class A: Calls the first method of class A to perform some action.\n        - methodB1 of class B: Calls the first method of class B to perform some action."
+    },
+    "c::C.methodC2": {
+        "version": 1,
+        "generated_on": "2024-06-21 18:20:43",
+        "source_code": "\n\ndef methodC2(self):\n    print('Method 2 from class C')\n    self.a.methodA2()\n    self.b.methodB2()\n",
+        "generated_docs": "../code2flow/projects/simple\\api\\c.py: \n\nThe function of this code is to define methodC2, which executes a series of operations from class C.\n\n## Method 1: methodC2\n\n### Description:\n\nExecutes a series of operations including printing 'Method 2 from class C' and calling methods from classes A and B.\n\n### Parameters: None\n\n### Returns: None\n\n### Called_functions:\n\n- `a.methodA2`: Prints the result of executing methodA2 in class A.\n- `b.methodB2`: Prints the result of executing methodB2 in class B."
+    },
+    "c::methodC3": {
+        "version": 1,
+        "generated_on": "2024-06-21 18:20:43",
+        "source_code": "\n\ndef methodC3():\n    print('Method 3 from module C')\n",
+        "generated_docs": "# ../code2flow/projects/simple\\api\\c.py:\n\nThe function of this module C is to provide a method that prints a specific message. \n\n## Function: methodC3\n\n### Parameters:\n\n- None: This method does not take any parameters.\n\n### Returns:\n\n- None: This method does not return any value.\n\n### Description:\nThis method simply prints the message 'Method 3 from module C'."
+    }
+}

@@ -1,0 +1,130 @@
+{
+    "EXTERNAL::print": {
+        "uid": "external_print",
+        "name": "EXTERNAL::print",
+        "content": null,
+        "callees": [],
+        "file_name": "EXTERNAL"
+    },
+    "EXTERNAL::str": {
+        "uid": "external_str",
+        "name": "EXTERNAL::str",
+        "content": null,
+        "callees": [],
+        "file_name": "EXTERNAL"
+    },
+    "EXTERNAL::uuid.uuid4": {
+        "uid": "external_uuid_uuid4",
+        "name": "EXTERNAL::uuid.uuid4",
+        "content": null,
+        "callees": [],
+        "file_name": "EXTERNAL"
+    },
+    "a::A.__init__": {
+        "uid": "node_6726b231",
+        "name": "a::A.__init__",
+        "content": "\n\ndef __init__(self):\n    pass\n",
+        "callees": [],
+        "file_name": "../code2flow/projects/simple\\a.py"
+    },
+    "a::A.methodA1": {
+        "uid": "node_46c49fb3",
+        "name": "a::A.methodA1",
+        "content": "\n\ndef methodA1(self):\n    str(uuid4())\n    print('Method 1 from class A')\n",
+        "callees": [
+            "EXTERNAL::print",
+            "EXTERNAL::str",
+            "EXTERNAL::uuid.uuid4"
+        ],
+        "file_name": "../code2flow/projects/simple\\a.py"
+    },
+    "a::A.methodA2": {
+        "uid": "node_e11eac90",
+        "name": "a::A.methodA2",
+        "content": "\n\ndef methodA2(self):\n    self.methodA1()\n",
+        "callees": [
+            "a::A.methodA1"
+        ],
+        "file_name": "../code2flow/projects/simple\\a.py"
+    },
+    "a::methodA3": {
+        "uid": "node_1b20c1c6",
+        "name": "a::methodA3",
+        "content": "\n\ndef methodA3():\n    print('Method 3 from module A')\n",
+        "callees": [
+            "EXTERNAL::print"
+        ],
+        "file_name": "../code2flow/projects/simple\\a.py"
+    },
+    "b::B.__init__": {
+        "uid": "node_44fc44a0",
+        "name": "b::B.__init__",
+        "content": "\n\ndef __init__(self):\n    self.a = A()\n",
+        "callees": [
+            "a::A.__init__"
+        ],
+        "file_name": "../code2flow/projects/simple\\b.py"
+    },
+    "b::B.methodB1": {
+        "uid": "node_b99395ce",
+        "name": "b::B.methodB1",
+        "content": "\n\ndef methodB1(self):\n    print('Method 1 from class B')\n    self.a.methodA1()\n",
+        "callees": [
+            "EXTERNAL::print",
+            "a::A.methodA1"
+        ],
+        "file_name": "../code2flow/projects/simple\\b.py"
+    },
+    "b::B.methodB2": {
+        "uid": "node_aa851669",
+        "name": "b::B.methodB2",
+        "content": "\n\ndef methodB2(self):\n    str(uuid.uuid4())\n    re.compile('')\n    print('Method 3 from class B')\n    methodA3()\n",
+        "callees": [
+            "EXTERNAL::print",
+            "EXTERNAL::str",
+            "a::methodA3"
+        ],
+        "file_name": "../code2flow/projects/simple\\b.py"
+    },
+    "c::C.__init__": {
+        "uid": "node_bba44b0d",
+        "name": "c::C.__init__",
+        "content": "\n\ndef __init__(self):\n    self.a = A()\n    self.b = B()\n",
+        "callees": [
+            "a::A.__init__",
+            "b::B.__init__"
+        ],
+        "file_name": "../code2flow/projects/simple\\api\\c.py"
+    },
+    "c::C.methodC1": {
+        "uid": "node_f198a33c",
+        "name": "c::C.methodC1",
+        "content": "\n\ndef methodC1(self):\n    print('Method 1 from class C')\n    self.a.methodA1()\n    self.b.methodB1()\n",
+        "callees": [
+            "EXTERNAL::print",
+            "a::A.methodA1",
+            "b::B.methodB1"
+        ],
+        "file_name": "../code2flow/projects/simple\\api\\c.py"
+    },
+    "c::C.methodC2": {
+        "uid": "node_a260e6e6",
+        "name": "c::C.methodC2",
+        "content": "\n\ndef methodC2(self):\n    print('Method 2 from class C')\n    self.a.methodA2()\n    self.b.methodB2()\n",
+        "callees": [
+            "EXTERNAL::print",
+            "a::A.methodA2",
+            "b::B.methodB2"
+        ],
+        "file_name": "../code2flow/projects/simple\\api\\c.py"
+    },
+    "c::methodC3": {
+        "uid": "node_4a3c85c1",
+        "name": "c::methodC3",
+        "content": "\n\ndef methodC3():\n    print('Method 3 from module C')\n",
+        "callees": [
+            "EXTERNAL::print"
+        ],
+        "file_name": "../code2flow/projects/simple\\api\\c.py"
+    }
+}
