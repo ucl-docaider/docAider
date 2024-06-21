@@ -4,6 +4,8 @@ from azure.core.credentials import AzureKeyCredential
 from azure.search.documents.indexes import SearchIndexClient
 from azure.search.documents.indexes.models import SearchIndex
 
+# This module manages Azure AI Search functions
+
 # Create a search client using environment variables
 search_client = SearchClient(
   endpoint=os.environ["SEARCH_ENDPOINT"], # Azure AI Search End Point
