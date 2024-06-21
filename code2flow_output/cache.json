@@ -1,0 +1,86 @@
+{
+    "EXTERNAL::print": {
+        "version": 0,
+        "generated_on": "",
+        "source_code": "",
+        "generated_docs": ""
+    },
+    "EXTERNAL::str": {
+        "version": 0,
+        "generated_on": "",
+        "source_code": "",
+        "generated_docs": ""
+    },
+    "EXTERNAL::uuid.uuid4": {
+        "version": 0,
+        "generated_on": "",
+        "source_code": "",
+        "generated_docs": ""
+    },
+    "a::A.__init__": {
+        "version": 0,
+        "generated_on": "",
+        "source_code": "",
+        "generated_docs": ""
+    },
+    "a::A.methodA1": {
+        "version": 0,
+        "generated_on": "",
+        "source_code": "",
+        "generated_docs": ""
+    },
+    "a::A.methodA2": {
+        "version": 0,
+        "generated_on": "",
+        "source_code": "",
+        "generated_docs": ""
+    },
+    "a::methodA3": {
+        "version": 0,
+        "generated_on": "",
+        "source_code": "",
+        "generated_docs": ""
+    },
+    "b::B.__init__": {
+        "version": 0,
+        "generated_on": "",
+        "source_code": "",
+        "generated_docs": ""
+    },
+    "b::B.methodB1": {
+        "version": 0,
+        "generated_on": "",
+        "source_code": "",
+        "generated_docs": ""
+    },
+    "b::B.methodB2": {
+        "version": 0,
+        "generated_on": "",
+        "source_code": "",
+        "generated_docs": ""
+    },
+    "c::C.__init__": {
+        "version": 0,
+        "generated_on": "",
+        "source_code": "",
+        "generated_docs": ""
+    },
+    "c::C.methodC1": {
+        "version": 0,
+        "generated_on": "",
+        "source_code": "",
+        "generated_docs": ""
+    },
+    "c::C.methodC2": {
+        "version": 0,
+        "generated_on": "",
+        "source_code": "",
+        "generated_docs": ""
+    },
+    "c::methodC3": {
+        "version": 0,
+        "generated_on": "",
+        "source_code": "",
+        "generated_docs": ""
+    }
+}
