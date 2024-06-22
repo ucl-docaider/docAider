@@ -1,86 +1,72 @@
 {
     "EXTERNAL::print": {
-        "version": 0,
-        "generated_on": "",
-        "source_code": "",
-        "generated_docs": ""
+        "version": null,
+        "generated_on": null,
+        "generated_docs": null
     },
     "EXTERNAL::str": {
-        "version": 0,
-        "generated_on": "",
-        "source_code": "",
-        "generated_docs": ""
+        "version": null,
+        "generated_on": null,
+        "generated_docs": null
     },
     "EXTERNAL::uuid.uuid4": {
-        "version": 0,
-        "generated_on": "",
-        "source_code": "",
-        "generated_docs": ""
+        "version": null,
+        "generated_on": null,
+        "generated_docs": null
     },
     "a::A.__init__": {
-        "version": 0,
-        "generated_on": "",
-        "source_code": "",
-        "generated_docs": ""
+        "version": null,
+        "generated_on": null,
+        "generated_docs": null
     },
     "a::A.methodA1": {
-        "version": 0,
-        "generated_on": "",
-        "source_code": "",
-        "generated_docs": ""
+        "version": null,
+        "generated_on": null,
+        "generated_docs": null
     },
     "a::A.methodA2": {
-        "version": 0,
-        "generated_on": "",
-        "source_code": "",
-        "generated_docs": ""
+        "version": null,
+        "generated_on": null,
+        "generated_docs": null
     },
     "a::methodA3": {
-        "version": 0,
-        "generated_on": "",
-        "source_code": "",
-        "generated_docs": ""
+        "version": null,
+        "generated_on": null,
+        "generated_docs": null
     },
     "b::B.__init__": {
-        "version": 0,
-        "generated_on": "",
-        "source_code": "",
-        "generated_docs": ""
+        "version": null,
+        "generated_on": null,
+        "generated_docs": null
     },
     "b::B.methodB1": {
-        "version": 0,
-        "generated_on": "",
-        "source_code": "",
-        "generated_docs": ""
+        "version": null,
+        "generated_on": null,
+        "generated_docs": null
     },
     "b::B.methodB2": {
-        "version": 0,
-        "generated_on": "",
-        "source_code": "",
-        "generated_docs": ""
+        "version": null,
+        "generated_on": null,
+        "generated_docs": null
     },
     "c::C.__init__": {
-        "version": 0,
-        "generated_on": "",
-        "source_code": "",
-        "generated_docs": ""
+        "version": null,
+        "generated_on": null,
+        "generated_docs": null
     },
     "c::C.methodC1": {
-        "version": 0,
-        "generated_on": "",
-        "source_code": "",
-        "generated_docs": ""
+        "version": null,
+        "generated_on": null,
+        "generated_docs": null
     },
     "c::C.methodC2": {
-        "version": 0,
-        "generated_on": "",
-        "source_code": "",
-        "generated_docs": ""
+        "version": null,
+        "generated_on": null,
+        "generated_docs": null
     },
     "c::methodC3": {
-        "version": 0,
-        "generated_on": "",
-        "source_code": "",
-        "generated_docs": ""
+        "version": null,
+        "generated_on": null,
+        "generated_docs": null
     }
 }
