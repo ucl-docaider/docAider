@@ -21,14 +21,14 @@
         "file_name": "EXTERNAL"
     },
     "a::A.__init__": {
-        "uid": "node_04dbdb62",
+        "uid": "node_67e39561",
         "name": "a::A.__init__",
         "content": "\n\ndef __init__(self):\n    pass\n",
         "callees": [],
         "file_name": "../code2flow/projects/simple\\a.py"
     },
     "a::A.methodA1": {
-        "uid": "node_70d9ce14",
+        "uid": "node_17f48c70",
         "name": "a::A.methodA1",
         "content": "\n\ndef methodA1(self):\n    str(uuid4())\n    print('Method 1 from class A')\n",
         "callees": [
@@ -39,7 +39,7 @@
         "file_name": "../code2flow/projects/simple\\a.py"
     },
     "a::A.methodA2": {
-        "uid": "node_9ce8267a",
+        "uid": "node_8f65cf7a",
         "name": "a::A.methodA2",
         "content": "\n\ndef methodA2(self):\n    self.methodA1()\n",
         "callees": [
@@ -48,7 +48,7 @@
         "file_name": "../code2flow/projects/simple\\a.py"
     },
     "a::methodA3": {
-        "uid": "node_be91985f",
+        "uid": "node_4db5ca7d",
         "name": "a::methodA3",
         "content": "\n\ndef methodA3():\n    print('Method 3 from module A')\n",
         "callees": [
@@ -57,7 +57,7 @@
         "file_name": "../code2flow/projects/simple\\a.py"
     },
     "b::B.__init__": {
-        "uid": "node_79b1917b",
+        "uid": "node_41fc72e2",
         "name": "b::B.__init__",
         "content": "\n\ndef __init__(self):\n    self.a = A()\n",
         "callees": [
@@ -66,7 +66,7 @@
         "file_name": "../code2flow/projects/simple\\b.py"
     },
     "b::B.methodB1": {
-        "uid": "node_4bcc73de",
+        "uid": "node_91afc038",
         "name": "b::B.methodB1",
         "content": "\n\ndef methodB1(self):\n    print('Method 1 from class B')\n    self.a.methodA1()\n",
         "callees": [
@@ -76,7 +76,7 @@
         "file_name": "../code2flow/projects/simple\\b.py"
     },
     "b::B.methodB2": {
-        "uid": "node_ff8d59e0",
+        "uid": "node_ad2479cf",
         "name": "b::B.methodB2",
         "content": "\n\ndef methodB2(self):\n    str(uuid.uuid4())\n    re.compile('')\n    print('Method 3 from class B')\n    methodA3()\n",
         "callees": [
@@ -87,7 +87,7 @@
         "file_name": "../code2flow/projects/simple\\b.py"
     },
     "c::C.__init__": {
-        "uid": "node_9b6e2b34",
+        "uid": "node_dcea77d1",
         "name": "c::C.__init__",
         "content": "\n\ndef __init__(self):\n    self.a = A()\n    self.b = B()\n",
         "callees": [
@@ -97,7 +97,7 @@
         "file_name": "../code2flow/projects/simple\\api\\c.py"
     },
     "c::C.methodC1": {
-        "uid": "node_218a8830",
+        "uid": "node_53025c0e",
         "name": "c::C.methodC1",
         "content": "\n\ndef methodC1(self):\n    print('Method 1 from class C')\n    self.a.methodA1()\n    self.b.methodB1()\n",
         "callees": [
@@ -108,7 +108,7 @@
         "file_name": "../code2flow/projects/simple\\api\\c.py"
     },
     "c::C.methodC2": {
-        "uid": "node_c24706bd",
+        "uid": "node_44f6bb05",
         "name": "c::C.methodC2",
         "content": "\n\ndef methodC2(self):\n    print('Method 2 from class C')\n    self.a.methodA2()\n    self.b.methodB2()\n",
         "callees": [
@@ -119,7 +119,7 @@
         "file_name": "../code2flow/projects/simple\\api\\c.py"
     },
     "c::methodC3": {
-        "uid": "node_7577fe7e",
+        "uid": "node_a135e4ab",
         "name": "c::methodC3",
         "content": "\n\ndef methodC3():\n    print('Method 3 from module C')\n",
         "callees": [
