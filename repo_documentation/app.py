@@ -35,6 +35,9 @@ class RepoDocumentation():
         # 2. Build mapping of a file to the functions called within them
         file_to_calls = utils.get_file_to_functions(graph)
 
+        # 3. Build BFS exploration of the call graph
+        bfs_explore = utils.explore_call_graph(graph)
+
         # 3. Generate documentation for each file and function within
         for file_path, calls in file_to_calls.items():
             print(f"Generating documentation for file={file_path}")
@@ -47,7 +50,7 @@ class RepoDocumentation():
                     docs = self._generate_docs_internal(name)
                 else:
                     docs = self._generate_docs_external(name, graph, cache,
-                                                       file_path, call['content'], call['callees'])
+                                                       file_path, call['content'], bfs_explore[name])
 
                 # Store the generated documentation in the cache (TODO: change impl)
                 self._update_cache(cache, name, docs)
@@ -75,7 +78,7 @@ class RepoDocumentation():
     def _generate_docs_internal(self, name):
         return f'(empty docs for {name})'
 
-    def _generate_docs_external(self, name, graph, cache, file_path, source_code, called_functions):
+    def _generate_docs_external(self, name, graph, cache, file_path, source_code, callees_dict):
         print(f"Generating documentation for function={name}")
         additional_docs = ""
 
@@ -85,8 +88,8 @@ class RepoDocumentation():
         # 1. Open the file and read all of its contents for additional documentation, as needed
         file = open(file_path, 'r')
 
-        for call in called_functions:
-            call = graph[call]  # Access the call information
+        for item in callees_dict:
+            call = graph[item]  # Access the call information
             call_name = call['name']
             
             if 'EXTERNAL' in call_name:
@@ -96,9 +99,6 @@ class RepoDocumentation():
             call_source_code = call['content']
             call_callees = call['callees']
             call_parent_file = open(call['file_name'], 'r')
-
-            # TODO: Traverse the callees using DFS (up to certain depth?) and use that to build up additional_docs
-            # self.dfs()
 
             # TODO: Here we could either read the entire file or just the function/class definition
             # additional_docs += f"\nFunction/Class {call_name}:\n{call_source_code}\n"
