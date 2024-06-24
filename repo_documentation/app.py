@@ -38,9 +38,17 @@ class RepoDocumentation():
         # 3. Build BFS exploration of the call graph
         bfs_explore = utils.explore_call_graph(graph)
 
-        # 3. Generate documentation for each file and function within
+        # 4. Generate documentation for each file and function within
         for file_path, calls in file_to_calls.items():
             print(f"Generating documentation for file={file_path}")
+            if file_path == 'EXTERNAL':
+                continue
+
+            additional_docs = self._generate_additional_docs(calls, graph, bfs_explore)
+            file_content = self._read_file_content(file_path)
+            file_docs = self._generate_file_docs(file_path, file_content, additional_docs)
+            self._write_file_docs(file_path, file_docs)
+
             for call in calls:
                 call = graph[call]
                 name = call['name']
@@ -55,7 +63,7 @@ class RepoDocumentation():
                 # Store the generated documentation in the cache (TODO: change impl)
                 self._update_cache(cache, name, docs)
 
-        # 4. Write the generated documentation back to the cache file
+        # 5. Write the generated documentation back to the cache file
         utils.write_json(f'{self.output_dir}/cache_docs.json', cache)
 
         total = round(time.time() - start_time, 3)
@@ -74,6 +82,62 @@ class RepoDocumentation():
             name="user",
             code_execution_config=False,
         )
+
+    def _generate_additional_docs(self, calls, graph, bfs_explore):
+        additional_docs = ""
+        for call_name in calls:
+            call = graph[call_name]
+            if 'EXTERNAL' in call['file_name']:
+                continue
+            for callee in bfs_explore[call_name]:
+                callee_call = graph[callee]
+                additional_docs += f"\nFunction/Class {callee_call['name']}:\n{callee_call['content']}\n"
+        return additional_docs
+
+    def _read_file_content(self, file_path):
+        full_path = file_path
+        print(f"Reading file: {full_path}")
+        try:
+            with open(full_path, 'r') as file:
+                return file.read()
+        except FileNotFoundError:
+            return ""
+
+    def _generate_file_docs(self, file_path, file_content, additional_docs):
+        prompt_message = DOCUMENTATION_PROMPT.format(
+            file_name=os.path.basename(file_path),
+            file_content=file_content,
+            root_folder=self.root_folder,
+            additional_docs=additional_docs
+        )
+
+        self.user.initiate_chat(
+            self.assistant,
+            message=prompt_message,
+            max_turns=1,
+            silent=True
+        )
+
+        file_name = self.output_dir + "/" + os.path.basename(file_path) + ".txt"
+
+        with open(file_name, 'w') as file:
+            file.write(prompt_message)
+
+        return self.assistant.last_message()['content']
+
+    def _write_file_docs(self, file_path, docs):
+        # Generate the output file path based on the input file path
+        relative_path = os.path.relpath(file_path, self.root_folder)
+        output_file_path = os.path.join(self.output_dir, relative_path)
+        output_dir = os.path.dirname(output_file_path)
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Add .md extension to the output file
+        output_file_path += ".md"
+
+        # Write the documentation to the output file
+        with open(output_file_path, 'w') as file:
+            file.write(docs)
 
     def _generate_docs_internal(self, name):
         return f'(empty docs for {name})'
@@ -101,7 +165,7 @@ class RepoDocumentation():
             call_parent_file = open(call['file_name'], 'r')
 
             # TODO: Here we could either read the entire file or just the function/class definition
-            # additional_docs += f"\nFunction/Class {call_name}:\n{call_source_code}\n"
+            additional_docs += f"\nFunction/Class {call_name}:\n{call_source_code}\n"
 
             # Close the file
             call_parent_file.close()
@@ -127,6 +191,8 @@ class RepoDocumentation():
 
     # TODO: Change the implementation as required
     def _update_cache(self, cache, function_name, docs):
+        if function_name not in cache:
+            cache[function_name] = {}
         cache[function_name]['version'] = 1
         cache[function_name]['generated_on'] = datetime.datetime.now().strftime(
             '%Y-%m-%d %H:%M:%S')
@@ -134,6 +200,6 @@ class RepoDocumentation():
 
 
 repo_doc = RepoDocumentation(
-    root_folder='../code2flow/projects/simple',
-    output_dir='code2flow_output')
+    root_folder='../code2flow/projects/users',
+    output_dir='./../code2flow_output_users')
 repo_doc.run()
