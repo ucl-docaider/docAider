@@ -99,7 +99,9 @@ class RepoDocumentation():
         print(f"Reading file: {full_path}")
         try:
             with open(full_path, 'r') as file:
-                return file.read()
+                content = file.read()
+                return content
+            
         except FileNotFoundError:
             return ""
 

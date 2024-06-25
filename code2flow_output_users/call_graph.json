@@ -1,0 +1,60 @@
+{
+    "EXTERNAL::print": {
+        "uid": "external_print",
+        "name": "EXTERNAL::print",
+        "content": null,
+        "callees": [],
+        "file_name": "EXTERNAL"
+    },
+    "data_processor::DataProcessor.check_emails": {
+        "uid": "node_249a0bbd",
+        "name": "data_processor::DataProcessor.check_emails",
+        "content": "\n\ndef check_emails(self, emails):\n    return [validate_email(email) for email in emails]\n",
+        "callees": [
+            "utils::validate_email"
+        ],
+        "file_name": "../code2flow/projects/users/data_processor.py"
+    },
+    "data_processor::DataProcessor.process_data": {
+        "uid": "node_a0497b3c",
+        "name": "data_processor::DataProcessor.process_data",
+        "content": "\n\ndef process_data(self, data):\n    return [item.upper() for item in data]\n",
+        "callees": [],
+        "file_name": "../code2flow/projects/users/data_processor.py"
+    },
+    "main::(global)": {
+        "uid": "node_32469b07",
+        "name": "main::(global)",
+        "content": null,
+        "callees": [
+            "main::main"
+        ],
+        "file_name": "../code2flow/projects/users/main.py"
+    },
+    "main::main": {
+        "uid": "node_e2c4e4bb",
+        "name": "main::main",
+        "content": "\n\ndef main():\n    user = User('John Doe', 'john.doe@example.com')\n    print(user)\n    processor = DataProcessor()\n    data = ['apple', 'banana', 'cherry']\n    processed_data = processor.process_data(data)\n    print(f'Processed Data: {processed_data}')\n",
+        "callees": [
+            "EXTERNAL::print",
+            "EXTERNAL::print",
+            "data_processor::DataProcessor.process_data",
+            "user::User.__init__"
+        ],
+        "file_name": "../code2flow/projects/users/main.py"
+    },
+    "user::User.__init__": {
+        "uid": "node_dcd0da79",
+        "name": "user::User.__init__",
+        "content": "\n\ndef __init__(self, name, email):\n    self.id = uuid.uuid4()\n    self.name = name\n    self.email = email\n",
+        "callees": [],
+        "file_name": "../code2flow/projects/users/user.py"
+    },
+    "utils::validate_email": {
+        "uid": "node_41eb539b",
+        "name": "utils::validate_email",
+        "content": "\n\ndef validate_email(email):\n    pattern = '^[a-z0-9]+[\\\\._]?[a-z0-9]+[@]\\\\w+[.]\\\\w+$'\n    if re.match(pattern, email):\n        return True\n    return False\n",
+        "callees": [],
+        "file_name": "../code2flow/projects/users/utils.py"
+    }
+}
