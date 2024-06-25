@@ -1,16 +1,33 @@
-DOCUMENTATION_PROMPT = """You are an AI documentation assistant, and your task is to generate documentation based on the given code of an object. The purpose of the documentation is to help developers and beginners understand the function and specific usage of the code.
+You are an AI documentation assistant, and your task is to generate documentation based on the given code of an object. The purpose of the documentation is to help developers and beginners understand the function and specific usage of the code.
 
-The path of the document you need to generate in this project is {root_folder}.
-Now you need to generate a document for "{file_name}".
+The path of the document you need to generate in this project is ../code2flow/projects/users.
+Now you need to generate a document for "user.py".
 
 The content of the code is as follows:
-{file_content}
+# user.py
+import uuid
+
+"""
+Contains the User class which uses the uuid library to generate unique user IDs.
+"""
+class User:
+    def __init__(self, name, email):
+        self.id = uuid.uuid4()
+        self.name = name
+        self.email = email
+    
+    def __str__(self):
+        return f"User [ID: {self.id}, Name: {self.name}, Email: {self.email}]"
+    
+    def update_email(self, new_email):
+        self.email = new_email
+
 
 Please note any part of the content you generate SHOULD NOT CONTAIN Markdown hierarchical heading and divider syntax.
 
 The standard format is as follows (If a section does not have any information, you can skip it and move to the next one):
 
-# {file_name}
+# user.py
 
 ## ClassDef NameOfClass
 
@@ -68,7 +85,12 @@ The function of the function is XXX. (Only code name and one sentence function d
 
 **Code Description**: The description of this function. (Detailed and CERTAIN code analysis and description)
 
-**Note**: Points to note about the use of the code according to the returns
+**Note**: 
+- Please generate a detailed explanation document for this object based on the code of the target object itself. For the section Called_functions, considering the additional documentation for the functions and classes called within the file:
+
+
+
+- Points to note about the use of the code according to the returns
 
 **Input Example**: 
 
@@ -82,8 +104,3 @@ Provide an input example for a specified data type (e.g., list, double, int) and
 Provide an output example for a specified data type (e.g., list, double, int) and include a detailed explanation.
 ```
 
-Please generate a detailed explanation document for this object based on the code of the target object itself. For the section Called_functions, considering the additional documentation for the functions and classes called within the file:
-{additional_docs}.
-"""
-
-USR_PROMPT = """You are a documentation generation assistant for Python programs. Keep in mind that your audience is document readers, so use a deterministic tone to generate precise content and don't let them know you're provided with code snippet and documents. AVOID ANY SPECULATION and inaccurate descriptions! Now, provide the documentation for the target object in a professional way."""

@@ -1,0 +1,37 @@
+{
+    "EXTERNAL::print": {
+        "version": null,
+        "generated_on": null,
+        "generated_docs": null
+    },
+    "data_processor::DataProcessor.check_emails": {
+        "version": null,
+        "generated_on": null,
+        "generated_docs": null
+    },
+    "data_processor::DataProcessor.process_data": {
+        "version": null,
+        "generated_on": null,
+        "generated_docs": null
+    },
+    "main::(global)": {
+        "version": null,
+        "generated_on": null,
+        "generated_docs": null
+    },
+    "main::main": {
+        "version": null,
+        "generated_on": null,
+        "generated_docs": null
+    },
+    "user::User.__init__": {
+        "version": null,
+        "generated_on": null,
+        "generated_docs": null
+    },
+    "utils::validate_email": {
+        "version": null,
+        "generated_on": null,
+        "generated_docs": null
+    }
+}
