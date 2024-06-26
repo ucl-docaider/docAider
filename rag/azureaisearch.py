@@ -6,7 +6,7 @@ from azure.search.documents.indexes import SearchIndexClient
 from azure.search.documents.indexes.models import SearchIndex
 
 # This module manages Azure AI Search functions
-load_dotenv()
+load_dotenv(dotenv_path='.env_rag')
 
 # Create a search client using environment variables
 search_client = SearchClient(

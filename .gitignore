@@ -1,5 +1,5 @@
 # Environment
-.env*
+.env_rag
 .venv*
 venv*
 env*
