@@ -1,16 +1,18 @@
 import os
+from dotenv import load_dotenv
 from azure.search.documents import SearchClient
 from azure.core.credentials import AzureKeyCredential
 from azure.search.documents.indexes import SearchIndexClient
 from azure.search.documents.indexes.models import SearchIndex
 
 # This module manages Azure AI Search functions
+load_dotenv()
 
 # Create a search client using environment variables
 search_client = SearchClient(
-  endpoint=os.environ["SEARCH_ENDPOINT"], # Azure AI Search End Point
+  endpoint=os.getenv("SEARCH_ENDPOINT"), # Azure AI Search End Point
   index_name="code-index", # Azure AI Search index name
-  credential=AzureKeyCredential(os.environ["AZURE_KEY_CREDENTIAL"]) # Azure AI Search API Key
+  credential=AzureKeyCredential(os.getenv("AZURE_KEY_CREDENTIAL")) # Azure AI Search API Key
 )
 """
 # This part contructed a new search index and inject documents to the index
