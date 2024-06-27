@@ -85,5 +85,26 @@ Provide an output example for a specified data type (e.g., list, double, int) an
 Please generate a detailed explanation document for this object based on the code of the target object itself. For the section Called_functions, considering the additional documentation for the functions and classes called within the file:
 {additional_docs}.
 """
+DOCUMENTATION_UPDATE_PROMPT = """You are an AI documentation assistant. Your task is to update the existing documentation based on the provided changes in the code. 
+
+The path of the document you need to update in this project is {root_folder}.
+Now you need to update the document for "{file_name}".
+
+**Old Documentation**:
+{old_file_docs}
+
+**Old Code Content**:
+{old_file_content}
+
+**New Code Content**:
+{new_file_content}
+
+**Diff between Old and New Code**:
+{diff}
+
+Please update the documentation accordingly, ensuring it accurately reflects the changes. Provide a comprehensive and clear description for any modified or new functions/classes.
+
+**Updated Documentation**:
+"""
 
 USR_PROMPT = """You are a documentation generation assistant for Python programs. Keep in mind that your audience is document readers, so use a deterministic tone to generate precise content and don't let them know you're provided with code snippet and documents. AVOID ANY SPECULATION and inaccurate descriptions! Now, provide the documentation for the target object in a professional way."""
