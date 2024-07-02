@@ -7,16 +7,11 @@ from prompt import DOCUMENTATION_PROMPT, USR_PROMPT
 sys.path.append(os.path.abspath(
     os.path.join(os.path.dirname(__file__), './../')))
 
+import config
 from cache.docs_cache import DocsCache
 from code2flow.code2flow import utils
 
 class RepoDocumentation():
-    __llm_config = {
-        "model": "llama3",
-        "base_url": "http://localhost:11434/v1",
-        "api_key": "ollama",
-    }
-
     def __init__(self, root_folder, output_dir='code2flow_output'):
         self.root_folder = root_folder
         self.output_dir = output_dir
@@ -66,7 +61,7 @@ class RepoDocumentation():
         return AssistantAgent(
             name="assistant",
             system_message=USR_PROMPT,
-            llm_config=self.__llm_config,
+            llm_config=config.llm_config,
             human_input_mode="NEVER"
         )
 
@@ -84,8 +79,7 @@ class RepoDocumentation():
                 continue
             for callee in bfs_explore[call_name]:
                 callee_call = graph[callee]
-                additional_docs += f"\nFunction/Class {
-                    callee_call['name']}:\n{callee_call['content']}\n"
+                additional_docs += f"\nFunction/Class {callee_call['name']}:\n{callee_call['content']}\n"
         return additional_docs
 
     def _read_file_content(self, file_path):
