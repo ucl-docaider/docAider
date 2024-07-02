@@ -1,4 +1,5 @@
 import os, sys, time, datetime
+import config
 from autogen import AssistantAgent, UserProxyAgent
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), './../')))
@@ -8,16 +9,10 @@ from ast_custom.utils import build_tree_and_relationships, save_to_json
 # Documentation Generation Code
 print("Starting the documentation generation process...")
 
-llm_config = {
-  "model": "llama3",
-  "base_url": "http://localhost:11434/v1",
-  "api_key": "ollama",
-}
-
 assistant = AssistantAgent(
   name="assistant",
   system_message="You are an AI developed to assist with generating tests for Python programs",
-  llm_config=llm_config,
+  llm_config=config.llm_config,
   human_input_mode="NEVER"
 )
 
