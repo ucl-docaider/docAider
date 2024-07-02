@@ -79,12 +79,7 @@ The function of the function is XXX. (Only code name and one sentence function d
 
 **Code Description**: The description of this function. (Detailed and CERTAIN code analysis and description)
 
-**Note**: 
-- Please generate a detailed explanation document for this object based on the code of the target object itself. For the section Called_functions, considering the additional documentation for the functions and classes called within the file:
-
-
-
-- Points to note about the use of the code according to the returns
+**Note**: Points to note about the use of the code according to the returns
 
 **Input Example**: 
 
@@ -98,3 +93,5 @@ Provide an input example for a specified data type (e.g., list, double, int) and
 Provide an output example for a specified data type (e.g., list, double, int) and include a detailed explanation.
 ```
 
+Please generate a detailed explanation document for this object based on the code of the target object itself. For the section Called_functions, considering the additional documentation for the functions and classes called within the file:
+.
