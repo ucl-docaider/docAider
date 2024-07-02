@@ -55,9 +55,9 @@ class RepoDocumentation():
 
                 # Core functionality to generate documentation
                 if 'EXTERNAL' in call['file_name']:
-                    docs = self._generate_docs_internal(name)
+                    docs = self._generate_docs_external(name)
                 else:
-                    docs = self._generate_docs_external(name, graph, cache,
+                    docs = self._generate_docs_internal(name, graph, cache,
                                                        file_path, call['content'], bfs_explore[name])
 
                 # Store the generated documentation in the cache (TODO: change impl)
@@ -141,10 +141,10 @@ class RepoDocumentation():
         with open(output_file_path, 'w') as file:
             file.write(docs)
 
-    def _generate_docs_internal(self, name):
+    def _generate_docs_external(self, name):
         return f'(empty docs for {name})'
 
-    def _generate_docs_external(self, name, graph, cache, file_path, source_code, callees_dict):
+    def _generate_docs_internal(self, name, graph, cache, file_path, source_code, callees_dict):
         print(f"Generating documentation for function={name}")
         additional_docs = ""
 
