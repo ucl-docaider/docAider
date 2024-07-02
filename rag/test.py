@@ -1,27 +1,11 @@
 import asyncio, os
 from generator import DocumentationGenerator
 
-dg = DocumentationGenerator()
+dg = DocumentationGenerator("mistral")
 """
-Test creating search index
+Test searching (Retrieval) and generation
 """
-#dg.retriever.create_index("code-index")
-
-"""
-Test upserting documents
-"""
-"""full_path = os.path.dirname(__file__) + "/../code2flow/projects/users/main.py"
-with open(full_path, "r") as file:
-  source_code = file.read()
-documents = [
-  {"id": "1", "codeSnippet": source_code, "comments": ""}
-]
-dg.retriever.upsert_documents(documents)"""
-
-"""
-Test Searching (Retrieval)
-"""
-source_code = asyncio.run(dg.retriever.search("I need code of id 1"))
+source_code = asyncio.run(dg.retriever.search("../code2flow/projects/users/main.py"))
 print(source_code)
 
 response = asyncio.run(dg.generate_documentation(

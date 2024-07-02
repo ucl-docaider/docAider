@@ -38,6 +38,7 @@ class Retriever():
       "name": index_name,
       "fields": [
         {"name": "id", "type": "Edm.String", "key": True, "filterable": False, "searchable": True},
+        {"name": "filePath", "type": "Edm.String", "searchable": True},
         {"name": "codeSnippet", "type": "Edm.String", "searchable": True},
         {"name": "comments", "type": "Edm.String", "searchable": True},
         {"name": "metadata", "type": "Edm.String", "searchable": False}
