@@ -29,6 +29,17 @@ class DocumentationUpdate():
         latest_commit = branch_ref.commit
         return latest_commit.hexsha
 
+    def _get_previous_non_doc_commit(self, commit):
+        # Traverse commit history to find the previous non-documentation update commit
+        while commit:
+            if "Update documentation" not in commit.message:
+                return commit
+            if commit.parents:
+                commit = commit.parents[0]
+            else:
+                break
+        return None
+
     def run(self):
         print("Starting the documentation update process...")
         start_time = time.time()
@@ -42,31 +53,35 @@ class DocumentationUpdate():
         bfs_explore = utils.explore_call_graph(graph)
 
         # Fetch commit details
-        commit = self.repo.commit(self.commit_sha)
-        parent_commit = commit.parents[0]  # Get the parent commit
+        latest_commit = self.repo.commit(self.commit_sha)
+        parent_commit = self._get_previous_non_doc_commit(latest_commit)  
+
+        if not parent_commit:
+            print("No valid parent commit found for updating documentation.")
+            return
 
         # Iterate over the diffs between the commit and its parent
-        for diff in commit.diff(parent_commit):
+        for diff in latest_commit.diff(parent_commit):
             file_path = diff.a_path
             print(f"Updating documentation for file={file_path}")
 
-            # Get the old and new file contents
+            # 1. Get the old and new file contents
             old_file_content = self._get_file_content(file_path, parent_commit)
-            new_file_content = self._get_file_content(file_path, commit)
+            new_file_content = self._get_file_content(file_path, latest_commit)
 
-            # Get the old documentation
+            # 2. Get the old documentation
             old_file_docs = self._get_old_file_docs(file_path)
 
-            # Generate the diff between old and new file contents
+            # 3. Generate the diff between old and new file contents
             diff_content = self._generate_diff(old_file_content, new_file_content)
 
-            # Generate additional docs using the call graph
+            # 4. Generate additional docs using the call graph
             additional_docs = self._generate_additional_docs(file_path, graph, bfs_explore)
 
-            # Update the documentation based on the diffs and additional docs
+            # 5. Update the documentation based on the diffs and additional docs
             updated_docs = self._update_file_docs(file_path, old_file_docs, old_file_content, new_file_content, diff_content, additional_docs)
 
-            # Write the updated documentation to the output directory
+            # 6. Write the updated documentation to the output directory
             self._write_file_docs(file_path, updated_docs)
 
         total = round(time.time() - start_time, 3)
@@ -171,11 +186,11 @@ class DocumentationUpdate():
 
 # Example usage
 repo_path = "/path/to/local/repo"
-branch = "branch"
-root_folder = '/example_root_folder'
+branch = "main"
+root_folder = '../code2flow/projects/users'
 repo_doc_updater = DocumentationUpdate(
     repo_path=repo_path,
     branch=branch,
     root_folder=root_folder,
-    output_dir='./../docs_output')
+    output_dir='../docs_output')
 repo_doc_updater.run()
