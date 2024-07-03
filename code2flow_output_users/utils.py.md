@@ -1,14 +1,14 @@
-# utils.py
+ # utils.py
 
 ## FunctionDef validate_email
 
 The function validates whether a given email address follows a certain format using regular expressions.
 
 **Parameters**:
-
-- `email` (`str`): The email address to be validated.
+- `email` (str): The email address to be validated.
 
 **Returns**:
+- bool: Returns True if the email is valid, False otherwise.
 
 - `bool`: True if the email address is valid, False otherwise.
 
@@ -18,6 +18,7 @@ The function validates whether a given email address follows a certain format us
 
 **Input Example**: 
 
+**Input Example**:
 ```
 Input: "test@example.com"
 Explanation: The input string represents a valid email address.

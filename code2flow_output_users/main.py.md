@@ -13,6 +13,9 @@ The function of the `main` function is to create a User instance and process som
 - None: The function returns no value.
 
 **Called_functions**:
+- `User.__init__`: This function initializes a User instance with a name and email address.
+- `DataProcessor.process_data`: This function processes a given list of items by converting each item to uppercase.
+- `print`: This built-in Python function prints the user object and processed data.
 
 - `User.__init__`: Initializes a new user with given name and email.
 - `DataProcessor.process_data`: Processes a list of data by converting each item to uppercase.

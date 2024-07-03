@@ -63,25 +63,6 @@ class RepoDocumentation():
             self._create_prompt_txt_file(self.documentation_generator.prompt, os.path.basename(file_path))
             self._create_documentation_md_file(documentation, file_path)
 
-            for call in calls:
-                call = graph[call]
-                name = call['name']
-
-                if 'EXTERNAL' in call['file_name']:
-                    docs = self._generate_docs_internal(name)
-                else:
-                    docs = self._generate_docs_external(
-                        name,
-                        graph,
-                        cache,
-                        file_path,
-                        call['content'],
-                        bfs_explore[name]
-                    )
-
-                # Store the generated documentation in the cache (TODO: change impl)
-                self._update_cache(cache, name, docs)
-
         # 5. Write the generated documentation back to the cache file
         utils.write_json(f'{self.output_dir}/cache_docs.json', cache)
 
