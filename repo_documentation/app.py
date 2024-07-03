@@ -127,6 +127,7 @@ class RepoDocumentation():
 
 
 repo_doc = RepoDocumentation(
-    root_folder='../code2flow/projects/users',
-    output_dir='./../code2flow_output_users')
+    root_folder='../simple-users',
+    output_dir='../simple-users/docs_output')
 repo_doc.run()
+ 
