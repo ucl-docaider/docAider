@@ -26,6 +26,13 @@ class Retriever():
       credential=AzureKeyCredential(ai_search_api_key) # Azure AI Search API Key
     )
 
+  def index_exist_or_not(self):
+    search_index_client = SearchIndexClient(
+      endpoint=self.endpoint,
+      credential=AzureKeyCredential(self.ai_search_api_key)
+    )
+    return self.index_name in search_index_client.list_index_names()
+
   def create_index(self, index_name) -> None:
     """
     Creates a new search index.
@@ -39,14 +46,15 @@ class Retriever():
       "fields": [
         {"name": "id", "type": "Edm.String", "key": True, "filterable": False, "searchable": True},
         {"name": "filePath", "type": "Edm.String", "searchable": True},
-        {"name": "codeSnippet", "type": "Edm.String", "searchable": True},
+        {"name": "content", "type": "Edm.String", "searchable": True},
         {"name": "comments", "type": "Edm.String", "searchable": True},
         {"name": "metadata", "type": "Edm.String", "searchable": False}
       ]
     }
     index = SearchIndex(name=index_config["name"], fields=index_config["fields"])
     try:
-      result = index_config["client"].create_index(index)
+      index_config["client"].create_index(index)
+      print(f"Search index {index_name} has been created successfully.")
     except:
       raise IndexAlreadyExistsError("The index already exists in the database, please try another name.")
 
@@ -58,8 +66,8 @@ class Retriever():
       documents (List[Dict]): a list of documents
     """
     try:
-      result = self.search_client.upload_documents(documents=documents)
-      print("Upload of new document succeeded: {}".format(result[0].succeeded))
+      self.search_client.upload_documents(documents=documents)
+      print(f"New documents have been uploaded to the database successfully.")
     except:
       raise UploadDocumentFailed("The documents upload failed, please try again.")
 

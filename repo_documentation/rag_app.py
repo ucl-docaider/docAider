@@ -54,7 +54,7 @@ class RepoDocumentation():
             )
             additional_docs = self._generate_additional_docs(calls, graph, bfs_explore)
             documentation = asyncio.run(self.documentation_generator.generate_documentation(
-                file_name=os.path.basename(file_path),
+                file_path=file_path,
                 file_content=source_code,
                 root_folder=self.root_folder,
                 additional_docs=additional_docs
