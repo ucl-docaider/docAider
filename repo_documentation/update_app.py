@@ -1,4 +1,5 @@
-import os, sys
+import os
+import sys
 import time
 import difflib
 import git
@@ -17,11 +18,11 @@ class DocumentationUpdate():
     }
 
     def __init__(self, repo_path, branch, root_folder, output_dir='docs_output'):
-        self.repo_path = repo_path
+        self.repo_path = os.path.abspath(repo_path)
         self.branch = branch
-        self.root_folder = root_folder
-        self.output_dir = output_dir
-        self.repo = git.Repo(repo_path)
+        self.root_folder = os.path.abspath(root_folder)
+        self.output_dir = os.path.abspath(output_dir)
+        self.repo = git.Repo(self.repo_path)
         self.commit_sha = self._get_latest_commit_sha()
         self.assistant = self._load_assistant_agent()
         self.user = self._load_user_agent()
@@ -57,7 +58,7 @@ class DocumentationUpdate():
 
         # Fetch commit details
         latest_commit = self.repo.commit(self.commit_sha)
-        parent_commit = self._get_previous_non_doc_commit(latest_commit)  
+        parent_commit = self._get_previous_non_doc_commit(latest_commit)
 
         if not parent_commit:
             print("No valid parent commit found for updating documentation.")
@@ -66,27 +67,32 @@ class DocumentationUpdate():
         # Iterate over the diffs between the commit and its parent
         for diff in latest_commit.diff(parent_commit):
             file_path = diff.a_path
-            print(f"Processing file: {file_path}")
-            print(f"Updating documentation for file={file_path}")
+            # Skip non-Python files
+            if not file_path.endswith('.py'):
+                continue  
+            
+            full_file_path = os.path.join(self.repo_path, file_path)
+            print(f"Processing file: {full_file_path}")
+            print(f"Updating documentation for file={full_file_path}")
 
             # 1. Get the old and new file contents
-            old_file_content = self._get_file_content(file_path, parent_commit)
-            new_file_content = self._get_file_content(file_path, latest_commit)
+            old_file_content = self._get_file_content(full_file_path, parent_commit)
+            new_file_content = self._get_file_content(full_file_path, latest_commit)
 
             # 2. Get the old documentation
-            old_file_docs = self._get_old_file_docs(file_path)
+            old_file_docs = self._get_old_file_docs(full_file_path)
 
             # 3. Generate the diff between old and new file contents
             diff_content = self._generate_diff(old_file_content, new_file_content)
 
             # 4. Generate additional docs using the call graph
-            additional_docs = self._generate_additional_docs(file_path, graph, bfs_explore)
+            additional_docs = self._generate_additional_docs(full_file_path, graph, bfs_explore)
 
             # 5. Update the documentation based on the diffs and additional docs
-            updated_docs = self._update_file_docs(file_path, old_file_docs, old_file_content, new_file_content, diff_content, additional_docs)
+            updated_docs = self._update_file_docs(full_file_path, old_file_docs, old_file_content, new_file_content, diff_content, additional_docs)
 
             # 6. Write the updated documentation to the output directory
-            self._write_file_docs(file_path, updated_docs)
+            self._write_file_docs(full_file_path, updated_docs)
 
         total = round(time.time() - start_time, 3)
         print(f"Total time taken to execute doc update: {total}s.")
@@ -110,14 +116,16 @@ class DocumentationUpdate():
     def _get_file_content(self, file_path, commit):
         # Get the content of the file at a specific commit
         try:
-            blob = commit.tree / file_path
+            relative_path = os.path.relpath(file_path, self.repo_path)
+            blob = commit.tree / relative_path
             return blob.data_stream.read().decode('utf-8')
         except KeyError:
             return ""
 
     def _get_old_file_docs(self, file_path):
         # Get the old documentation content for the file
-        doc_path = self._get_old_doc_path(file_path)
+        relative_path = os.path.relpath(file_path, self.repo_path)
+        doc_path = self._get_old_doc_path(relative_path)
         print(f"Reading old documentation file: {doc_path}")
         try:
             with open(doc_path, 'r') as file:
@@ -134,9 +142,10 @@ class DocumentationUpdate():
     def _generate_additional_docs(self, file_path, graph, bfs_explore):
         # Generate additional documentation using the call graph and BFS exploration
         additional_docs = ""
+        relative_path = os.path.relpath(file_path, self.repo_path)
         file_to_calls = utils.get_file_to_functions(graph)
-        if file_path in file_to_calls:
-            calls = file_to_calls[file_path]
+        if relative_path in file_to_calls:
+            calls = file_to_calls[relative_path]
             for call_name in calls:
                 call = graph[call_name]
                 if 'EXTERNAL' in call['file_name']:
@@ -164,16 +173,11 @@ class DocumentationUpdate():
             silent=True
         )
 
-        file_name = self.output_dir + "/" + os.path.basename(file_path) + ".txt"
-
-        with open(file_name, 'w') as file:
-            file.write(prompt_message)
-
         return self.assistant.last_message()['content']
 
     def _write_file_docs(self, file_path, docs):
         # Write the updated documentation to the output directory
-        relative_path = os.path.relpath(file_path, self.root_folder)
+        relative_path = os.path.relpath(file_path, self.repo_path)
         output_file_path = os.path.join(self.output_dir, relative_path)
         output_dir = os.path.dirname(output_file_path)
         os.makedirs(output_dir, exist_ok=True)
@@ -185,8 +189,7 @@ class DocumentationUpdate():
 
     def _get_old_doc_path(self, file_path):
         # Get the path to the old documentation file
-        relative_path = os.path.relpath(file_path, self.root_folder)
-        return os.path.join(self.output_dir, relative_path + ".md")
+        return os.path.join(self.output_dir, file_path + ".md")
 
 # Example usage
 repo_path = "./../Huffman-encoding"
