@@ -1,36 +1,36 @@
+import utils
 import os
 import sys
 import time
-from autogen import AssistantAgent, UserProxyAgent
-from prompt import DOCUMENTATION_PROMPT, USR_PROMPT
+from prompt import DOCUMENTATION_PROMPT
 
 sys.path.append(os.path.abspath(
     os.path.join(os.path.dirname(__file__), './../')))
 
-import config
+from autogen_utils import utils as autogen_utils
 from cache.docs_cache import DocsCache
-from code2flow.code2flow import utils
+from code2flow.code2flow import utils as graph_utils
 
 class RepoDocumentation():
-    def __init__(self, root_folder, output_dir='code2flow_output'):
+    def __init__(self, root_folder):
         self.root_folder = root_folder
-        self.output_dir = output_dir
-        self.assistant = self._load_assistant_agent()
-        self.user = self._load_user_agent()
+        self.output_dir = os.path.join(self.root_folder, "docs_output")
+        self.assistant = autogen_utils.load_assistant_agent()
+        self.user = autogen_utils.load_user_agent()
 
     def run(self):
         print("Starting the documentation generation process...")
         start_time = time.time()
 
-        # 1. Generate graph (call_graph.json and cache.json)
-        utils.generate_graph(self.root_folder, self.output_dir)
-        graph = utils.get_call_graph(self.output_dir)
+        # 1. Generate graph
+        graph_utils.generate_graph(self.root_folder, self.output_dir)
+        graph = graph_utils.get_call_graph(self.output_dir)
 
         # 2. Build mapping of a file to the functions called within them
-        file_to_calls = utils.get_file_to_functions(graph)
+        file_to_calls = graph_utils.get_file_to_functions(graph)
 
         # 3. Build BFS exploration of the call graph
-        bfs_explore = utils.explore_call_graph(graph)
+        bfs_explore = graph_utils.explore_call_graph(graph)
 
         # 4. Prepare cache, where we will map file paths to their respective documentation
         cache = DocsCache()
@@ -43,7 +43,7 @@ class RepoDocumentation():
 
             additional_docs = self._get_additional_docs(
                 calls, graph, bfs_explore)
-            file_content = self._read_file_content(file_path)
+            file_content = utils.read_file_content(file_path)
             file_docs = self._generate_file_docs(
                 file_path, file_content, additional_docs)
             docs_output_filepath = self._write_file_docs(file_path, file_docs)
@@ -52,24 +52,11 @@ class RepoDocumentation():
             cache.add(file_path, docs_output_filepath)
 
         # 7. Save cache to a file
-        utils.write_json(f'{self.output_dir}/cache.json', cache.to_dict())
+        graph_utils.write_json(
+            f'{self.output_dir}/cache.json', cache.to_dict())
 
         total = round(time.time() - start_time, 3)
         print(f"Total time taken to execute doc generation: {total}s.")
-
-    def _load_assistant_agent(self):
-        return AssistantAgent(
-            name="assistant",
-            system_message=USR_PROMPT,
-            llm_config=config.llm_config,
-            human_input_mode="NEVER"
-        )
-
-    def _load_user_agent(self):
-        return UserProxyAgent(
-            name="user",
-            code_execution_config=False,
-        )
 
     def _get_additional_docs(self, calls, graph, bfs_explore):
         additional_docs = ""
@@ -79,13 +66,9 @@ class RepoDocumentation():
                 continue
             for callee in bfs_explore[call_name]:
                 callee_call = graph[callee]
-                additional_docs += f"\nFunction/Class {callee_call['name']}:\n{callee_call['content']}\n"
+                additional_docs += f"\nFunction/Class {
+                    callee_call['name']}:\n{callee_call['content']}\n"
         return additional_docs
-
-    def _read_file_content(self, file_path):
-        print(f"Reading file: {file_path}")
-        with open(file_path, 'r') as file:
-            return file.read()
 
     def _generate_file_docs(self, file_path, file_content, additional_docs):
         prompt_message = DOCUMENTATION_PROMPT.format(
@@ -94,13 +77,7 @@ class RepoDocumentation():
             root_folder=self.root_folder,
             additional_docs=additional_docs
         )
-
-        self.user.initiate_chat(
-            self.assistant,
-            message=prompt_message,
-            max_turns=1,
-            silent=True
-        )
+        autogen_utils.initiate_chat(self.user, self.assistant, prompt_message)
 
         # Save the prompt message to a file (debugging purposes)
         file_name = self.output_dir + "/" + \
@@ -127,7 +104,8 @@ class RepoDocumentation():
 
 
 repo_doc = RepoDocumentation(
-    root_folder='../simple-users',
-    output_dir='../simple-users/docs_output')
+    root_folder='../../Huffman-encoding'
+)
+
+print(repo_doc.output_dir)
 repo_doc.run()
- 

@@ -1,10 +1,10 @@
 import os, sys, time
-from autogen import AssistantAgent, UserProxyAgent
+from autogen_utils import AssistantAgent, UserProxyAgent
 
 sys.path.append(os.path.abspath(
     os.path.join(os.path.dirname(__file__), './../')))
 
-import config
+import autogen_utils.config as config
 
 # Documentation Generation Code
 print("Starting the documentation generation process...")
