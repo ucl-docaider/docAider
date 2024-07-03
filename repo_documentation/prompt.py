@@ -87,7 +87,6 @@ Please generate a detailed explanation document for this object based on the cod
 """
 DOCUMENTATION_UPDATE_PROMPT = """You are an AI documentation assistant. Your task is to update the existing documentation based on the provided changes in the code. 
 
-The path of the document you need to update in this project is {root_folder}.
 Now you need to update the document for "{file_name}".
 
 **Old Documentation**:

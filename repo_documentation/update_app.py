@@ -49,7 +49,7 @@ class DocumentationUpdate():
 
         # Generate graph (call_graph.json and cache.json)
         utils.generate_graph(self.root_folder, self.output_dir)
-        cache = utils.get_cache(self.output_dir)
+        # cache = utils.get_cache(self.output_dir)
         graph = utils.get_call_graph(self.output_dir)
 
         # Build BFS exploration of the call graph
@@ -66,6 +66,7 @@ class DocumentationUpdate():
         # Iterate over the diffs between the commit and its parent
         for diff in latest_commit.diff(parent_commit):
             file_path = diff.a_path
+            print(f"Processing file: {file_path}")
             print(f"Updating documentation for file={file_path}")
 
             # 1. Get the old and new file contents
