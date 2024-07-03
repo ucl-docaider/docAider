@@ -1,9 +1,12 @@
-import os
+import os, sys
 import time
 import difflib
 import git
 from autogen import AssistantAgent, UserProxyAgent
 from prompt import DOCUMENTATION_UPDATE_PROMPT, USR_PROMPT
+
+sys.path.append(os.path.abspath(
+    os.path.join(os.path.dirname(__file__), './../')))
 from code2flow.code2flow import utils
 
 class DocumentationUpdate():
@@ -33,7 +36,7 @@ class DocumentationUpdate():
         # Traverse commit history to find the previous non-documentation update commit
         while commit:
             if "Update documentation" not in commit.message:
-                return commit
+                return commit.parents[0]
             if commit.parents:
                 commit = commit.parents[0]
             else:
@@ -185,12 +188,12 @@ class DocumentationUpdate():
         return os.path.join(self.output_dir, relative_path + ".md")
 
 # Example usage
-repo_path = "/path/to/local/repo"
+repo_path = "./../Huffman-encoding"
 branch = "main"
-root_folder = '../code2flow/projects/users'
+root_folder = './../Huffman-encoding'
 repo_doc_updater = DocumentationUpdate(
     repo_path=repo_path,
     branch=branch,
     root_folder=root_folder,
-    output_dir='../docs_output')
+    output_dir='./../docs_output')
 repo_doc_updater.run()
