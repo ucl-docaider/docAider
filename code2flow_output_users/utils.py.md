@@ -2,7 +2,7 @@
 
 ## FunctionDef validate_email
 
-The function of the function is to validate email addresses using regular expressions.
+The function validates whether a given email address follows a certain format using regular expressions.
 
 **Parameters**:
 
@@ -10,24 +10,22 @@ The function of the function is to validate email addresses using regular expres
 
 **Returns**:
 
-- `bool`: Returns True if the email address is valid, False otherwise.
+- `bool`: True if the email address is valid, False otherwise.
 
-**Code Description**: This function uses a regular expression pattern to match the given email address. If the pattern matches, the function returns True, indicating that the email address is valid. Otherwise, it returns False.
+**Code Description**: This function uses a regular expression pattern to validate whether an email address meets the required format. It checks for the presence of alphanumeric characters, dots, and underscores in the local part, followed by the @ symbol and a domain name that contains only word characters. If the email address matches this pattern, it returns True; otherwise, it returns False.
 
-**Note**: When using this function, ensure that the input email addresses conform to the expected format to avoid false positives or negatives.
+**Note**: This function is case-sensitive and does not consider internationalized domain names (IDNs).
 
 **Input Example**: 
 
 ```
-email = "test@example.com"
-if validate_email(email):
-    print("Email is valid")
-else:
-    print("Email is not valid")
+Input: "test@example.com"
+Explanation: The input string represents a valid email address.
 ```
 
-**Output Example**:
+**Output Example**: 
 
 ```
-If the input email address is "test@example.com", the output will be "Email is valid". If the input email address is invalid, the output will be "Email is not valid".
+Output: True
+Explanation: Since the provided email address follows the required format, the function returns True.
 ```

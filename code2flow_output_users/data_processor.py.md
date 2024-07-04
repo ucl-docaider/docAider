@@ -2,45 +2,50 @@
 
 ## ClassDef DataProcessor
 
-The function of the class is to process data by converting all items into uppercase and check the validity of email addresses.
+The function of the class is to provide methods for processing data and checking the validity of email addresses.
 
 **Attributes**:
 
-- None
+None
 
 **Functions**:
 
-- `process_data(self, data) -> list`
+- `process_data` (`self`, `data`) -> `list`
     - Parameters:
-        - `data`: This can be a list, tuple or any iterable collection.
+        - `self`: The instance of the class.
+        - `data`: A list of items to be processed. (type: list)
     - Returns:
-        - A list of strings where all items are in uppercase.
+        - A list of uppercase strings from the input data.
 
-- `check_emails(self, emails) -> list`
-    - Parameters:
-        - `emails`: This should be a list of email addresses to be validated.
-    - Returns:
-        - A list indicating whether each email is valid or not.
+**Code Description**: This method processes a given list of data by converting each item to its uppercase equivalent.
 
-**Called_functions**:
-
-- `validate_email(email) -> boolean` (function from utils.py)
-    - This function takes an email address, checks if it matches the specified pattern and returns True if valid, False otherwise.
-
-**Code Description**: The DataProcessor class processes data by converting all items into uppercase. It also validates a list of emails using the `validate_email` function from the `utils` module.
-
-**Note**: The `process_data` method can handle various types of iterable collections like lists or tuples as input and returns a list of strings where all items are in uppercase. The `check_emails` method validates a list of email addresses and returns a list indicating whether each email is valid or not.
+**Note**: The return value is a list of strings in uppercase.
 
 **Input Example**:
 
 ```
-input_list = ['hello', 'world']
-output = DataProcessor().process_data(input_list)
-print(output)  # Output: ['HELLO', 'WORLD']
+Input: ["hello", "world"]
+Output: ["HELLO", "WORLD"]
 ```
 
-**Output Example**: 
+- `check_emails` (`self`, `emails`) -> `list`
+    - Parameters:
+        - `self`: The instance of the class.
+        - `emails`: A list of email addresses to be validated. (type: list)
+    - Returns:
+        - A list indicating whether each email address is valid or not.
 
-No output example provided for the `check_emails` method as it returns a list and its exact format depends on how the function is used.
+**Code Description**: This method uses a regular expression pattern to validate each email address in the input list, returning a corresponding boolean value for each one.
 
-Please note that this documentation provides an accurate and deterministic description of the code.
+**Note**: The return value is a list of booleans where True indicates a valid email and False otherwise.
+
+**Input Example**:
+
+```
+Input: ["test@example.com", "invalid"]
+Output: [True, False]
+```
+
+**Called_functions**:
+
+- `utils::validate_email` (`email`) -> `boolean`: This function validates an email address using a regular expression pattern. If the email matches the pattern, it returns True; otherwise, it returns False.
