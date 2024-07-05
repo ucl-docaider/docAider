@@ -13,13 +13,15 @@ from code2flow.code2flow import utils as graph_utils
 
 class RepoDocumentation():
     def __init__(self, root_folder):
-        self.root_folder = root_folder
+        self.root_folder = os.path.abspath(root_folder)
         self.output_dir = os.path.join(self.root_folder, "docs_output")
         self.assistant = autogen_utils.load_assistant_agent()
         self.user = autogen_utils.load_user_agent()
 
     def run(self):
-        print("Starting the documentation generation process...")
+        print('Generating documentation...')
+        print(f'Root folder: {self.root_folder}')
+        print(f'Output folder: {self.output_dir}')
         start_time = time.time()
 
         # 1. Generate graph
@@ -37,26 +39,30 @@ class RepoDocumentation():
 
         # 5. Generate documentation for each file and function within
         for file_path, calls in file_to_calls.items():
-            print(f"Generating documentation for file={file_path}")
-            if file_path == 'EXTERNAL':
+            if file_path == 'EXTERNAL':  # Skip all external functions
                 continue
 
+            print(f"Generating documentation for file={file_path}")
             additional_docs = self._get_additional_docs(
                 calls, graph, bfs_explore)
             file_content = utils.read_file_content(file_path)
-            file_docs = self._generate_file_docs(
+            docs = self._generate_file_docs(
                 file_path, file_content, additional_docs)
-            docs_output_filepath = self._write_file_docs(file_path, file_docs)
+            docs_filepath = utils.write_file_docs(output_dir=self.output_dir,
+                                                  root_folder=self.root_folder,
+                                                  file_path=file_path,
+                                                  docs=docs)
 
-            # 6. Add the generated documentation to the cache (file_path -> docs_output_filepath)
-            cache.add(file_path, docs_output_filepath)
+            # 6. Add the file path and its according documentation to the cache
+            cache.add(file_path, docs_filepath)
 
         # 7. Save cache to a file
-        graph_utils.write_json(
-            f'{self.output_dir}/cache.json', cache.to_dict())
+        utils.save_cache(self.output_dir, cache)
 
         total = round(time.time() - start_time, 3)
-        print(f"Total time taken to execute doc generation: {total}s.")
+        print(f'Generated documentation ({
+              cache.size()} files) can be found in {self.output_dir}')
+        print(f"Documentation generation completed in {total}s.")
 
     def _get_additional_docs(self, calls, graph, bfs_explore):
         additional_docs = ""
@@ -78,34 +84,9 @@ class RepoDocumentation():
             additional_docs=additional_docs
         )
         autogen_utils.initiate_chat(self.user, self.assistant, prompt_message)
-
-        # Save the prompt message to a file (debugging purposes)
-        file_name = self.output_dir + "/" + \
-            os.path.basename(file_path) + ".txt"
-        with open(file_name, 'w') as file:
-            file.write(prompt_message)
-
+        utils.save_prompt_debug(
+            self.output_dir, os.path.basename(file_path), prompt_message, utils.Mode.CREATE)
         return self.assistant.last_message()['content']
 
-    def _write_file_docs(self, file_path, docs) -> str:
-        # Generate the output file path based on the input file path
-        relative_path = os.path.relpath(file_path, self.root_folder)
-        output_file_path = os.path.join(self.output_dir, relative_path)
-        output_dir = os.path.dirname(output_file_path)
-        os.makedirs(output_dir, exist_ok=True)
 
-        # Add .md extension to the output file
-        output_file_path += ".md"
-
-        # Write the documentation to the output file
-        with open(output_file_path, 'w') as file:
-            file.write(docs)
-        return output_file_path
-
-
-repo_doc = RepoDocumentation(
-    root_folder='../../Huffman-encoding'
-)
-
-print(repo_doc.output_dir)
-repo_doc.run()
+RepoDocumentation(root_folder='../simple-users/').run()
