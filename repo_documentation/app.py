@@ -48,14 +48,16 @@ class RepoDocumentation():
             file_content = utils.read_file_content(file_path)
             docs = self._generate_file_docs(
                 file_path, file_content, additional_docs)
-            docs_filepath = self._write_file_docs(file_path, docs)
+            docs_filepath = utils.write_file_docs(output_dir=self.output_dir,
+                                                  root_folder=self.root_folder,
+                                                  file_path=file_path,
+                                                  docs=docs)
 
             # 6. Add the file path and its according documentation to the cache
             cache.add(file_path, docs_filepath)
 
         # 7. Save cache to a file
-        graph_utils.write_json(
-            f'{self.output_dir}/cache.json', cache.to_dict())
+        utils.save_cache(self.output_dir, cache)
 
         total = round(time.time() - start_time, 3)
         print(f'Generated documentation ({
@@ -83,22 +85,8 @@ class RepoDocumentation():
         )
         autogen_utils.initiate_chat(self.user, self.assistant, prompt_message)
         utils.save_prompt_debug(
-            self.output_dir, os.path.basename(file_path), prompt_message)
+            self.output_dir, os.path.basename(file_path), prompt_message, utils.Mode.CREATE)
         return self.assistant.last_message()['content']
-
-    def _write_file_docs(self, file_path, docs) -> str:
-        # Create the output directory if it doesn't exist
-        os.makedirs(self.output_dir, exist_ok=True)
-
-        # Get the path that relative from root folder
-        rel_path = os.path.relpath(file_path, self.root_folder)
-
-        # Write the docs to a markdown file
-        rel_path += '.md'
-        output_file_path = os.path.join(self.output_dir, rel_path)
-        with open(output_file_path, 'w') as file:
-            file.write(docs)
-        return output_file_path
 
 
 RepoDocumentation(root_folder='../simple-users/').run()

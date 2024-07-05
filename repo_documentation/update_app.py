@@ -3,33 +3,28 @@ import sys
 import time
 import difflib
 import git
-from autogen import AssistantAgent, UserProxyAgent
-from prompt import DOCUMENTATION_UPDATE_PROMPT, USR_PROMPT
+from prompt import DOCUMENTATION_UPDATE_PROMPT
 
 sys.path.append(os.path.abspath(
     os.path.join(os.path.dirname(__file__), './../')))
-from code2flow.code2flow import utils
+
+from code2flow.code2flow import utils as code2flow_utils
+from autogen_utils import utils as autogen_utils
+from repo_documentation import utils
 
 class DocumentationUpdate():
-    __llm_config = {
-        "model": "llama3",
-        "base_url": "http://localhost:11434/v1",
-        "api_key": "ollama",
-    }
-
-    def __init__(self, repo_path, branch, root_folder):
-        self.repo_path = os.path.abspath(repo_path)
+    def __init__(self, repo_path, branch):
         self.branch = branch
-        self.root_folder = os.path.abspath(root_folder)
+        self.root_folder = os.path.abspath(repo_path)
         self.output_dir = os.path.join(self.root_folder, "docs_output")
-        self.repo = git.Repo(self.repo_path)
+        self.repo = git.Repo(self.root_folder)
         self.commit_sha = self._get_latest_commit_sha()
-        self.assistant = self._load_assistant_agent()
-        self.user = self._load_user_agent()
+        self.assistant = autogen_utils.load_assistant_agent()
+        self.user = autogen_utils.load_user_agent()
 
     def _get_latest_commit_sha(self):
         # Fetch the latest commit SHA on the specified branch
-        branch_ref = self.repo.heads[self.branch]
+        branch_ref = self.repo.heads[self.branch] # TODO: Handle exception when not found
         latest_commit = branch_ref.commit
         return latest_commit.hexsha
 
@@ -49,16 +44,19 @@ class DocumentationUpdate():
         start_time = time.time()
 
         # Generate graph (call_graph.json and cache.json)
-        utils.generate_graph(self.root_folder, self.output_dir)
+        code2flow_utils.generate_graph(self.root_folder, self.output_dir)
         # cache = utils.get_cache(self.output_dir)
-        graph = utils.get_call_graph(self.output_dir)
+        graph = code2flow_utils.get_call_graph(self.output_dir)
 
         # Build BFS exploration of the call graph
-        bfs_explore = utils.explore_call_graph(graph)
+        bfs_explore = code2flow_utils.explore_call_graph(graph)
 
         # Fetch commit details
         latest_commit = self.repo.commit(self.commit_sha)
         parent_commit = self._get_previous_non_doc_commit(latest_commit)
+
+        # Load cache
+        cache = utils.get_cache(self.output_dir)
 
         if not parent_commit:
             print("No valid parent commit found for updating documentation.")
@@ -71,16 +69,28 @@ class DocumentationUpdate():
             if not file_path.endswith('.py'):
                 continue  
             
-            full_file_path = os.path.join(self.repo_path, file_path)
+            full_file_path = os.path.join(self.root_folder, file_path)
             print(f"Processing file: {full_file_path}")
             print(f"Updating documentation for file={full_file_path}")
 
             # 1. Get the old and new file contents
-            old_file_content = self._get_file_content(full_file_path, parent_commit)
-            new_file_content = self._get_file_content(full_file_path, latest_commit)
+            old_file_content = self._get_file__commit_content(full_file_path, parent_commit)
+            new_file_content = self._get_file__commit_content(full_file_path, latest_commit)
+            
+            cached = cache.get(full_file_path)
+            
+            # 2a. Generate new documentation if the file is not cached
+            if not cached:
+                # TODO: Generate documentation for new files
+                continue
+            
+            # 2b. Skip if the file has not been modified since last update
+            if cached.source_file_hash == hash(new_file_content):
+                print(f"File {full_file_path} has not been modified since last update.")
+                continue
 
-            # 2. Get the old documentation
-            old_file_docs = self._get_old_file_docs(full_file_path)
+            # 2c. Otherwise fetch the old file docs
+            old_file_docs = self._get_old_file_docs(cache, full_file_path)
 
             # 3. Generate the diff between old and new file contents
             diff_content = self._generate_diff(old_file_content, new_file_content)
@@ -89,50 +99,33 @@ class DocumentationUpdate():
             additional_docs = self._generate_additional_docs(full_file_path, graph, bfs_explore)
 
             # 5. Update the documentation based on the diffs and additional docs
-            updated_docs = self._update_file_docs(full_file_path, old_file_docs, old_file_content, new_file_content, diff_content, additional_docs)
+            updated_docs = self._get_updated_docs(full_file_path, old_file_docs, old_file_content, new_file_content, diff_content, additional_docs)
 
             # 6. Write the updated documentation to the output directory
-            self._write_file_docs(full_file_path, updated_docs)
-
+            updated_docs_path = utils.write_file_docs(output_dir=self.output_dir,
+                                    root_folder=self.root_folder,
+                                    file_path=full_file_path,
+                                    docs=updated_docs)
+            
+            # 7. Update the cache with the new documentation path and save
+            cache.update_docs(full_file_path, updated_docs_path)
+            utils.save_cache(self.output_dir, cache)
+            
         total = round(time.time() - start_time, 3)
         print(f"Total time taken to execute doc update: {total}s.")
 
-    def _load_assistant_agent(self):
-        # Load the assistant agent for LLM-based documentation generation
-        return AssistantAgent(
-            name="assistant",
-            system_message=USR_PROMPT,
-            llm_config=self.__llm_config,
-            human_input_mode="NEVER"
-        )
-
-    def _load_user_agent(self):
-        # Load the user agent for LLM-based documentation generation
-        return UserProxyAgent(
-            name="user",
-            code_execution_config=False,
-        )
-
-    def _get_file_content(self, file_path, commit):
+    def _get_file__commit_content(self, file_path, commit):
         # Get the content of the file at a specific commit
         try:
-            relative_path = os.path.relpath(file_path, self.repo_path)
+            relative_path = os.path.relpath(file_path, self.root_folder)
             blob = commit.tree / relative_path
             return blob.data_stream.read().decode('utf-8')
         except KeyError:
             return ""
 
-    def _get_old_file_docs(self, file_path):
-        # Get the old documentation content for the file
-        relative_path = os.path.relpath(file_path, self.repo_path)
-        doc_path = self._get_old_doc_path(relative_path)
-        print(f"Reading old documentation file: {doc_path}")
-        try:
-            with open(doc_path, 'r') as file:
-                content = file.read()
-                return content
-        except FileNotFoundError:
-            return ""
+    def _get_old_file_docs(self, cache, file_path):
+        old_docs_path = cache.get(file_path).generated_docs_path
+        return utils.read_file_content(old_docs_path)
 
     def _generate_diff(self, old_content, new_content):
         # Generate the diff between the old and new file contents
@@ -142,10 +135,9 @@ class DocumentationUpdate():
     def _generate_additional_docs(self, file_path, graph, bfs_explore):
         # Generate additional documentation using the call graph and BFS exploration
         additional_docs = ""
-        relative_path = os.path.relpath(file_path, self.repo_path)
-        file_to_calls = utils.get_file_to_functions(graph)
-        if relative_path in file_to_calls:
-            calls = file_to_calls[relative_path]
+        file_to_calls = code2flow_utils.get_file_to_functions(graph)
+        if file_path in file_to_calls:
+            calls = file_to_calls[file_path]
             for call_name in calls:
                 call = graph[call_name]
                 if 'EXTERNAL' in call['file_name']:
@@ -155,7 +147,7 @@ class DocumentationUpdate():
                     additional_docs += f"\nFunction/Class {callee_call['name']}:\n{callee_call['content']}\n"
         return additional_docs
 
-    def _update_file_docs(self, file_path, old_file_docs, old_file_content, new_file_content, diff, additional_docs):
+    def _get_updated_docs(self, file_path, old_file_docs, old_file_content, new_file_content, diff, additional_docs):
         # Update the file documentation using the old docs, diffs, and additional docs
         prompt_message = DOCUMENTATION_UPDATE_PROMPT.format(
             file_name=os.path.basename(file_path),
@@ -165,44 +157,14 @@ class DocumentationUpdate():
             diff=diff,
             additional_docs=additional_docs
         )
-
-        self.user.initiate_chat(
-            self.assistant,
-            message=prompt_message,
-            max_turns=1,
-            silent=True
-        )
-
-        # Save the prompt message to a file (debugging purposes)
-        file_name = self.output_dir + "/" + \
-            os.path.basename(file_path) + ".txt"
-        with open(file_name, 'w') as file:
-            file.write(prompt_message)
-
+        autogen_utils.initiate_chat(self.user, self.assistant, prompt_message)
+        utils.save_prompt_debug(self.output_dir, file_path, prompt_message, utils.Mode.UPDATE)
         return self.assistant.last_message()['content']
+    
 
-    def _write_file_docs(self, file_path, docs):
-        # Write the updated documentation to the output directory
-        relative_path = os.path.relpath(file_path, self.repo_path)
-        output_file_path = os.path.join(self.output_dir, relative_path)
-        output_dir = os.path.dirname(output_file_path)
-        os.makedirs(output_dir, exist_ok=True)
-
-        output_file_path += ".md"
-
-        with open(output_file_path, 'w') as file:
-            file.write(docs)
-
-    def _get_old_doc_path(self, file_path):
-        # Get the path to the old documentation file
-        return os.path.join(self.output_dir, file_path + ".md")
-
-
-repo_path = "./../../Huffman-encoding"
-branch = "main"
-root_folder = repo_path
+repo_path = "../simple-users/"
+branch = "feature"
 repo_doc_updater = DocumentationUpdate(
     repo_path=repo_path,
-    branch=branch,
-    root_folder=root_folder)
+    branch=branch)
 repo_doc_updater.run()

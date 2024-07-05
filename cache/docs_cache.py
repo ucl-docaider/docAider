@@ -6,6 +6,13 @@ A simple cache to map project file paths to their respective documentation.
 
 
 class DocsCache():
+    @staticmethod
+    def from_dict(data: dict):
+        cache = DocsCache()
+        for key, value in data.items():
+            cache.__cache[key] = Document.from_dict(value)
+        return cache
+
     def __init__(self):
         self.__cache = {}
 
@@ -16,8 +23,12 @@ class DocsCache():
         self.__cache[source_path] = Document(
             source_path, gen_docs_path)
 
-    def get(self, key: str) -> str:
+    def get(self, key: str) -> Document:
         return self.__cache.get(key, None)
+
+    def update_docs(self, key, path):
+        assert key in self.__cache, f"Key {key} not found in cache"
+        self.get(key).update_path(path)
 
     def remove(self, key: str):
         if key in self.__cache:
