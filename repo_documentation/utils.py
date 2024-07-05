@@ -5,6 +5,14 @@ def read_file_content(file_path):
     with open(file_path, 'r') as file:
         return file.read()
     
+def save_prompt_debug(output_dir, file_name, prompt_message):
+    file_name += '.txt'
+    debug_output_dir = os.path.join(output_dir, 'prompt_debug')
+    os.makedirs(debug_output_dir, exist_ok=True)
+    path = os.path.join(debug_output_dir, file_name)
+    with open(path, 'w') as file:
+        file.write(prompt_message)
+
 def write_file_docs(root_folder, file_path, output_directory, docs) -> str:
     # Generate the output file path based on the input file path
     relative_path = os.path.relpath(file_path, root_folder)
