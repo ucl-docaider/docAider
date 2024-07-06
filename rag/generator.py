@@ -8,6 +8,7 @@ from semantic_kernel.connectors.ai.ollama.services.ollama_chat_completion import
 from semantic_kernel.connectors.ai.ollama.services.ollama_text_embedding import OllamaTextEmbedding
 from semantic_kernel.prompt_template import PromptTemplateConfig
 from repo_documentation.prompt import DOCUMENTATION_PROMPT
+from exceptions import SemanticKernelError
 
 load_dotenv(dotenv_path='.env_rag')
 
@@ -26,15 +27,10 @@ class DocumentationGenerator():
     """
     self.llm_id = llm_id
     self.kernel = Kernel()
-    self.context_retriever = Retriever(
+    self.retriever = Retriever(
       ai_search_api_key=os.getenv("AZURE_KEY_CREDENTIAL"),
       endpoint=os.getenv("SEARCH_ENDPOINT"),
-      index_name="code2flow-index"
-    )
-    self.doc_retriever = Retriever(
-      ai_search_api_key=os.getenv("AZURE_KEY_CREDENTIAL"),
-      endpoint=os.getenv("SEARCH_ENDPOINT"),
-      index_name="documentation-index"
+      index_name="repo-index"
     )
     self.chat_service_id = "documentation_generation"
     self.prompt = ""
@@ -60,10 +56,8 @@ class DocumentationGenerator():
     )
     self.kernel.add_service(embedding_generator)
 
-    if not self.context_retriever.index_exist_or_not():
-      self.context_retriever.create_index(self.context_retriever.index_name)
-    if not self.doc_retriever.index_exist_or_not():
-      self.doc_retriever.create_index(self.doc_retriever.index_name)
+    if not self.retriever.index_exist_or_not():
+      self.retriever.create_index(self.retriever.index_name)
 
   async def generate_documentation(self, file_path, file_content, root_folder, additional_docs) -> str:
     """
@@ -78,7 +72,6 @@ class DocumentationGenerator():
     Returns:
       LLM-generated documentation in string
     """
-
     file_name = os.path.basename(file_path)
     prompt = DOCUMENTATION_PROMPT.format(
       file_name=file_name,
@@ -106,10 +99,11 @@ class DocumentationGenerator():
     print(f"Waiting for semantic kernel to respond...")
     try:
       documentation = str(await self.kernel.invoke(documentation_generator))
+      document_count = self.retriever.search_client.get_document_count()
       # Save documentation to the database
-      self.doc_retriever.upsert_documents([{
-        "id": str(self.doc_retriever.search_client.get_document_count()),
-        "filePath": file_path,
+      self.retriever.upsert_documents([{
+        "id": str(document_count),
+        "filePath": file_path + ".md",
         "content": documentation,
         "comments": "" # set to be empty string temporarily
       }])
@@ -117,6 +111,3 @@ class DocumentationGenerator():
       return documentation
     except:
       raise SemanticKernelError(f"The generation for {file_name} failed. Please check kernel configurations and try again.")
-
-class SemanticKernelError(Exception):
-  pass

@@ -63,11 +63,10 @@ class Retriever():
     Upload new documents to the vector database.
 
     Args:
-      documents (List[Dict]): a list of documents
+      documents (List[Dict]): a list of documents. The document should have the same schema as the search index.
     """
     try:
       self.search_client.upload_documents(documents=documents)
-      print(f"New documents have been uploaded to the database successfully.")
     except:
       raise UploadDocumentFailed("The documents upload failed, please try again.")
 
@@ -78,7 +77,7 @@ class Retriever():
     print(f"Searching...")
     results = self.search_client.search(query)
     print(f"Search completed")
-    return list(results)[0]["codeSnippet"]
+    return list(results)[0]["content"]
   
 class IndexAlreadyExistsError(Exception):
   pass
