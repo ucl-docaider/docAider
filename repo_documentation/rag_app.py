@@ -1,8 +1,12 @@
 import os, sys, time, datetime, asyncio
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(parent_dir)
+from dotenv import load_dotenv
 from rag.generator import DocumentationGenerator
 from code2flow.code2flow import utils
+from repo_utils.saver import RepoSaver
+
+load_dotenv(dotenv_path='.env')
 
 class RepoDocumentation():
     """
@@ -22,6 +26,9 @@ class RepoDocumentation():
         self.root_folder = root_folder
         self.output_dir = output_dir
         self.documentation_generator = DocumentationGenerator(llm_id)
+        
+        repo_saver = RepoSaver("CQ-Ke/repo-copilot-test")
+        repo_saver.auto_save_python_and_md_files()
 
     def run(self):
         """
@@ -50,7 +57,7 @@ class RepoDocumentation():
 
             # Semantic search for getting source code of the file path
             source_code = asyncio.run(
-                self.documentation_generator.retriever.search(query=f"{file_path}")
+                self.documentation_generator.context_retriever.search(query=f"{file_path}")
             )
             additional_docs = self._generate_additional_docs(calls, graph, bfs_explore)
             documentation = asyncio.run(self.documentation_generator.generate_documentation(
