@@ -2,14 +2,13 @@ import utils
 import os
 import sys
 import time
-from prompt import DOCUMENTATION_PROMPT
 
 sys.path.append(os.path.abspath(
     os.path.join(os.path.dirname(__file__), './../')))
 
-from autogen_utils import utils as autogen_utils
-from cache.docs_cache import DocsCache
 from code2flow.code2flow import utils as graph_utils
+from cache.docs_cache import DocsCache
+from autogen_utils import utils as autogen_utils
 
 class RepoDocumentation():
     def __init__(self, root_folder):
@@ -42,12 +41,23 @@ class RepoDocumentation():
             if file_path == 'EXTERNAL':  # Skip all external functions
                 continue
 
-            print(f"Generating documentation for file={file_path}")
-            additional_docs = self._get_additional_docs(
+            additional_docs = autogen_utils.get_additional_docs_calls(
                 calls, graph, bfs_explore)
             file_content = utils.read_file_content(file_path)
-            docs = self._generate_file_docs(
-                file_path, file_content, additional_docs)
+
+            # Generate documentation for the file
+            docs = autogen_utils.get_documentation(
+                file_path=file_path,
+                file_content=file_content,
+                additional_docs=additional_docs,
+                user=self.user,
+                assistant=self.assistant,
+                output_dir=self.output_dir,
+                root_folder=self.root_folder,
+                save_debug=True
+            )
+
+            # Write the documentation to a file
             docs_filepath = utils.write_file_docs(output_dir=self.output_dir,
                                                   root_folder=self.root_folder,
                                                   file_path=file_path,
@@ -63,30 +73,6 @@ class RepoDocumentation():
         print(f'Generated documentation ({
               cache.size()} files) can be found in {self.output_dir}')
         print(f"Documentation generation completed in {total}s.")
-
-    def _get_additional_docs(self, calls, graph, bfs_explore):
-        additional_docs = ""
-        for call_name in calls:
-            call = graph[call_name]
-            if 'EXTERNAL' in call['file_name']:
-                continue
-            for callee in bfs_explore[call_name]:
-                callee_call = graph[callee]
-                additional_docs += f"\nFunction/Class {
-                    callee_call['name']}:\n{callee_call['content']}\n"
-        return additional_docs
-
-    def _generate_file_docs(self, file_path, file_content, additional_docs):
-        prompt_message = DOCUMENTATION_PROMPT.format(
-            file_name=os.path.basename(file_path),
-            file_content=file_content,
-            root_folder=self.root_folder,
-            additional_docs=additional_docs
-        )
-        autogen_utils.initiate_chat(self.user, self.assistant, prompt_message)
-        utils.save_prompt_debug(
-            self.output_dir, file_path, prompt_message, utils.Mode.CREATE)
-        return self.assistant.last_message()['content']
 
 
 RepoDocumentation(root_folder='../simple-users/').run()
