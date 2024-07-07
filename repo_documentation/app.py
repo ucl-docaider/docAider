@@ -85,7 +85,7 @@ class RepoDocumentation():
         )
         autogen_utils.initiate_chat(self.user, self.assistant, prompt_message)
         utils.save_prompt_debug(
-            self.output_dir, os.path.basename(file_path), prompt_message, utils.Mode.CREATE)
+            self.output_dir, file_path, prompt_message, utils.Mode.CREATE)
         return self.assistant.last_message()['content']
 
 
