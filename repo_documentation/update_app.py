@@ -184,8 +184,18 @@ class DocumentationUpdate():
         """
         try:
             relative_path = os.path.relpath(file_path, self.root_folder)
-            blob = commit.tree / relative_path
-            return blob.data_stream.read().decode('utf-8')
+            blob = commit.tree
+
+            # Split the path and traverse the tree
+            for part in relative_path.split(os.path.sep):
+                blob = blob[part]
+
+            # If it's a blob, return its content
+            if blob.type == 'blob':
+                return blob.data_stream.read().decode('utf-8')
+            else:
+                # If it's not a blob (e.g., it's a tree), return an empty string
+                return ''
         except KeyError:
             return ''
 
