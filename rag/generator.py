@@ -5,8 +5,10 @@ from semantic_kernel import Kernel
 from rag.retriever import Retriever
 from semantic_kernel.connectors.ai.ollama.services.ollama_chat_completion import OllamaChatCompletion
 from semantic_kernel.connectors.ai.ollama.services.ollama_text_embedding import OllamaTextEmbedding
+from semantic_kernel.connectors.ai.ollama.ollama_prompt_execution_settings import OllamaChatPromptExecutionSettings
 from semantic_kernel.prompt_template import PromptTemplateConfig
 from repo_documentation.prompt import DOCUMENTATION_PROMPT
+from exceptions import SemanticKernelError
 
 class DocumentationGenerator():
   """
@@ -85,11 +87,19 @@ class DocumentationGenerator():
     )
     self.prompt = prompt
 
+    # Configure execution settings
+    execution_settings = OllamaChatPromptExecutionSettings(
+      service_id=self.chat_service_id,
+      ai_model_id=self.llm_id,
+      temperature=0      
+    )
+
     # Configure the prompt template
     prompt_template_config = PromptTemplateConfig(
       template=prompt,
       name="documentation-generation",
       template_format="semantic-kernel",
+      execution_settings=execution_settings
     )
 
     # Add summarization function to the kernel
@@ -104,16 +114,13 @@ class DocumentationGenerator():
     try:
       documentation = str(await self.kernel.invoke(documentation_generator))
       # Save documentation to the database
-      self.doc_retriever.upsert_documents([{
+      """self.doc_retriever.upsert_documents([{
         "id": str(self.doc_retriever.search_client.get_document_count()),
         "filePath": file_path,
         "content": documentation,
         "comments": "" # set to be empty string temporarily
-      }])
+      }])"""
       print(f"Documentation generated for {file_name}.")
       return documentation
     except:
       raise SemanticKernelError(f"The generation for {file_name} failed. Please check kernel configurations and try again.")
-
-class SemanticKernelError(Exception):
-  pass
