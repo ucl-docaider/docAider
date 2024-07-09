@@ -19,31 +19,28 @@ class DocumentationUpdate():
         self.branch = branch
 
     def run(self):
-        # 1. Fetch the latest commit and first non-documentation parent commit
-        sha = git_utils.get_latest_commit_sha(self.repo, self.branch)
-        latest_commit = self.repo.commit(sha)
-        parent_commit = git_utils.get_previous_non_doc_commit(latest_commit)
+        # 1. Get the latest commit of the current branch and the main branch
+        current_branch_sha = git_utils.get_latest_commit_sha(self.repo, self.branch)
+        main_branch_sha = git_utils.get_latest_commit_sha(self.repo, 'main')
 
-        # Exit if no valid parent commit is found
-        if not parent_commit:
-            raise Exception(
-                "No valid parent commit found for updating documentation.")
+        current_branch_commit = self.repo.commit(current_branch_sha)
+        main_branch_commit = self.repo.commit(main_branch_sha)
 
-        # 2. Find the diffs between the latest commit and its parent
-        diffs = git_utils.get_diffs(latest_commit, parent_commit)
+        # 2. Find the diffs between the current branch and main
+        diffs = git_utils.get_diffs(current_branch_commit, main_branch_commit)
 
-        # Exit if no Python file changes are found in the commit
+        # Exit if no Python file changes are found
         if not diffs:
-            print("No Python file changes found in the commit.")
+            print("No Python file changes found between main and the current branch.")
             return
-        print(f'Found {len(diffs)} Python file changes in the commit.')
+        print(f'Found {len(diffs)} Python file changes between main and the current branch.')
 
         # 3. Initialize the necessary dependencies for the documentation update process
         self._initialize()
         print("Starting the documentation update process...")
         start_time = time.time()
 
-        # 4. Update the documentation for each Python file in the commit
+        # 4. Update the documentation for each Python file that has changed
         for diff in diffs:
             file_path = os.path.join(self.root_folder, diff.a_path)
             file_path = os.path.abspath(file_path)
@@ -52,9 +49,9 @@ class DocumentationUpdate():
 
             # Get the old and new file contents
             old_file_content = git_utils.get_file__commit_content(self.root_folder,
-                                                                  file_path, parent_commit)
+                                                                  file_path, main_branch_commit)
             new_file_content = git_utils.get_file__commit_content(self.root_folder,
-                                                                  file_path, latest_commit)
+                                                                  file_path, current_branch_commit)
 
             # Attempt to get the cached documentation for the file
             cached = self.cache.get(file_path)
