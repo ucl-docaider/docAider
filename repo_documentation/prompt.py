@@ -85,6 +85,7 @@ Provide an output example for a specified data type (e.g., list, double, int) an
 Please generate a detailed explanation document for this object based on the code of the target object itself. For the section Called_functions, considering the additional documentation for the functions and classes called within the file:
 {additional_docs}.
 """
+
 DOCUMENTATION_UPDATE_PROMPT = """You are an AI documentation assistant. Your task is to update the existing documentation based on the provided changes in the code. 
 
 Now you need to update the document for "{file_name}".
@@ -100,6 +101,9 @@ Now you need to update the document for "{file_name}".
 
 **Diff between Old and New Code**:
 {diff}
+
+**Changes in the Functions**:
+{changes}
 
 Please update the documentation accordingly, ensuring it accurately reflects the changes. Provide a comprehensive and clear description for any modified or new functions/classes.
 

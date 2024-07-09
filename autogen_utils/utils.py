@@ -49,7 +49,8 @@ def get_updated_documentation(file_path,
                              old_file_content,
                              new_file_content,
                              diff,
-                             additional_docs,
+                             additional_docs, # TODO: Add additional_docs to the prompt
+                             changes,
                              user,
                              assistant,
                              output_dir,
@@ -78,7 +79,7 @@ def get_updated_documentation(file_path,
         old_file_content=old_file_content,
         new_file_content=new_file_content,
         diff=diff,
-        additional_docs=additional_docs
+        changes=changes
     )
     initiate_chat(user, assistant, prompt_message)
     if save_debug:
@@ -95,7 +96,7 @@ def get_additional_docs_path(file_path, graph, bfs_explore):
             continue
         calls = file_to_calls[file_path]
         additional_docs += get_additional_docs_calls(calls, graph, bfs_explore)
-
+    return additional_docs
 
 def get_additional_docs_calls(calls, graph, bfs_explore):
     additional_docs = ""

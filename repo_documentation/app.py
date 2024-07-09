@@ -64,7 +64,7 @@ class RepoDocumentation():
                                                   docs=docs)
 
             # 6. Add the file path and its according documentation to the cache
-            cache.add(file_path, docs_filepath)
+            cache.add(file_path, file_content, docs_filepath)
 
         # 7. Save cache to a file
         utils.save_cache(self.output_dir, cache)

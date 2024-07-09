@@ -1,4 +1,3 @@
-import difflib
 import git_utils
 import os
 import sys
@@ -8,9 +7,11 @@ import git
 sys.path.append(os.path.abspath(
     os.path.join(os.path.dirname(__file__), './../')))
 
-from repo_documentation import utils
-from autogen_utils import utils as autogen_utils
+from code2flow.code2flow import ast_utils
 from code2flow.code2flow import utils as code2flow_utils
+from autogen_utils import utils as autogen_utils
+from repo_documentation import utils
+from cache.document import sha256_hash
 
 class DocumentationUpdate():
     def __init__(self, repo_path, branch):
@@ -40,7 +41,6 @@ class DocumentationUpdate():
 
         # 3. Initialize the necessary dependencies for the documentation update process
         self._initialize()
-        file_to_functions = code2flow_utils.get_file_to_functions(self.graph)
         print("Starting the documentation update process...")
         start_time = time.time()
 
@@ -48,8 +48,7 @@ class DocumentationUpdate():
         for diff in diffs:
             file_path = os.path.join(self.root_folder, diff.a_path)
             file_path = os.path.abspath(file_path)
-            print(f"Processing file: {file_path}")
-            print(f"Updating documentation for file={file_path}")
+           
 
             # Get the old and new file contents
             old_file_content = git_utils.get_file__commit_content(self.root_folder,
@@ -66,6 +65,7 @@ class DocumentationUpdate():
 
             # 6a. Generate new documentation if the file is not cached
             if not cached:
+                print(f"Generating documentation for file={file_path}")
                 autogen_utils.get_documentation(
                     file_path=file_path,
                     file_content=new_file_content,
@@ -79,11 +79,11 @@ class DocumentationUpdate():
                 continue
 
             # 6b. Skip if the file has not been modified since last update
-            if cached.source_file_hash == hash(new_file_content):
-                print(
-                    f'File {file_path} has not been modified since last update.')
+            if cached.source_file_hash == sha256_hash(new_file_content):
+                print(f'Skipping documentation update for file={file_path} as it has not been modified since last update.')
                 continue
 
+            print(f"Updating documentation for file={file_path}")
             # 6c. Otherwise fetch the old file docs
             old_file_docs = self._get_old_file_docs(self.cache, file_path)
 
@@ -91,11 +91,15 @@ class DocumentationUpdate():
             diff = git_utils.get_unified_diff(old_content=old_file_content,
                                               new_content=new_file_content)
 
-            # 8. TODO: Get parent dependencies
-            closest_matching_functions = self.find_closest_matching_functions(
-                file_to_functions[file_path], diff)
+            # 8. Find out all the changes (added, removed, updated, renamed) in the functions
+            changes = ast_utils.get_function_changes(
+                file_path, old_file_content, new_file_content)
+
+            # 9. Find all parent dependencies that need to be updated as well
+            filtered = ast_utils.filter_changes(changes)
             parent_dependencies = code2flow_utils.get_parent_dependencies(
-                self.graph, closest_matching_functions)
+                self.graph, filtered)
+            # TODO: Update the parent dependencies as well
 
             # 8. Update the documentation based on the diffs and additional docs
             updated_docs = autogen_utils.get_updated_documentation(
@@ -105,6 +109,7 @@ class DocumentationUpdate():
                 new_file_content=new_file_content,
                 diff=diff,
                 additional_docs=additional_docs,
+                changes=self._changes_to_string(changes),
                 user=self.user,
                 assistant=self.assistant,
                 output_dir=self.output_dir,
@@ -118,7 +123,7 @@ class DocumentationUpdate():
                                                       docs=updated_docs)
 
             # 10. Update the cache with the new documentation path and save
-            self.cache.update_docs(file_path, updated_docs_path)
+            self.cache.update_docs(file_path, new_file_content, updated_docs_path)
             utils.save_cache(self.output_dir, self.cache)
 
         total = round(time.time() - start_time, 3)
@@ -155,50 +160,8 @@ class DocumentationUpdate():
         cached_docs_path = cache.get(file_path).generated_docs_path
         return utils.read_file_content(cached_docs_path)
 
-    """
-    TODO: We need to be able to handle all of these scenarios when updating the documentation:
-    Possible scenarios:
-    1. Function is updated (should return the original function)
-    2. Function is added (should return 'None', as there is no such function in the file yet)
-    3. Function is renamed (should return the original function)
-    4. Function is removed (should return 'None', as there is no such function in the file anymore)
-    
-    5. Other scenarios, where functions are not changed (should return -1, special case)
-    """
-
-    def find_closest_matching_functions(self, file_functions, diff):
-        closest_matches = []
-
-        # Extract function names and their content from the diff
-        diff_functions = git_utils.extract_functions_from_diff(diff)
-
-        for diff_func_name, diff_func_content in diff_functions.items():
-            best_match = None
-            highest_ratio = 0
-
-            for file_func in file_functions:
-                entry = self.graph.get(file_func)
-                file_func_name = entry['name'].split('::')[-1]
-                file_func_content = entry['content']
-
-                # Calculate similarity ratio
-                name_ratio = difflib.SequenceMatcher(
-                    None, diff_func_name, file_func_name).ratio()
-                content_ratio = difflib.SequenceMatcher(
-                    None, diff_func_content, file_func_content).ratio()
-                ratio = (name_ratio + content_ratio) / 2
-
-                if ratio > highest_ratio:
-                    highest_ratio = ratio
-                    best_match = file_func
-
-            if best_match:
-                closest_matches.append(best_match)
-
-        # Handle case where no functions changed
-        if not closest_matches and not diff_functions:
-            return [-1]
-        return closest_matches
+    def _changes_to_string(self, changes):
+        return '\n'.join([f'- {str(change)}' for change in changes])
 
 
 repo_path = "../simple-users/"

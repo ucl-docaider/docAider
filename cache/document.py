@@ -1,5 +1,5 @@
 import datetime
-
+import hashlib
 
 class Document():
     """
@@ -12,35 +12,28 @@ class Document():
 
     @staticmethod
     def from_dict(data: dict):
-        doc = Document(None, None)
+        doc = Document(None, None, None)
         doc.source_file_path = data['source_file_path']
         doc.source_file_hash = data['source_file_hash']
         doc.generated_docs_path = data['generated_docs_path']
-        doc.generated_docs_hash = data['generated_docs_hash']
         doc.modified_on = data['modified_on']
         return doc
 
-    def __init__(self, source_file_path, generated_docs_path):
+    def __init__(self, source_file_path, source_file_content, generated_docs_path):
         self.source_file_path = source_file_path
-        self.source_file_hash = self.__get_file_content_hash(
-            source_file_path) if source_file_path else None
+        self.source_file_hash = sha256_hash(source_file_content) if source_file_content else ''
         self.generated_docs_path = generated_docs_path
-        self.generated_docs_hash = self.__get_file_content_hash(
-            generated_docs_path) if generated_docs_path else None
         self.modified_on = self.__timestamp()
-
-    def __get_file_content_hash(self, file_path):
-        return hash(self.__read_file_content(file_path))
 
     def __timestamp(self):
         return datetime.datetime.now().isoformat()
-
-    def __read_file_content(self, file_path):
-        with open(file_path, 'r') as file:
-            return file.read()
-
-    def update_path(self, path):
-        self.generated_docs_path = path
-        self.generated_docs_hash = self.__get_file_content_hash(path)
+    
+    def update(self, path, content, generated_docs_path):
+        self.source_file_path = path
+        self.source_file_hash = sha256_hash(content)
+        self.generated_docs_path = generated_docs_path
         self.modified_on = self.__timestamp()
         print(f'Cache updated for {self.source_file_path} at {self.modified_on}')
+
+def sha256_hash(content : str):
+    return hashlib.sha256(content.encode('utf-8')).hexdigest()
