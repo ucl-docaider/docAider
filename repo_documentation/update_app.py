@@ -1,3 +1,4 @@
+import difflib
 import git_utils
 import os
 import sys
@@ -7,9 +8,9 @@ import git
 sys.path.append(os.path.abspath(
     os.path.join(os.path.dirname(__file__), './../')))
 
-from code2flow.code2flow import utils as code2flow_utils
-from autogen_utils import utils as autogen_utils
 from repo_documentation import utils
+from autogen_utils import utils as autogen_utils
+from code2flow.code2flow import utils as code2flow_utils
 
 class DocumentationUpdate():
     def __init__(self, repo_path, branch):
@@ -20,7 +21,8 @@ class DocumentationUpdate():
 
     def run(self):
         # 1. Get the latest commit of the current branch and the main branch
-        current_branch_sha = git_utils.get_latest_commit_sha(self.repo, self.branch)
+        current_branch_sha = git_utils.get_latest_commit_sha(
+            self.repo, self.branch)
         main_branch_sha = git_utils.get_latest_commit_sha(self.repo, 'main')
 
         current_branch_commit = self.repo.commit(current_branch_sha)
@@ -33,10 +35,12 @@ class DocumentationUpdate():
         if not diffs:
             print("No Python file changes found between main and the current branch.")
             return
-        print(f'Found {len(diffs)} Python file changes between main and the current branch.')
+        print(
+            f'Found {len(diffs)} Python file changes between main and the current branch.')
 
         # 3. Initialize the necessary dependencies for the documentation update process
         self._initialize()
+        file_to_functions = code2flow_utils.get_file_to_functions(self.graph)
         print("Starting the documentation update process...")
         start_time = time.time()
 
@@ -86,6 +90,12 @@ class DocumentationUpdate():
             # 7. Generate the diff between old and new file contents
             diff = git_utils.get_unified_diff(old_content=old_file_content,
                                               new_content=new_file_content)
+
+            # 8. TODO: Get parent dependencies
+            closest_matching_functions = self.find_closest_matching_functions(
+                file_to_functions[file_path], diff)
+            parent_dependencies = code2flow_utils.get_parent_dependencies(
+                self.graph, closest_matching_functions)
 
             # 8. Update the documentation based on the diffs and additional docs
             updated_docs = autogen_utils.get_updated_documentation(
@@ -144,6 +154,51 @@ class DocumentationUpdate():
     def _get_old_file_docs(self, cache, file_path):
         cached_docs_path = cache.get(file_path).generated_docs_path
         return utils.read_file_content(cached_docs_path)
+
+    """
+    TODO: We need to be able to handle all of these scenarios when updating the documentation:
+    Possible scenarios:
+    1. Function is updated (should return the original function)
+    2. Function is added (should return 'None', as there is no such function in the file yet)
+    3. Function is renamed (should return the original function)
+    4. Function is removed (should return 'None', as there is no such function in the file anymore)
+    
+    5. Other scenarios, where functions are not changed (should return -1, special case)
+    """
+
+    def find_closest_matching_functions(self, file_functions, diff):
+        closest_matches = []
+
+        # Extract function names and their content from the diff
+        diff_functions = git_utils.extract_functions_from_diff(diff)
+
+        for diff_func_name, diff_func_content in diff_functions.items():
+            best_match = None
+            highest_ratio = 0
+
+            for file_func in file_functions:
+                entry = self.graph.get(file_func)
+                file_func_name = entry['name'].split('::')[-1]
+                file_func_content = entry['content']
+
+                # Calculate similarity ratio
+                name_ratio = difflib.SequenceMatcher(
+                    None, diff_func_name, file_func_name).ratio()
+                content_ratio = difflib.SequenceMatcher(
+                    None, diff_func_content, file_func_content).ratio()
+                ratio = (name_ratio + content_ratio) / 2
+
+                if ratio > highest_ratio:
+                    highest_ratio = ratio
+                    best_match = file_func
+
+            if best_match:
+                closest_matches.append(best_match)
+
+        # Handle case where no functions changed
+        if not closest_matches and not diff_functions:
+            return [-1]
+        return closest_matches
 
 
 repo_path = "../simple-users/"
