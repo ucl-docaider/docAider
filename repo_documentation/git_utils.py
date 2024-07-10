@@ -1,6 +1,5 @@
 import difflib
 import os
-import re
 
 
 def get_latest_commit_sha(repo, branch):
@@ -79,36 +78,3 @@ def get_unified_diff(old_content, new_content):
     diff = difflib.unified_diff(
         old_content.splitlines(), new_content.splitlines())
     return "\n".join(diff)
-
-def extract_functions_from_diff(diff):
-    function_pattern = r'^[\+\-]?\s*def\s+(\w+)\s*\([^)]*\):'
-    lines = diff.split('\n')
-
-    functions = {}
-    current_function = None
-    function_content = []
-
-    for line in lines:
-        # Skip lines that are not part of the actual changes
-        if line.startswith('---') or line.startswith('+++') or line.startswith('@@'):
-            continue
-            
-        # Check if this line is a function definition
-        match = re.match(function_pattern, line)
-        if match:
-            # If we were tracking a previous function, save it
-            if current_function:
-                functions[current_function] = '\n'.join(function_content)
-
-            # Start tracking the new function
-            current_function = match.group(1)
-            function_content = [line]
-        elif current_function:
-            # If we're inside a function, add the line to its content
-            function_content.append(line)
-
-    # Save the last function if there is one
-    if current_function:
-        functions[current_function] = '\n'.join(function_content)
-
-    return functions
