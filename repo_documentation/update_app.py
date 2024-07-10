@@ -59,7 +59,7 @@ class DocumentationUpdate():
                 self._create_docs(path, curr_branch_commit)
 
             # 6b. Skip if the file has not been modified since last update
-            elif cached.source_file_hash == sha256_hash(self._new_content(path, curr_branch_commit)):
+            elif cached.source_file_hash == sha256_hash(self._new_commit_content(path, curr_branch_commit)):
                 print(f'Skipping documentation update for file={
                       path} as it has not been modified since last update.')
 
@@ -112,7 +112,7 @@ class DocumentationUpdate():
         path = os.path.abspath(path)
         return path
 
-    def _new_content(self, file_path, current_branch_commit):
+    def _new_commit_content(self, file_path, current_branch_commit):
         return git_utils.get_file__commit_content(self.root_folder, file_path, current_branch_commit)
 
     def _create_docs(self, file_path, current_branch_commit):
@@ -157,7 +157,7 @@ class DocumentationUpdate():
                      current_branch_commit,
                      changes,
                      additional_functions_info=None):
-        print(f"Updating documentation for file={path}")
+        print(f"Updating documentation for file={file_path}")
         # 1. Get the file contents from the main and current branch
         old_content = git_utils.get_file__commit_content(self.root_folder,
                                                          file_path, main_branch_commit)
@@ -208,7 +208,7 @@ class DocumentationUpdate():
         assert cached is not None, f"File {path} not found in cache."
 
         # Skip cached
-        if cached.source_file_hash == sha256_hash(self._new_content(path, curr_branch_commit)):
+        if cached.source_file_hash == sha256_hash(self._new_commit_content(path, curr_branch_commit)):
             print(f'Skipping parent documentation update for file={
                   path} as it has not been modified since last update.')
             return
@@ -241,8 +241,8 @@ class DocumentationUpdate():
         utils.save_cache(self.output_dir, self.cache)
 
 
-repo_path = "../simple-users/"
-branch = "feature"
+repo_path = "./../../users/"
+branch = "test"
 repo_doc_updater = DocumentationUpdate(
     repo_path=repo_path,
     branch=branch)
