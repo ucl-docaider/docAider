@@ -8,29 +8,27 @@ from code2flow.code2flow import utils as graph_utils
 from cache.docs_cache import DocsCache
 from autogen_utils import utils as autogen_utils
 
-load_dotenv(dotenv_path='.env')
+load_dotenv(dotenv_path='../.env')
 
 class RepoDocumentation():
     """
     This class provides a set of functions to generate documentation for a repository
     """
-    def __init__(self, llm_id, root_folder, output_dir):
+    def __init__(self, root_folder, output_dir):
         """
         Initializes a new instance of the RepoDocumentation class.
         
         Args:
-            llm_id: Ollama model name, see https://ollama.ai/library
             root_folder: we generate documentation for all source files under the root folder.
             output_dir: the directory stores the output files and documentation
-            documentation_generator: the instance of documentation generator class
         """
-        self.llm_id = llm_id
         self.root_folder = root_folder
         self.output_dir = os.path.join(self.root_folder, output_dir)
-        self.documentation_generator = DocumentationGenerator(llm_id)
+        self.documentation_generator = DocumentationGenerator()
         
-        repo_saver = RepoSaver("CQ-Ke/repo-copilot-test")
-        repo_saver.auto_save_python_and_md_files()
+        # Save repo files into DB
+        #repo_saver = RepoSaver("CQ-Ke/repo-copilot-test")
+        #repo_saver.auto_save_python_and_md_files()
 
     def run(self):
         print('Generating documentation...')
@@ -85,9 +83,5 @@ class RepoDocumentation():
         print(f"Documentation generation completed in {total}s.")
 
 # Test this script
-repo_doc = RepoDocumentation(
-    llm_id="mistral",
-    root_folder="../simple-users/",
-    output_dir="docs_output"
-)
+repo_doc = RepoDocumentation(root_folder="../samples/", output_dir="../docs_output")
 repo_doc.run()

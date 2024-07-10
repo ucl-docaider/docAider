@@ -11,3 +11,8 @@ env*
 __pycache__/
 
 .vscode/
+.DS_Store
+
+# Docs
+*docs_output*
+*samples*
