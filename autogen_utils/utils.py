@@ -105,8 +105,7 @@ def get_additional_docs_calls(calls, graph, bfs_explore):
             continue
         for callee in bfs_explore[call_name]:
             callee_call = graph[callee]
-            additional_docs += f"\nFunction/Class {
-                callee_call['name']}:\n{callee_call['content']}\n"
+            additional_docs += f"\nFunction/Class {callee_call['name']}:\n{callee_call['content']}\n"
     return additional_docs
 
 
