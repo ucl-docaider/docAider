@@ -111,3 +111,20 @@ Please update the documentation accordingly, ensuring it accurately reflects the
 """
 
 USR_PROMPT = """You are a documentation generation assistant for Python programs. Keep in mind that your audience is document readers, so use a deterministic tone to generate precise content and don't let them know you're provided with code snippet and documents. AVOID ANY SPECULATION and inaccurate descriptions! Now, provide the documentation for the target object in a professional way."""
+
+
+PARENT_UPDATE = """
+
+**The following functions:**
+{filtered}
+
+**In the file below:**
+{new_content}
+
+Have been updated. These changes influence the current file on the path: 
+{path}
+
+Please make sure to update the following functions in the file accordingly.
+{functions}
+
+"""
