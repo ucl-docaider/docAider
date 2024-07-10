@@ -65,7 +65,6 @@ class DocumentationUpdate():
 
             # 6c. Otherwise update the documentation
             else:
-                print(f"Updating documentation for file={path}")
                 self._update_docs(file_path=path,
                                   main_branch_commit=main_branch_commit,
                                   current_branch_commit=curr_branch_commit,
@@ -158,6 +157,7 @@ class DocumentationUpdate():
                      current_branch_commit,
                      changes,
                      additional_functions_info=None):
+        print(f"Updating documentation for file={path}")
         # 1. Get the file contents from the main and current branch
         old_content = git_utils.get_file__commit_content(self.root_folder,
                                                          file_path, main_branch_commit)
