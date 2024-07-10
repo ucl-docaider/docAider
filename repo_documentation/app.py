@@ -70,9 +70,8 @@ class RepoDocumentation():
         utils.save_cache(self.output_dir, cache)
 
         total = round(time.time() - start_time, 3)
-        print(f'Generated documentation ({
-              cache.size()} files) can be found in {self.output_dir}')
+        print(f'Generated documentation ({cache.size()} files) can be found in {self.output_dir}')
         print(f"Documentation generation completed in {total}s.")
 
 
-RepoDocumentation(root_folder='../simple-users/').run()
+RepoDocumentation(root_folder='../code2flow/projects/simple').run()
