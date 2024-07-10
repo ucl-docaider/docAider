@@ -1,14 +1,16 @@
 import sys, os
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(parent_dir)
+from dotenv import load_dotenv
 from semantic_kernel import Kernel
 from rag.retriever import Retriever
-from semantic_kernel.connectors.ai.ollama.services.ollama_chat_completion import OllamaChatCompletion
-from semantic_kernel.connectors.ai.ollama.services.ollama_text_embedding import OllamaTextEmbedding
-from semantic_kernel.connectors.ai.ollama.ollama_prompt_execution_settings import OllamaChatPromptExecutionSettings
+from semantic_kernel.connectors.ai.open_ai.services.azure_chat_completion import AzureChatCompletion
+from semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.azure_chat_prompt_execution_settings import AzureChatPromptExecutionSettings
 from semantic_kernel.prompt_template import PromptTemplateConfig
 from repo_documentation.prompt import DOCUMENTATION_PROMPT
 from exceptions import SemanticKernelError
+
+load_dotenv(dotenv_path="../.env")
 
 class DocumentationGenerator():
   """
@@ -16,48 +18,39 @@ class DocumentationGenerator():
   It uses a retriever to get context information and uses a LLM-based generator to generate documentation.
   Semantic Kernel is central of the implementation.
   """
-  def __init__(self, llm_id):
+  def __init__(self):
     """
     Initialize a new instance of the DocumentationGenerator class
-
-    Args:
-      llm_id: Ollama model name, see https://ollama.ai/library
     """
-    self.llm_id = llm_id
     self.kernel = Kernel()
     self.context_retriever = Retriever(
-      ai_search_api_key=os.getenv("AZURE_KEY_CREDENTIAL"),
+      ai_search_api_key=os.getenv("AZURE_AI_SEARCH_KEY"),
       endpoint=os.getenv("SEARCH_ENDPOINT"),
       index_name="repo-index"
     )
     self.doc_retriever = Retriever(
-      ai_search_api_key=os.getenv("AZURE_KEY_CREDENTIAL"),
+      ai_search_api_key=os.getenv("AZURE_AI_SEARCH_KEY"),
       endpoint=os.getenv("SEARCH_ENDPOINT"),
       index_name="documentation-index"
     )
     self.chat_service_id = "documentation_generation"
     self.prompt = ""
 
-    self._init()    
-    print(f"Documentation generator initialised successfully.")
+    self._init()
 
   def _init(self):
     """
     Initialse kernel services and retrievers
     """
     # Add a chat completion service
-    ollama_chat_completion = OllamaChatCompletion(
+    azure_open_ai_completion = AzureChatCompletion(
       service_id=self.chat_service_id,
-      ai_model_id=self.llm_id,
-      url="http://localhost:11434/api/chat"
+      deployment_name=os.getenv("CHAT_DEPLOYMENT_NAME"),
+      api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+      endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+      api_version=os.getenv("AZURE_OPENAI_API_VERSION")
     )
-    self.kernel.add_service(ollama_chat_completion)
-    # Add a text embedding service
-    embedding_generator = OllamaTextEmbedding(
-      service_id="embedding",
-      ai_model_id="all-minilm"
-    )
-    self.kernel.add_service(embedding_generator)
+    self.kernel.add_service(azure_open_ai_completion)
 
     if not self.context_retriever.index_exist_or_not():
       self.context_retriever.create_index(self.context_retriever.index_name)
@@ -88,9 +81,8 @@ class DocumentationGenerator():
     self.prompt = prompt
 
     # Configure execution settings
-    execution_settings = OllamaChatPromptExecutionSettings(
+    execution_settings = AzureChatPromptExecutionSettings(
       service_id=self.chat_service_id,
-      ai_model_id=self.llm_id,
       temperature=0      
     )
 
@@ -110,7 +102,6 @@ class DocumentationGenerator():
     )
 
     # Invoke kernel to generate documentation
-    print(f"Waiting for semantic kernel to respond...")
     try:
       documentation = str(await self.kernel.invoke(documentation_generator))
       # Save documentation to the database
