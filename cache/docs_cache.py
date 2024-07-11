@@ -27,8 +27,10 @@ class DocsCache():
         return self.__cache.get(key, None)
 
     def update_docs(self, path, content, gen_docs_path):
-        assert path in self.__cache, f"{path} not found in cache"
-        self.get(path).update(path, content, gen_docs_path)
+        if path not in self.__cache:
+            self.add(path, content, gen_docs_path)
+        else:
+            self.get(path).update(path, content, gen_docs_path)
 
     def remove(self, key: str):
         if key in self.__cache:
