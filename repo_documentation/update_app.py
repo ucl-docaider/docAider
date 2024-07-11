@@ -221,11 +221,11 @@ class DocumentationUpdate():
 		print(f'Parent dependencies: {parent_dependencies}')
 		for path, functions in parent_dependencies.items():
 			self._update_parent(path, current_branch_commit, main_branch_commit,
-								new_content, filtered, functions, self._changes_to_string(changes))
+								new_content, filtered, functions, changes)
 
-	def _update_parent(self, path, curr_branch_commit, main_branch_commit,
+	def _update_parent(self, file_path, curr_branch_commit, main_branch_commit,
 					   new_content, filtered, functions, changes):
-		cached = self.cache.get(path)
+		cached = self.cache.get(file_path)
 		assert cached is not None, f"File {path} not found in cache."
 
 		# # Skip cached
@@ -234,22 +234,46 @@ class DocumentationUpdate():
 		# 		  path} as it has not been modified since last update.')
 		# 	return
 
-		print(f'Updating parent dependency for file={path}')
+		print(f'Updating parent dependency for file={file_path}')
 
 		# Prepare additional functions info for the prompt
 		additional_functions_info = PARENT_UPDATE.format(
 			filtered=filtered,
 			new_content=new_content,
-			path=path,
+			path=file_path,
 			functions=functions
 		)
 
-		# Update the documentation for the dependency
-		self._update_docs(file_path=path,
-						  main_branch_commit=main_branch_commit,
-						  current_branch_commit=curr_branch_commit,
-						  changes= changes,
-						  additional_functions_info=additional_functions_info)
+		old_content = git_utils.get_file__commit_content(self.root_folder,
+														 file_path, main_branch_commit)
+		new_content = git_utils.get_file__commit_content(self.root_folder,
+														 file_path, curr_branch_commit)
+
+		diff = git_utils.get_unified_diff(old_content, new_content)
+
+		additional_docs = autogen_utils.get_additional_docs_path(
+			file_path, self.graph, self.bfs_explore)
+
+		if additional_functions_info:
+			additional_docs += additional_functions_info
+
+		# 6. Update the documentation based on the diffs and additional docs
+		updated_docs = autogen_utils.get_updated_documentation(
+			file_path=file_path,
+			old_file_docs=self._get_old_file_docs(self.cache, file_path),
+			old_file_content=old_content,
+			new_file_content=new_content,
+			diff=diff,
+			additional_docs=additional_docs,
+			changes=self._changes_to_string(changes),
+			user=self.user,
+			assistant=self.assistant,
+			output_dir=self.output_dir,
+			save_debug=True
+		)
+
+		# 7. Write the updated documentation to the output directory and save to cache
+		self._write_docs_and_cache(file_path, new_content, updated_docs)
 
 	def _write_docs_and_cache(self, file_path, content, docs):
 		# Write the updated documentation to the output directory
