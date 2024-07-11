@@ -107,7 +107,7 @@ Now you need to update the document for "{file_name}".
 
 Please update the documentation accordingly, ensuring it accurately reflects the changes. Provide a comprehensive and clear description for any modified or new functions/classes.
 
-**Updated Documentation**:
+**Note**: DO NOT CHANGE ANYTHING IN THE OLD DOCUMENTATION THAT HAS NOT BEEN AFFECTED BY THE CODE CHANGES.
 """
 
 USR_PROMPT = """You are a documentation generation assistant for Python programs. Keep in mind that your audience is document readers, so use a deterministic tone to generate precise content and don't let them know you're provided with code snippet and documents. AVOID ANY SPECULATION and inaccurate descriptions! Now, provide the documentation for the target object in a professional way."""
@@ -126,5 +126,7 @@ Have been updated. These changes influence the current file on the path:
 
 Please make sure to update the following functions in the file accordingly.
 {functions}
+
+••Note:••: DO NOT CHANGE ANYTHING IN THE OLD DOCUMENTATION THAT HAS NOT BEEN AFFECTED BY THE CODE CHANGES.
 
 """
