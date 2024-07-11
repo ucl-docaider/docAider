@@ -91,9 +91,7 @@ def get_updated_documentation(file_path,
 def get_additional_docs_path(file_path, graph, bfs_explore):
     additional_docs = ""
     file_to_calls = code2flow_utils.get_file_to_functions(graph)
-    for file_path, calls in file_to_calls.items():
-        if file_path == 'EXTERNAL':
-            continue
+    if file_path in file_to_calls:
         calls = file_to_calls[file_path]
         additional_docs += get_additional_docs_calls(calls, graph, bfs_explore)
     return additional_docs
