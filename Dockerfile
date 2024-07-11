@@ -9,4 +9,6 @@ COPY . /repo-copilot
 
 RUN pip install -r requirements.txt
 
+EXPOSE 5000
+
 CMD ["tail", "-f", "/dev/null"]

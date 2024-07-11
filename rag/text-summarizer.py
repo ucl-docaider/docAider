@@ -11,7 +11,7 @@ kernel = Kernel()
 ollama_chat_completion = OllamaChatCompletion(
   service_id="chat-completion",
   ai_model_id="llama3",
-  url="http://localhost:11434/api/chat"
+  url="http://host.docker.internal:11434/api/chat"
 )
 kernel.add_service(ollama_chat_completion)
 
