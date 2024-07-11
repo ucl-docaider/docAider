@@ -36,10 +36,10 @@ jobs:
 
       - name: Run generate/update documentation script
         run: |
-          if [ -d "/workspace/docs_output" ]; then
-            docker exec -it repo-copilot python3 /repo-copilot/repo_documentation/app.py  
+          if [ -d "docs_output" ]; then
+            docker exec repo-copilot python3 /repo-copilot/repo_documentation/app.py  
           else
-            docker exec -it repo-copilot python3 /repo-copilot/repo_documentation/update_app.py "${{ github.ref_name }}"
+            docker exec repo-copilot python3 /repo-copilot/repo_documentation/update_app.py "${{ github.ref_name }}"
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
