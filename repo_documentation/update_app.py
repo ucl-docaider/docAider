@@ -226,7 +226,7 @@ class DocumentationUpdate():
 	def _update_parent(self, file_path, curr_branch_commit, main_branch_commit,
 					   new_content, filtered, functions, changes):
 		cached = self.cache.get(file_path)
-		assert cached is not None, f"File {path} not found in cache."
+		assert cached is not None, f"File {file_path} not found in cache."
 
 		# # Skip cached
 		# if cached.source_file_hash == sha256_hash(self._new_commit_content(path, curr_branch_commit)):
@@ -257,7 +257,7 @@ class DocumentationUpdate():
 		if additional_functions_info:
 			additional_docs += additional_functions_info
 
-		# 6. Update the documentation based on the diffs and additional docs
+		# Update the documentation based on the diffs and additional docs
 		updated_docs = autogen_utils.get_updated_documentation(
 			file_path=file_path,
 			old_file_docs=self._get_old_file_docs(self.cache, file_path),
@@ -272,7 +272,7 @@ class DocumentationUpdate():
 			save_debug=True
 		)
 
-		# 7. Write the updated documentation to the output directory and save to cache
+		# Write the updated documentation to the output directory and save to cache
 		self._write_docs_and_cache(file_path, new_content, updated_docs)
 
 	def _write_docs_and_cache(self, file_path, content, docs):
