@@ -19,16 +19,16 @@ class DocsCache():
     def __str__(self) -> str:
         return str(self.__cache)
 
-    def add(self, source_path, gen_docs_path):
+    def add(self, source_path, source_content, gen_docs_path):
         self.__cache[source_path] = Document(
-            source_path, gen_docs_path)
+            source_path, source_content, gen_docs_path)
 
     def get(self, key: str) -> Document:
         return self.__cache.get(key, None)
 
-    def update_docs(self, key, path):
-        assert key in self.__cache, f"Key {key} not found in cache"
-        self.get(key).update_path(path)
+    def update_docs(self, path, content, gen_docs_path):
+        assert path in self.__cache, f"{path} not found in cache"
+        self.get(path).update(path, content, gen_docs_path)
 
     def remove(self, key: str):
         if key in self.__cache:
