@@ -63,6 +63,7 @@ class DocumentationUpdate():
 			cached = self.cache.get(path)
 			
 			change_type = ChangeType(diff.change_type)
+			print(diff)
 
 			# 6a. Generate new documentation if the file is not cached
 			if change_type == ChangeType.ADDED:
@@ -86,6 +87,7 @@ class DocumentationUpdate():
 			# 6e. If the file has been deleted
 			elif change_type == ChangeType.DELETED:
 				self._handle_deleted(path)
+			
 			
 		total = round(time.time() - start_time, 3)
 		print(f"Total time taken to execute doc update: {total}s.")
@@ -260,13 +262,14 @@ class DocumentationUpdate():
 	def _handle_deleted(self, file_path):
 		print(f"File deleted: {file_path}")
 		old_file_docs_path = self._get_old_file_docs(self.cache, file_path)
+		print(f"Old file docs path: {old_file_docs_path}")
 		if os.path.exists(old_file_docs_path):
 			os.remove(old_file_docs_path)
 			print(f"Deleted documentation for {file_path}")
 
 
 repo_path = "./../../users/"
-branch = "test"
+branch = "testing3"
 repo_doc_updater = DocumentationUpdate(
 	repo_path=repo_path,
 	branch=branch)

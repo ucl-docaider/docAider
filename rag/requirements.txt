@@ -1,7 +1,0 @@
-semantic-kernel
-pyautogen
-azure-core
-azure-search-documents
-python-dotenv
-PyGithub
-chardet
