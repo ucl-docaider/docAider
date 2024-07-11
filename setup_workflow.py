@@ -1,8 +1,7 @@
 import os
-import subprocess
 
 workflow_content = """
-name: Start Actions on Commit for Updating Documentation
+name: Start Actions on Commit for Generating and Updating Documentation
 on:
   push:
       branches:
@@ -22,27 +21,34 @@ jobs:
         uses: actions/setup-python@v2
         with: 
          python-version: '3.10'
-
-      - name: Install Graphviz
-        run: sudo apt-get install -y graphviz
+      
+      - name: Start ollama server
+        run: curl -fsSL https://ollama.com/install.sh | sh
   
       - name: Run Llama 3
         run: ollama run llama3
 
-      - name: Run update documentation script
+      - name: Create workspace_data
+        run: docker volume create workspace_data
+
+      - name: Run docker image zenawang/repo-copilot:test
+        run: docker run --rm -v $(pwd):/workspace -w /workspace -d --name repo-copilot zenawang/repo-copilot:test
+
+      - name: Run generate/update documentation script
         run: |
-          cd repo_copilot/repo_documentation
-          git checkout zena/test_doc_update
-          python update_app.py "${{ github.ref_name }}"
+          if [ -d "/workspace/docs_output" ]; then
+            docker exec -it repo-copilot python3 /repo-copilot/repo_documentation/app.py  
+          else
+            docker exec -it repo-copilot python3 /repo-copilot/repo_documentation/update_app.py "${{ github.ref_name }}"
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Commit and push if changes in clucker
+      - name: Commit and push if changes in repository
         run: |
           git checkout ${{ github.ref_name }}
           git config --local user.email "github-actions@github.com"
           git config --local user.name "github-actions"
-          git config remote.origin.url "https://github.com/ZenaWangqwq/clucker.git"
           git add .
           git diff-index --quiet HEAD || (git commit -m "Documentation Updated" && git pull --rebase)
           git push
@@ -51,10 +57,8 @@ jobs:
 """
 
 def create_workflow():
-    # 创建 .github/workflows 目录
     os.makedirs('/workspace/.github/workflows', exist_ok=True)
-    # 写入 workflow 文件
-    with open('/workspace/.github/workflows/update-docs.yml', 'w') as f:
+    with open('/workspace/.github/workflows/generate-update-docs.yml', 'w') as f:
         f.write(workflow_content)
         
 if __name__ == "__main__":

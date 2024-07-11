@@ -74,4 +74,4 @@ class RepoDocumentation():
         print(f"Documentation generation completed in {total}s.")
 
 
-RepoDocumentation(root_folder='../code2flow/projects/simple').run()
+RepoDocumentation(root_folder='/workspace').run()

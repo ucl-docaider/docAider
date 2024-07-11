@@ -149,8 +149,8 @@ class DocumentationUpdate():
         return utils.read_file_content(cached_docs_path)
 
 
-repo_path = "../simple-users/"
-branch = "feature"
+repo_path = "../../workspace"
+branch = sys.argv[1]
 repo_doc_updater = DocumentationUpdate(
     repo_path=repo_path,
     branch=branch)
