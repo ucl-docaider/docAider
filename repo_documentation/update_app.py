@@ -63,7 +63,6 @@ class DocumentationUpdate():
 			cached = self.cache.get(path)
 			
 			change_type = ChangeType(diff.change_type)
-			print(diff)
 
 			# 6a. Generate new documentation if the file is not cached
 			if change_type == ChangeType.ADDED:
@@ -163,7 +162,8 @@ class DocumentationUpdate():
 		path = self._file_path(diff)
 		old_content = git_utils.get_file__commit_content(self.root_folder, path, main_branch_commit)
 		new_content = git_utils.get_file__commit_content(self.root_folder, path, curr_branch_commit)
-		return  ast_utils.get_function_changes(path, old_content, new_content)
+		return ast_utils.get_function_changes(path, old_content, new_content)
+
 	
 	def _parents_count(self, path, changes):
 		filtered = ast_utils.filter_changes(changes)
@@ -188,6 +188,7 @@ class DocumentationUpdate():
 
 		# 3. Find out all the relevant changes in the functions
 		filtered = ast_utils.filter_changes(changes)
+		print(f'Filtered changes: {filtered}')
 		parent_dependencies = code2flow_utils.get_parent_dependencies(
 			self.graph, filtered, file_path)
 
@@ -217,20 +218,21 @@ class DocumentationUpdate():
 		self._write_docs_and_cache(file_path, new_content, updated_docs)
 
 		# 8. For each parent dependency (file -> all functions affected by changes), update docs
+		print(f'Parent dependencies: {parent_dependencies}')
 		for path, functions in parent_dependencies.items():
 			self._update_parent(path, current_branch_commit, main_branch_commit,
-								new_content, filtered, functions)
+								new_content, filtered, functions, self._changes_to_string(changes))
 
 	def _update_parent(self, path, curr_branch_commit, main_branch_commit,
-					   new_content, filtered, functions):
+					   new_content, filtered, functions, changes):
 		cached = self.cache.get(path)
 		assert cached is not None, f"File {path} not found in cache."
 
-		# Skip cached
-		if cached.source_file_hash == sha256_hash(self._new_commit_content(path, curr_branch_commit)):
-			print(f'Skipping parent documentation update for file={
-				  path} as it has not been modified since last update.')
-			return
+		# # Skip cached
+		# if cached.source_file_hash == sha256_hash(self._new_commit_content(path, curr_branch_commit)):
+		# 	print(f'Skipping parent documentation update for file={
+		# 		  path} as it has not been modified since last update.')
+		# 	return
 
 		print(f'Updating parent dependency for file={path}')
 
@@ -246,6 +248,7 @@ class DocumentationUpdate():
 		self._update_docs(file_path=path,
 						  main_branch_commit=main_branch_commit,
 						  current_branch_commit=curr_branch_commit,
+						  changes= changes,
 						  additional_functions_info=additional_functions_info)
 
 	def _write_docs_and_cache(self, file_path, content, docs):
@@ -269,7 +272,7 @@ class DocumentationUpdate():
 
 
 repo_path = "./../../users/"
-branch = "testing3"
+branch = "testing4"
 repo_doc_updater = DocumentationUpdate(
 	repo_path=repo_path,
 	branch=branch)
