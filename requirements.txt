@@ -1,0 +1,12 @@
+pyautogen
+azure-core
+azure-search-documents
+python-dotenv
+pytest
+gitpython
+astunparse
+semantic-kernel
+ollama
+ordered-set
+gitpython
+pygithub

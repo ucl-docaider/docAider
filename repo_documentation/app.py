@@ -75,4 +75,4 @@ class RepoDocumentation():
         print(f"Documentation generation completed in {total}s.")
 
 
-RepoDocumentation(root_folder='../simple-users/').run()
+RepoDocumentation(root_folder='./../../users/').run()

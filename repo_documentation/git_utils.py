@@ -33,7 +33,7 @@ def get_diffs(commit, parent):
     """
     Find all the Python file diffs between the commit and its parent.
     """
-    diffs = commit.diff(parent)
+    diffs = commit.diff(parent, R=True)
     python_diffs = []
     for diff in diffs:
         file_path = diff.a_path

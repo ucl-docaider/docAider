@@ -1,14 +1,11 @@
 import os, sys, time, asyncio, utils
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(parent_dir)
-from dotenv import load_dotenv
 from rag.generator import DocumentationGenerator
 from repo_utils.saver import RepoSaver
 from code2flow.code2flow import utils as graph_utils
 from cache.docs_cache import DocsCache
 from autogen_utils import utils as autogen_utils
-
-load_dotenv(dotenv_path='../.env')
 
 class RepoDocumentation():
     """
