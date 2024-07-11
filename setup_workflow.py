@@ -3,13 +3,12 @@ import os
 workflow_content = """
 name: Start Actions on Commit for Generating and Updating Documentation
 on:
-  push:
-      branches:
-        - '**'
+  pull_request:
+      types:
+        - opened
   
 jobs:          
   documentation:
-    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: write

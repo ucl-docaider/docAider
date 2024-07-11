@@ -1,6 +1,6 @@
-pyautogen == 0.2.28
-prompt == 0.4.1
-pandas == 2.2.2 
+pyautogen
+prompt 
+pandas 
 pytest
 gitpython
 astunparse
