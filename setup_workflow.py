@@ -33,6 +33,9 @@ jobs:
 
       - name: Run docker image zenawang/repo-copilot:test
         run: docker run --rm -v $(pwd):/workspace -w /workspace -d --name repo-copilot zenawang/repo-copilot:test
+      
+      - name: Configure Git in Docker Container
+        run: docker exec repo-copilot git config --global --add safe.directory /workspace
 
       - name: Run generate/update documentation script
         run: |
