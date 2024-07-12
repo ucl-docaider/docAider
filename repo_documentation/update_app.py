@@ -236,36 +236,35 @@ class DocumentationUpdate():
 
 		print(f'Updating parent dependency for file={file_path}')
 
-		# Prepare additional functions info for the prompt
-		additional_functions_info = PARENT_UPDATE.format(
-			filtered=filtered,
-			new_content=new_content,
-			path=file_path,
-			functions=functions
-		)
+		# # Prepare additional functions info for the prompt
+		# additional_functions_info = PARENT_UPDATE.format(
+		# 	filtered=filtered,
+		# 	new_content=new_content,
+		# 	path=file_path,
+		# 	functions=functions
+		# )
 
-		old_content = git_utils.get_file__commit_content(self.root_folder,
-														 file_path, main_branch_commit)
-		new_content = git_utils.get_file__commit_content(self.root_folder,
-														 file_path, curr_branch_commit)
+		# old_content = git_utils.get_file__commit_content(self.root_folder,
+		# 												 file_path, main_branch_commit)
+		parent_content = git_utils.get_file__commit_content(self.root_folder,
+		 												 file_path, curr_branch_commit)
 
-		diff = git_utils.get_unified_diff(old_content, new_content)
+		# diff = git_utils.get_unified_diff(old_content, new_content)
 
-		additional_docs = autogen_utils.get_additional_docs_path(
-			file_path, self.graph, self.bfs_explore)
+		# additional_docs = autogen_utils.get_additional_docs_path(
+		# 	file_path, self.graph, self.bfs_explore)
 
-		if additional_functions_info:
-			additional_docs += additional_functions_info
+		# if additional_functions_info:
+		# 	additional_docs += additional_functions_info
 
 		# Update the documentation based on the diffs and additional docs
-		updated_docs = autogen_utils.get_updated_documentation(
+		updated_docs = autogen_utils.get_updated_parent_documentation(
 			file_path=file_path,
-			old_file_docs=self._get_old_file_docs(self.cache, file_path),
-			old_file_content=old_content,
-			new_file_content=new_content,
-			diff=diff,
-			additional_docs=additional_docs,
-			changes=self._changes_to_string(changes),
+			filtered=filtered,
+			new_content=new_content,
+			functions=functions,
+			parent_content=parent_content,
+			old_parent_docs = self._get_old_file_docs(self.cache, file_path),
 			user=self.user,
 			assistant=self.assistant,
 			output_dir=self.output_dir,

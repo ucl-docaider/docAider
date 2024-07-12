@@ -126,7 +126,10 @@ Have been updated. These changes influence the current file on the path:
 
 Please make sure to update the following functions in the file accordingly.
 {functions}
-
+File content:
+{parent_content}
+Old documentation:
+{old_parent_docs}
 ••Note:••: DO NOT CHANGE ANYTHING IN THE OLD DOCUMENTATION THAT HAS NOT BEEN AFFECTED BY THE CODE CHANGES.
 
 """
