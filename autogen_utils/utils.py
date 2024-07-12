@@ -1,7 +1,7 @@
 import os
 from autogen import AssistantAgent, UserProxyAgent
 from repo_documentation.prompt import DOCUMENTATION_PROMPT, \
-    DOCUMENTATION_UPDATE_PROMPT, USR_PROMPT, PARENT_UPDATE
+    DOCUMENTATION_UPDATE_PROMPT, USR_PROMPT, PARENT_UPDATE, COMENT_UPDATE
 from repo_documentation import utils
 from . import config
 from code2flow.code2flow import utils as code2flow_utils
@@ -99,17 +99,17 @@ def get_updated_parent_documentation(file_path,
                              output_dir,
                              save_debug=False):
     """
-    Update the file documentation using the old docs, diffs, and additional docs.
+    Update the parent file documentation using the filtered changes, new content, functions, and old documentation.
 
     Args:
-        file_path (str): The path of the file being updated.
-        old_file_docs (str): The old documentation of the file.
-        old_file_content (str): The old content of the file.
-        new_file_content (str): The new content of the file.
-        diff (str): The difference between the old and new content of the file.
-        additional_docs (str): Additional documentation to be included.
-        user (str): The user interacting with the assistant.
-        assistant (Assistant): The assistant object used for communication.
+        file_path (str): The path of the parent file being updated.
+        filtered (list): The list of filtered changes that affect the parent file.
+        new_content (str): The new content of the parent file.
+        functions (str): The functions within the parent file that are affected by the changes.
+        parent_content (str): The content of the parent file.
+        old_parent_docs (str): The old documentation of the parent file.
+        user (UserProxyAgent): The user interacting with the assistant.
+        assistant (AssistantAgent): The assistant object used for communication.
         output_dir (str): The directory to save debug information.
         save_debug (bool, optional): Whether to save debug information. Defaults to False.
 
@@ -129,6 +129,43 @@ def get_updated_parent_documentation(file_path,
         utils.save_prompt_debug(
             output_dir, file_path, prompt_message, utils.Mode.UPDATE)
     return assistant.last_message()['content']
+
+def get_updated_commit_documentation(file_path,
+                             comment,
+                             file_content,
+                             old_file_docs,
+                             user,
+                             assistant,
+                             output_dir,
+                             save_debug=False):
+    """
+    Update the file documentation based on a user comment, using the old documentation and the current file content.
+
+    Args:
+        file_path (str): The path of the file being updated.
+        comment (str): The user comment requesting the update.
+        file_content (str): The current content of the file.
+        old_file_docs (str): The old documentation of the file.
+        user (UserProxyAgent): The user interacting with the assistant.
+        assistant (AssistantAgent): The assistant object used for communication.
+        output_dir (str): The directory to save debug information.
+        save_debug (bool, optional): Whether to save debug information. Defaults to False.
+
+    Returns:
+        str: The content of the last message from the assistant.
+    """
+    prompt_message = COMENT_UPDATE.format(
+        abs_file_path=file_path,
+        comment=comment,
+        file_content=file_content,
+        old_file_docs=old_file_docs,
+    )
+    initiate_chat(user, assistant, prompt_message)
+    if save_debug:
+        utils.save_prompt_debug(
+            output_dir, file_path, prompt_message, utils.Mode.UPDATE)
+    return assistant.last_message()['content']
+
 
 def get_additional_docs_path(file_path, graph, bfs_explore):
     additional_docs = ""
