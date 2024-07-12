@@ -133,3 +133,13 @@ Old documentation:
 ••Note:••: DO NOT CHANGE ANYTHING IN THE OLD DOCUMENTATION THAT HAS NOT BEEN AFFECTED BY THE CODE CHANGES.
 
 """
+
+COMENT_UPDATE = """The user has requested an update for the documentation in the file {abs_file_path} with the following comment:
+{comment}
+Please update the documentation accordingly. The current content of the file is as follows:
+{file_content}
+The old documentation is as follows:
+{old_file_docs}
+
+Please provide the updated documentation content. DO NOT CHANGE ANYTHING IN THE OLD DOCUMENTATION THAT HAS NOT BEEN MENTIONED IN THE COMMENT.
+"""

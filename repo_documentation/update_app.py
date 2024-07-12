@@ -9,12 +9,12 @@ from enum import Enum
 sys.path.append(os.path.abspath(
 	os.path.join(os.path.dirname(__file__), './../')))
 
-from repo_documentation.prompt import PARENT_UPDATE
 from code2flow.code2flow import ast_utils
 from code2flow.code2flow import utils as code2flow_utils
 from autogen_utils import utils as autogen_utils
 from repo_documentation import utils
 from cache.document import sha256_hash
+import argparse
 
 class ChangeType(Enum):
 	ADDED = 'A'
@@ -23,73 +23,74 @@ class ChangeType(Enum):
 	MODIFIED = 'M'
 
 class DocumentationUpdate():
-	def __init__(self, repo_path, branch):
+	def __init__(self, repo_path, branch, file_path=None, comment=None):
 		self.root_folder = os.path.abspath(repo_path)
 		self.output_dir = os.path.join(self.root_folder, "docs_output")
 		self.repo = git.Repo(self.root_folder)
 		self.branch = branch
+		self.file_path = file_path
+		self.comment = comment
 
 	def run(self):
-		# 1. Get the latest commit of the current branch and the main branch
-		curr_branch_sha = git_utils.get_latest_commit_sha(
-			self.repo, self.branch)
-		main_branch_sha = git_utils.get_latest_commit_sha(self.repo, 'main')
+		if self.file_path and self.comment:
+			curr_branch_sha = git_utils.get_latest_commit_sha(self.repo, self.branch)
+			curr_branch_commit = self.repo.commit(curr_branch_sha)
+			self.update_documentation_based_on_comment(self.file_path, self.comment, curr_branch_commit)
+		else:
+			# 1. Get the latest commit of the current branch and the main branch
+			curr_branch_sha = git_utils.get_latest_commit_sha(self.repo, self.branch)
+			main_branch_sha = git_utils.get_latest_commit_sha(self.repo, 'main')
 
-		curr_branch_commit = self.repo.commit(curr_branch_sha)
-		main_branch_commit = self.repo.commit(main_branch_sha)
+			curr_branch_commit = self.repo.commit(curr_branch_sha)
+			main_branch_commit = self.repo.commit(main_branch_sha)
 
-		# 2. Find the diffs between the current branch and main
-		diffs = git_utils.get_diffs(curr_branch_commit, main_branch_commit)
+			# 2. Find the diffs between the current branch and main
+			diffs = git_utils.get_diffs(curr_branch_commit, main_branch_commit)
 
-		# Exit if no Python file changes are found
-		if not diffs:
-			print("No Python file changes found between main and the current branch.")
-			return
+			# Exit if no Python file changes are found
+			if not diffs:
+				print("No Python file changes found between main and the current branch.")
+				return
 
-		# 3. Initialize the necessary dependencies for the documentation update process
-		self._initialize()
-		print("Starting the documentation update process...")
-		start_time = time.time()
+			# 3. Initialize the necessary dependencies for the documentation update process
+			self._initialize()
+			print("Starting the documentation update process...")
+			start_time = time.time()
 
-		# Sort diffs by number of parent dependencies, so that we update the leaves first
-		diffs = [(diff, self._get_changes(diff, main_branch_commit, curr_branch_commit)) for diff in diffs]
-		diffs.sort(key=lambda x: self._parents_count(self._file_path(x[0]), x[1]))
+			# Sort diffs by number of parent dependencies, so that we update the leaves first
+			diffs = [(diff, self._get_changes(diff, main_branch_commit, curr_branch_commit)) for diff in diffs]
+			diffs.sort(key=lambda x: self._parents_count(self._file_path(x[0]), x[1]))
 
-		# 4. Update the documentation for each Python file that has changed
-		for diff, changes in diffs:
-			path = self._file_path(diff)
+			# 4. Update the documentation for each Python file that has changed
+			for diff, changes in diffs:
+				path = self._file_path(diff)
 
-			# Attempt to get the cached documentation for the file
-			cached = self.cache.get(path)
-			
-			change_type = ChangeType(diff.change_type)
-
-			# 6a. Generate new documentation if the file is not cached
-			if change_type == ChangeType.ADDED:
-				self._create_docs(path, curr_branch_commit)
-
-			# 6b. Skip if the file has not been modified since last update
-			elif cached.source_file_hash == sha256_hash(self._new_commit_content(path, curr_branch_commit)):
-				print(f'Skipping documentation update for file={
-					  path} as it has not been modified since last update.')
+				# Attempt to get the cached documentation for the file
+				cached = self.cache.get(path)
 				
-			# 6c. If the file has been modified, update the documentation
-			elif change_type == ChangeType.MODIFIED:
-				self._update_docs(file_path=path,
-								  main_branch_commit=main_branch_commit,
-								  current_branch_commit=curr_branch_commit,
-								  changes=changes)
-			# 6d. If the file has been renamed
-			elif change_type == ChangeType.RENAMED:
-				# TODO: Handle renamed files
-				pass
-			# 6e. If the file has been deleted
-			elif change_type == ChangeType.DELETED:
-				self._handle_deleted(path)
-			
-			
-		total = round(time.time() - start_time, 3)
-		print(f"Total time taken to execute doc update: {total}s.")
+				change_type = ChangeType(diff.change_type)
+
+				# 6a. Generate new documentation if the file is not cached
+				if change_type == ChangeType.ADDED:
+					self._create_docs(path, curr_branch_commit)
+
+				# 6b. Skip if the file has not been modified since last update
+				elif cached and cached.source_file_hash == sha256_hash(self._new_commit_content(path, curr_branch_commit)):
+					print(f'Skipping documentation update for file={path} as it has not been modified since last update.')
+					
+				# 6c. If the file has been modified, update the documentation
+				elif change_type == ChangeType.MODIFIED:
+					self._update_docs(file_path=path, main_branch_commit=main_branch_commit, current_branch_commit=curr_branch_commit, changes=changes)
+				# 6d. If the file has been renamed
+				elif change_type == ChangeType.RENAMED:
+					# TODO: Handle renamed files
+					pass
+				# 6e. If the file has been deleted
+				elif change_type == ChangeType.DELETED:
+					self._handle_deleted(path)
+				
+			total = round(time.time() - start_time, 3)
+			print(f"Total time taken to execute doc update: {total}s.")
 
 	def _initialize(self):
 		"""
@@ -294,9 +295,48 @@ class DocumentationUpdate():
 			print(f"Deleted documentation for {file_path}")
 
 
-repo_path = "./../../users/"
-branch = "testing4"
-repo_doc_updater = DocumentationUpdate(
-	repo_path=repo_path,
-	branch=branch)
-repo_doc_updater.run()
+	def update_documentation_based_on_comment(self, file_path, comment, curr_branch_commit):
+		# Convert the relative file path to an absolute path		
+		new_content = git_utils.get_file__commit_content(self.root_folder,
+													file_path, curr_branch_commit)
+
+		# Read the current file content
+		with open(file_path, 'r') as f:
+			file_content = f.read()
+
+		# Get old documentation
+		old_file_docs = self._get_old_file_docs(self.cache, file_path)
+
+
+		updated_docs = autogen_utils.get_updated_commit_documentation(
+			comment=comment,
+			file_content=file_content,
+			old_file_docs=old_file_docs,
+			user=self.user,
+			assistant=self.assistant,
+			output_dir=self.output_dir,
+			save_debug=True
+		)
+		# Update cache with new documentation
+		self._write_docs_and_cache(file_path, new_content, updated_docs)
+
+
+if __name__ == "__main__":
+	# Parse arguments
+	parser = argparse.ArgumentParser(description='Update documentation based on PR comment')
+	parser.add_argument('--file', type=str, help='The path of the file to update')
+	parser.add_argument('--comment', type=str, help='The comment to base the update on')
+	args = parser.parse_args()
+
+	repo_path = "./../../users/"
+	branch = "testing5"
+	file_path = args.file
+	comment = args.comment
+
+	repo_doc_updater = DocumentationUpdate(
+		repo_path=repo_path,
+		branch=branch,
+		file_path=file_path,
+		comment=comment
+	)
+	repo_doc_updater.run()
