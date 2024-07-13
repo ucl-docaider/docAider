@@ -3,3 +3,6 @@ class RepoLoadFailed(Exception):
 
 class SemanticKernelError(Exception):
   pass
+
+class DocGenByKernelFailed(Exception):
+  pass

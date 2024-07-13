@@ -74,10 +74,11 @@ class Retriever():
     """
     Search for the query. Returns the most relevant result.
     """
-    print(f"Searching...")
-    results = self.search_client.search(query)
-    print(f"Search completed")
-    return list(results)[0]["content"]
+    results = list(self.search_client.search(query))
+    if(len(results) != 0):
+      return results[0]["content"] # If the search result is not empty
+    else:
+      return ""
   
 class IndexAlreadyExistsError(Exception):
   pass
