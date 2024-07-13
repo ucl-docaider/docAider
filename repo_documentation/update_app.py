@@ -33,10 +33,15 @@ class DocumentationUpdate():
 
 	def run(self):
 		if self.file_path and self.comment:
+			self._initialize()
+			print("Updating documentation based on PR comment...")
 			curr_branch_sha = git_utils.get_latest_commit_sha(self.repo, self.branch)
 			curr_branch_commit = self.repo.commit(curr_branch_sha)
-			self.update_documentation_based_on_comment(self.file_path, self.comment, curr_branch_commit)
+			abs_file_path = os.path.join(self.root_folder, self.file_path)
+			print(f"File path: {abs_file_path}")
+			self.update_documentation_based_on_comment(abs_file_path, self.comment, curr_branch_commit)
 		else:
+			print("Updating documentation based on branch changes...")
 			# 1. Get the latest commit of the current branch and the main branch
 			curr_branch_sha = git_utils.get_latest_commit_sha(self.repo, self.branch)
 			main_branch_sha = git_utils.get_latest_commit_sha(self.repo, 'main')
@@ -221,6 +226,8 @@ class DocumentationUpdate():
 		# 8. For each parent dependency (file -> all functions affected by changes), update docs
 		print(f'Parent dependencies: {parent_dependencies}')
 		for path, functions in parent_dependencies.items():
+			new_content = git_utils.get_file__commit_content(self.root_folder,
+													path, current_branch_commit)
 			self._update_parent(path, current_branch_commit, main_branch_commit,
 								new_content, filtered, functions, changes)
 
@@ -236,6 +243,8 @@ class DocumentationUpdate():
 		# 	return
 
 		print(f'Updating parent dependency for file={file_path}')
+		print(f"New content for parent dependency: {new_content}")
+
 
 		# # Prepare additional functions info for the prompt
 		# additional_functions_info = PARENT_UPDATE.format(
@@ -307,8 +316,8 @@ class DocumentationUpdate():
 		# Get old documentation
 		old_file_docs = self._get_old_file_docs(self.cache, file_path)
 
-
 		updated_docs = autogen_utils.get_updated_commit_documentation(
+			file_path=file_path,
 			comment=comment,
 			file_content=file_content,
 			old_file_docs=old_file_docs,
