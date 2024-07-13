@@ -1,14 +1,14 @@
 CODE_CONTEXT_PROMPT = """
-First find the content of the file (source code): {file_name}.
+First you need to find the content of the file (source code): {file_name}.
 
-This is the information of the called function in the source code:
-{info_of_called_functions}
----Information of called functions end---
+Then you need to find the information of the callee function in the source code for this file path: {file_path}
+`callee function information`
+
 The information of the called function can help you understand the context of the APIs. Your task is to generate a brief explanation for the Python file.
 
 Please use the following output template:
 
-The content of the file is as follows:
+The content of the file (source code) is as follows:
 `Put the file content here.`
 
 Explanation of code context:
@@ -19,13 +19,14 @@ Called functions:
 """
 
 DOCUMENTATION_PROMPT = """
-You can first use the code context explainer to get the code context, then based on the contextual information, generate a documentation for the source code. The purpose of the documentation is to help developers and beginners understand the function and specific usage of the code.
+You can first use the code context explainer to get the code context, then based on the contextual information, generate a documentation for the source code. 
+The purpose of the documentation is to help developers and beginners understand the function and specific usage of the code.
 
 Please note any part of the content you generate SHOULD NOT CONTAIN Markdown hierarchical heading and divider syntax.
 
 The standard format is as follows (If a section does not have any information, you can skip it and move to the next one):
 
-# {file_name}
+# {file_path}
 
 ## ClassDef NameOfClass
 

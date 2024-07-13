@@ -11,6 +11,7 @@ from semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.azure_chat_
 from semantic_kernel.functions.kernel_arguments import KernelArguments
 from plugins.diff_plugin import DiffPlugin
 
+# This agent is not in use!!!
 async def main():
   # Initialize the kernel
   kernel = Kernel()

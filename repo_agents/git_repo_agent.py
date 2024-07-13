@@ -10,14 +10,14 @@ from semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.azure_chat_
     AzureChatPromptExecutionSettings,
 )
 from semantic_kernel.functions.kernel_arguments import KernelArguments
-from plugins.code_context_plugin import CodeContextPlugin
-from prompt import CODE_CONTEXT_PROMPT
+from plugins.github_info_plugin import GithubInfoPlugin
+from plugins.documentation_plugin import DocumentationPlugin
 from typing import Annotated
 from azure_openai_settings import azure_chat_completion_service
 from dotenv import load_dotenv
 load_dotenv(dotenv_path="../.env")
 
-class CodeContextAgent:
+class GitRepoAgent:
   def __init__(self) -> None:
     self.kernel = Kernel()
 
@@ -35,20 +35,19 @@ class CodeContextAgent:
     self.history = ChatHistory()
     self.history.add_system_message(
       "Remember to ask for help if you're unsure how to proceed."
-      "You are a helpful assistant who can provide the contextual description and explanation of Python code."
+      "You are a helpful repository copilot."
     )
-    # Load the Github info plugin
+    # Add plugins to the kernel
     self.kernel.add_plugin(
-      CodeContextPlugin(),
-      plugin_name="CodeContext",
+      GithubInfoPlugin(),
+      plugin_name="github_info_plugin",
+    )
+    self.kernel.add_plugin(
+      DocumentationPlugin(),
+      plugin_name="documentation_plugin"
     )
 
-  async def code_context_explanation(self, file_path) -> Annotated[str, "The code context description."]:
-    message = CODE_CONTEXT_PROMPT.format(
-      file_name=os.path.basename(file_path),
-      file_path=file_path
-    )
-    
+  async def chat_with_agent(self, message) -> Annotated[str, "AI agent response"]:
     self.history.add_message({
       "role": "user",
       "content": message,
@@ -60,11 +59,27 @@ class CodeContextAgent:
       kernel=self.kernel,
       arguments=KernelArguments(),
     ))[0]
-    return str(result)
-
+    print("Assistant > " + str(result))
+    self.history.add_message(result)
+  
 # Test this agent
+# Note: nested async functions are problematic. (code_context_explanation is never awaited)
 if __name__ == "__main__":
-  cca = CodeContextAgent()
-  file_path = "/Users/chengqike/Desktop/summer_project/repo-copilot/repo_agents/samples/data_processor.py"
-  result = asyncio.run(cca.code_context_explanation(file_path))
+  copilot = GitRepoAgent()
+  dg = DocumentationPlugin()
+  print("Hello! I am your Github repo copilot.")
+  print("Due to current AST analysis performs locally, we do not support relative paths.")
+  print("Instead, you need to provide the absolute path of your file.")
+  print("Note: the `samples` folder has the files for testing purpose.")
+  print("I can help you find Github information, for example, you can ask: Show me the content of the file XXX in the repo XXX")
+  print("See my plugin file to find out what functions I can do.")
+  print("To terminate this conversation, you can say 'exit'.")
+  while True:
+    user_input = input("User > ")
+    if user_input == "exit":
+      break
+    asyncio.run(copilot.chat_with_agent(user_input))
+
+  file_path = input("Please enter the file path for which you want to generate documentation: ")
+  result = dg.generate_documentation_for_file(file_path=file_path)
   print(result)
