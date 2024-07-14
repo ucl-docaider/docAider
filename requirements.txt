@@ -8,5 +8,6 @@ astunparse
 semantic-kernel
 ollama
 ordered-set
-chardet
 PyGithub
+chardet
+
