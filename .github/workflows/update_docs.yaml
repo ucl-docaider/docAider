@@ -1,0 +1,59 @@
+name: Update Documentation on Pull Request Comment
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  pr_commented:
+    name: PR comment
+    if: ${{ github.event.issue.pull_request }} && startsWith(github.event.comment.body, 'Documentation ')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Insall dependencies
+        run: pip install -r requirements.txt
+
+      - name: Extract file name and comment
+        id: extract
+        run: |
+          COMMENT="${{ github.event.comment.body }}"
+          FILE_NAME=$(echo "$COMMENT" | grep -oP '(?<=Documentation\s).*(?=:)')
+          COMMENT_BODY=$(echo "$COMMENT" | sed 's/.*://')
+          echo "FILE_NAME=$FILE_NAME"
+          echo "COMMENT_BODY=$COMMENT_BODY"
+
+        shell: bash
+        env:
+          COMMENT: ${{ github.event.comment.body }}
+
+      - name: Update Documentation
+        run: |
+          python update_app.py --file "$FILE_NAME" --comment "$COMMENT_BODY"
+        env:
+          FILE_NAME: ${{ steps.extract.outputs.FILE_NAME }}
+          COMMENT_BODY: ${{ steps.extract.outputs.COMMENT_BODY }}
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "github-actions"
+          git add "$FILE_NAME"
+          git commit -m 'Update documentation for $FILE_NAME' && git pull --rebase
+          git push
+        env:
+          FILE_NAME: ${{ steps.extract.outputs.FILE_NAME }}
+          
+
+
+
+
+
