@@ -3,6 +3,7 @@ name: Update Documentation on Pull Request Comment
 on:
   issue_comment:
     types: [created]
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -17,7 +18,7 @@ jobs:
 
       - name: Checkout PR branch
         uses: actions/checkout@v3
-        with:
+        withi:
           ref: ${{ steps.comment-branch.outputs.head_ref }}
 
       - name: Set up Python
