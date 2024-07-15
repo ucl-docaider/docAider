@@ -116,7 +116,7 @@ USR_PROMPT = """You are a documentation generation assistant for Python programs
 PARENT_UPDATE = """
 
 **The following functions:**
-{filtered}
+{updated_function_contents}
 
 **In the file below:**
 {new_content}

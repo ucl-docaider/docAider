@@ -228,49 +228,31 @@ class DocumentationUpdate():
 		for path, functions in parent_dependencies.items():
 			new_content = git_utils.get_file__commit_content(self.root_folder,
 													path, current_branch_commit)
-			self._update_parent(path, current_branch_commit, main_branch_commit,
-								new_content, filtered, functions, changes)
+			self._update_parent(path, current_branch_commit,
+								new_content, filtered, functions)
 
-	def _update_parent(self, file_path, curr_branch_commit, main_branch_commit,
-					   new_content, filtered, functions, changes):
+	def _update_parent(self, file_path, curr_branch_commit,
+					   new_content, filtered, functions):
 		cached = self.cache.get(file_path)
 		assert cached is not None, f"File {file_path} not found in cache."
 
-		# # Skip cached
-		# if cached.source_file_hash == sha256_hash(self._new_commit_content(path, curr_branch_commit)):
-		# 	print(f'Skipping parent documentation update for file={
-		# 		  path} as it has not been modified since last update.')
-		# 	return
-
 		print(f'Updating parent dependency for file={file_path}')
 		print(f"New content for parent dependency: {new_content}")
-
-
-		# # Prepare additional functions info for the prompt
-		# additional_functions_info = PARENT_UPDATE.format(
-		# 	filtered=filtered,
-		# 	new_content=new_content,
-		# 	path=file_path,
-		# 	functions=functions
-		# )
-
-		# old_content = git_utils.get_file__commit_content(self.root_folder,
-		# 												 file_path, main_branch_commit)
+  
 		parent_content = git_utils.get_file__commit_content(self.root_folder,
 		 												 file_path, curr_branch_commit)
 
-		# diff = git_utils.get_unified_diff(old_content, new_content)
-
-		# additional_docs = autogen_utils.get_additional_docs_path(
-		# 	file_path, self.graph, self.bfs_explore)
-
-		# if additional_functions_info:
-		# 	additional_docs += additional_functions_info
-
+		# Update the documentation based on the diffs and additional docs
+	
+		# Map the functions to their new, updated content
+		updated_functions = {}
+		for func in filtered:
+			updated_functions[func] = self.graph[func]['content']
+  
 		# Update the documentation based on the diffs and additional docs
 		updated_docs = autogen_utils.get_updated_parent_documentation(
 			file_path=file_path,
-			filtered=filtered,
+			updated_functions=updated_functions,
 			new_content=new_content,
 			functions=functions,
 			parent_content=parent_content,
