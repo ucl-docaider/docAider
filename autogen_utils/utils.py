@@ -89,7 +89,7 @@ def get_updated_documentation(file_path,
 
 
 def get_updated_parent_documentation(file_path,
-                             filtered,
+                             updated_functions,
                              new_content,
                              functions,
                              parent_content,
@@ -103,7 +103,7 @@ def get_updated_parent_documentation(file_path,
 
     Args:
         file_path (str): The path of the parent file being updated.
-        filtered (list): The list of filtered changes that affect the parent file.
+        updated_functions (dict): The mapping of functions to their change contents.
         new_content (str): The new content of the parent file.
         functions (str): The functions within the parent file that are affected by the changes.
         parent_content (str): The content of the parent file.
@@ -116,8 +116,13 @@ def get_updated_parent_documentation(file_path,
     Returns:
         str: The content of the last message from the assistant.
     """
+    # Convert the updated functions to a string
+    updated_function_contents = ""
+    for func, content in updated_functions.items():
+        updated_function_contents += f"- Function {func}:\n{content}\n"
+    
     prompt_message = PARENT_UPDATE.format(
-        filtered=filtered,
+        updated_function_contents=updated_function_contents,
         new_content=new_content,
         path=file_path,
         functions=functions,
