@@ -8,7 +8,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     name: PR comment
-    if: ${{ github.event.issue.pull_request }} && startsWith(github.event.comment.body, 'Documentation')
+    if: ${{ github.event.issue.pull_request }} && startsWith(github.event.comment.body, 'Documentation ')
  
     steps:
       - name: Get PR branch
@@ -34,8 +34,8 @@ jobs:
           COMMENT="${{ github.event.comment.body }}"
           FILE_PATH=$(echo "$COMMENT" | grep -oP '(?<=Documentation\s)[^:]*')
           COMMENT_BODY=$(echo "$COMMENT" | sed 's/^[^:}*: //')
-          echo "::set-output name=file_path::$FILE_PATH"
-          echo "::set-output name=comment_body::$COMMENT_BODY"
+          echo "file_path=$FILE_PATH" >> $GITHUB_OUTPUT
+          echo "comment_body=$COMMENT_BODY" >> $GITHUB_OUTPUT
 
         shell: bash
         env:
