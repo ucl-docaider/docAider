@@ -30,16 +30,13 @@ jobs:
 
       - name: Get file path name and comment
         id: extract
+          Ai
         run: |
           COMMENT="${{ github.event.comment.body }}"
           FILE_PATH=$(echo "$COMMENT" | grep -oP '(?<=Documentation\s)[^:]*')
           COMMENT_BODY=$(echo "$COMMENT" | sed 's/^[^:}*: //')
           echo "file_path=$FILE_PATH" >> $GITHUB_OUTPUT
           echo "comment_body=$COMMENT_BODY" >> $GITHUB_OUTPUT
-
-        shell: bash
-        env:
-          COMMENT: ${{ github.event.comment.body }}
 
       - name: Update Documentation
         run: |
