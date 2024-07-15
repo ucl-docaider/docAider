@@ -30,7 +30,6 @@ jobs:
 
       - name: Get file path name and comment
         id: extract
-          Ai
         run: |
           COMMENT="${{ github.event.comment.body }}"
           FILE_PATH=$(echo "$COMMENT" | grep -oP '(?<=Documentation\s)[^:]*')
