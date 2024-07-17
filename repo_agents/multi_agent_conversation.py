@@ -1,25 +1,34 @@
-import os, sys, asyncio, pprint
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(parent_dir)
+import asyncio
 from autogen import ConversableAgent, register_function
-from autogen_utils import config
-from code_context_agent import CodeContextAgent
-from prompt import DOCUMENTATION_PROMPT
+import azure_openai_settings as ai_service_settings
+from repo_agents.code_context_agent import CodeContextAgent
+from repo_agents.prompt import DOCUMENTATION_PROMPT
 from typing import Annotated
 
+"""
+Multi-agent conversation pattern: sequential chats
+Code context agent: provides description and explanation for code context (optional)
+Documentation generation agent: generates documentation for the code
+Review agent: checks the quality of generated documentation and improve it
+Agent manager: is the mediator of the conversation
+"""
+
 code_context_agent = CodeContextAgent()
+
 documentation_generation_agent = ConversableAgent(
   name="documentation_generation_agent",
-  system_message="You are an AI documentation assistant, and your task is to generate documentation for Python code.",
-  llm_config=config.llm_config,
+  system_message="You are an AI documentation assistant, and your task is to generate documentation for the code.",
+  llm_config=ai_service_settings.autogen_llm_config,
   human_input_mode="NEVER"
 )
+
 review_agent = ConversableAgent(
   name="documentation_reviewer",
   system_message="You are a documentation reviewer who can check the quality of the generated documentation and improve it if necessary.",
-  llm_config=config.llm_config,
+  llm_config=ai_service_settings.autogen_llm_config,
   human_input_mode="NEVER"
 )
+
 agent_manager = ConversableAgent(
   name="agent_manager",
   llm_config=False,
@@ -29,8 +38,14 @@ agent_manager = ConversableAgent(
 def code_context_explainer(
   file_path: Annotated[str, "The file path"]
 ) -> Annotated[str, "The code context description"]:
+  """
+  This function calls the method `code_context_agent.code_context_explanation`.
+  The purpose is to register the function to agents.
+  This encapsulation is necessary because agents can only call functions, but not methods.
+  """
   return asyncio.run(code_context_agent.code_context_explanation(file_path))
 
+# Tool use: register functions to agents
 register_function(
   code_context_explainer,
   caller=documentation_generation_agent,
@@ -57,6 +72,3 @@ def multi_agent_documentation_generation(file_path) -> str:
     ]
   )
   return chat_result[1].chat_history[-1]["content"]
-
-#result = multi_agent_documentation_generation("/Users/chengqike/Desktop/summer_project/repo-copilot/repo_agents/samples/data_processor.py")
-#print(result)

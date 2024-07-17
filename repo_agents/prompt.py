@@ -1,10 +1,10 @@
 CODE_CONTEXT_PROMPT = """
-First you need to find the content of the file (source code): {file_name}.
+First you need to get the content of this file (source code): {file_path}.
 
-Then you need to find the information of the callee function in the source code for this file path: {file_path}
+Then you need to get the information of the callee function in the same file path:
 `callee function information`
 
-The information of the called function can help you understand the context of the APIs. Your task is to generate a brief explanation for the Python file.
+The information of the callee function can help you understand the context of the APIs. Your task is to generate a brief explanation for the Python file.
 
 Please use the following output template:
 
@@ -14,8 +14,8 @@ The content of the file (source code) is as follows:
 Explanation of code context:
 `Put the description of the code context here.`
 
-Called functions:
-`Put a list of called functions here. Ignore this section if there is no called function.`
+Callee functions:
+`Put a list of callee functions here. Ignore this section if there is no callee function.`
 """
 
 DOCUMENTATION_PROMPT = """
