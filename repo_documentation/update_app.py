@@ -279,7 +279,7 @@ class DocumentationUpdate():
 
 	def _handle_deleted(self, file_path):
 		print(f"File deleted: {file_path}")
-		old_file_docs_path = self._get_old_file_docs(self.cache, file_path)
+		old_file_docs_path = self.cache.get(file_path).generated_docs_path
 		print(f"Old file docs path: {old_file_docs_path}")
 		if os.path.exists(old_file_docs_path):
 			os.remove(old_file_docs_path)
