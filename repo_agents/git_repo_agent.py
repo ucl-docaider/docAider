@@ -1,6 +1,4 @@
-import asyncio, os, sys
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(parent_dir)
+import azure_openai_settings as ai_service_settings
 from semantic_kernel import Kernel
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
 from semantic_kernel.connectors.ai.function_call_behavior import FunctionCallBehavior
@@ -10,19 +8,21 @@ from semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.azure_chat_
     AzureChatPromptExecutionSettings,
 )
 from semantic_kernel.functions.kernel_arguments import KernelArguments
-from plugins.github_info_plugin import GithubInfoPlugin
-from plugins.documentation_plugin import DocumentationPlugin
+from repo_agents.plugins.github_info_plugin import GithubInfoPlugin
+from repo_agents.plugins.documentation_plugin import DocumentationPlugin
 from typing import Annotated
-from azure_openai_settings import azure_chat_completion_service
-from dotenv import load_dotenv
-load_dotenv(dotenv_path="../.env")
 
 class GitRepoAgent:
+  """
+  The entry point of the multi-agent documentation generation.
+  The agent is responsible for getting git repo information and generating documentation
+  It has two plugins, GithubInfoPlugin and DocumentationPlugin.
+  """
   def __init__(self) -> None:
     self.kernel = Kernel()
 
     # Add Azure OpenAI chat completion
-    self.kernel.add_service(azure_chat_completion_service)
+    self.kernel.add_service(ai_service_settings.azure_chat_completion_service)
 
     self.chat_completion : AzureChatCompletion = self.kernel.get_service(type=ChatCompletionClientBase)
     # Enable planning
@@ -61,13 +61,23 @@ class GitRepoAgent:
     ))[0]
     print("Assistant > " + str(result))
     self.history.add_message(result)
+
+  def generate_all_documentation(self) -> None:
+    """
+    Generates documentation for all files under the ROOT_FOLDER.
+    Alternatively, you can chat with the agent to get your repo information, generate documentation for specified file, and also generate all documentation in one command.
+    The chat_with_agent option is recommended for fully manipulating the repo agent.
+    """
+    documentation_helper = DocumentationPlugin()
+    documentation_helper.generate_all()
   
 # Test this agent
-# Note: nested async functions are problematic. (code_context_explanation is never awaited)
+# Note of Bug alert: nested async functions are problematic. (code_context_explanation is never awaited)
 if __name__ == "__main__":
   copilot = GitRepoAgent()
   dg = DocumentationPlugin()
-  print("Hello! I am your Github repo copilot.")
+  # If you want to chat with git repo agent, use the following code:
+  """print("Hello! I am your Github repo copilot.")
   print("Due to current AST analysis performs locally, we do not support relative paths.")
   print("Instead, you need to provide the absolute path of your file.")
   print("Note: the `samples` folder has the files for testing purpose.")
@@ -78,8 +88,6 @@ if __name__ == "__main__":
     user_input = input("User > ")
     if user_input == "exit":
       break
-    asyncio.run(copilot.chat_with_agent(user_input))
+    asyncio.run(copilot.chat_with_agent(user_input))"""
 
-  file_path = input("Please enter the file path for which you want to generate documentation: ")
-  result = dg.generate_documentation_for_file(file_path=file_path)
-  print(result)
+  dg.generate_all()

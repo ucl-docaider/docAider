@@ -7,3 +7,12 @@ azure_chat_completion_service = AzureChatCompletion(
   endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
   api_version=os.getenv("AZURE_OPENAI_API_VERSION")
 )
+
+autogen_llm_config = dict(
+  model=os.getenv("CHAT_DEPLOYMENT_NAME"),
+  base_url=os.getenv("BASE_URL"),
+  api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+  api_type=os.getenv("API_TYPE"),
+  api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
+  temperature=0
+)
