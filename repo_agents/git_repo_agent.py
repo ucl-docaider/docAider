@@ -1,3 +1,8 @@
+import os, sys
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(parent_dir)
+from dotenv import load_dotenv
+load_dotenv(dotenv_path="../.env")
 import azure_openai_settings as ai_service_settings
 from semantic_kernel import Kernel
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
@@ -72,7 +77,7 @@ class GitRepoAgent:
     documentation_helper.generate_all()
   
 # Test this agent
-# Note of Bug alert: nested async functions are problematic. (code_context_explanation is never awaited)
+# Note: nested async functions are problematic. (code_context_explanation is never awaited)
 if __name__ == "__main__":
   copilot = GitRepoAgent()
   dg = DocumentationPlugin()
@@ -90,4 +95,4 @@ if __name__ == "__main__":
       break
     asyncio.run(copilot.chat_with_agent(user_input))"""
 
-  dg.generate_all()
+  dg.generate_documentation_for_file("absolute-file-path")
