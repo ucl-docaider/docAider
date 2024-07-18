@@ -1,10 +1,8 @@
 CODE_CONTEXT_PROMPT = """
 First you need to get the content of this file (source code): {file_path}.
-
-Then you need to get the information of the callee function in the same file path:
-`callee function information`
-
-The information of the callee function can help you understand the context of the APIs. Your task is to generate a brief explanation for the Python file.
+Then you need to get the information of the callee function in the same file path.
+The information of the callee function can help you understand the context of the APIs.
+Your task is to generate a brief explanation for the Python file.
 
 Please use the following output template:
 
@@ -14,19 +12,27 @@ The content of the file (source code) is as follows:
 Explanation of code context:
 `Put the description of the code context here.`
 
-Callee functions:
-`Put a list of callee functions here. Ignore this section if there is no callee function.`
+Callee function information:
+`Put callee function information here.` (Ignore this section if there is no callee function.)
 """
 
 DOCUMENTATION_PROMPT = """
-You can first use the code context explainer to get the code context, then based on the contextual information, generate a documentation for the source code. 
+First you can use the code context explainer to get the code context.
+Then based on the code contextual explanation, generate a documentation for the source code. 
 The purpose of the documentation is to help developers and beginners understand the function and specific usage of the code.
-
 Please note any part of the content you generate SHOULD NOT CONTAIN Markdown hierarchical heading and divider syntax.
+The file path is: {file_path}
 
-The standard format is as follows (If a section does not have any information, you can skip it and move to the next one):
+The standard format is as follows:
+(Note:
+1. If a section does not have any information, you can skip it and move to the next one;
+2. If you are confused about any part, feel free to add notes or comments;
+3. If you have any suggestion to the code, also add concise comments.)
 
-# {file_path}
+# {file_name}
+
+## Source Code
+`Put the file content here.`
 
 ## ClassDef NameOfClass
 
@@ -96,4 +102,10 @@ Provide an input example for a specified data type (e.g., list, double, int) and
 ```
 Provide an output example for a specified data type (e.g., list, double, int) and include a detailed explanation.
 ```
+"""
+
+REVIEWER_PROMPT = """
+This is the generated documentation for the source code. Please review it and improve the documentation quality.
+Note: Do not change the structure of the documentation. Do not change values in the input/output examples.
+After you are done with all checks of quality and accuracy, please remove the source code block.
 """

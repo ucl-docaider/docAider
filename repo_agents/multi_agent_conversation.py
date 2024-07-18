@@ -3,7 +3,7 @@ import asyncio
 from autogen import ConversableAgent, register_function
 import azure_openai_settings as ai_service_settings
 from repo_agents.code_context_agent import CodeContextAgent
-from repo_agents.prompt import DOCUMENTATION_PROMPT
+from repo_agents.prompt import DOCUMENTATION_PROMPT, REVIEWER_PROMPT
 from repo_documentation.utils import Mode, save_prompt_debug
 from typing import Annotated
 
@@ -62,13 +62,16 @@ def multi_agent_documentation_generation(file_path) -> str:
     [
       {
         "recipient": documentation_generation_agent,
-        "message": DOCUMENTATION_PROMPT.format(file_path=file_path),
+        "message": DOCUMENTATION_PROMPT.format(
+          file_path=file_path,
+          file_name=os.path.basename(file_path)
+        ),
         "max_turns": 2,
         "summary_method": "last_msg",
       },
       {
         "recipient": review_agent,
-        "message": "This is the generated documentation for the source code. Please review it and improve the documentation quality.",
+        "message": REVIEWER_PROMPT,
         "max_turns": 1,
         "summary_method": "reflection_with_llm",
       }
