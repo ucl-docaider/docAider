@@ -3,7 +3,7 @@ import repo_agents.multi_agent_conversation as mac
 from repo_agents.ast_agent import ASTAgent
 from semantic_kernel.functions import kernel_function
 from cache.docs_cache import DocsCache
-from repo_documentation.utils import save_cache
+from repo_documentation.utils import save_cache, write_file_docs
 from typing import Annotated
 
 class DocumentationPlugin:
@@ -25,9 +25,13 @@ class DocumentationPlugin:
     """
     file_content = self.get_file_content(file_path)
     documentation = mac.multi_agent_documentation_generation(file_path)
-    output_path = self.save_documentation(
-      os.path.basename(file_path),
-      documentation=documentation
+    root_folder = os.path.abspath(os.getenv("ROOT_FOLDER"))
+    output_folder = os.path.join(root_folder, "docs_output")
+    output_path = write_file_docs(
+      output_folder,
+      root_folder,
+      file_path,
+      documentation
     )
     self.cache.add(file_path, file_content, output_path)
 
@@ -52,14 +56,3 @@ class DocumentationPlugin:
   def get_file_content(self, file_path) -> str:
     with open(file_path, "r") as file:
       return file.read()
-
-  def save_documentation(self, file_name, documentation, output_folder="./docs_output") -> str:
-    """
-    Saves the generated documentation to the output folder.
-    """
-    doc_file_name = file_name + ".md"
-    path = os.path.join(output_folder, doc_file_name)
-    with open(path, "w") as file:
-      file.write(documentation)
-    print(f"{doc_file_name} saved to {path}.")
-    return path
