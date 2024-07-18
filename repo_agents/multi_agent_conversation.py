@@ -1,8 +1,10 @@
+import os
 import asyncio
 from autogen import ConversableAgent, register_function
 import azure_openai_settings as ai_service_settings
 from repo_agents.code_context_agent import CodeContextAgent
 from repo_agents.prompt import DOCUMENTATION_PROMPT
+from repo_documentation.utils import Mode, save_prompt_debug
 from typing import Annotated
 
 """
@@ -55,6 +57,7 @@ register_function(
 )
 
 def multi_agent_documentation_generation(file_path) -> str:
+  output_folder = os.path.join(os.getenv("ROOT_FOLDER"), "docs_output")
   chat_result = agent_manager.initiate_chats(
     [
       {
@@ -71,4 +74,7 @@ def multi_agent_documentation_generation(file_path) -> str:
       }
     ]
   )
+  # Save prompt text for debug
+  save_prompt_debug(output_folder, file_path + "_dga", chat_result[0].chat_history[2]["content"], Mode.UPDATE)
+  save_prompt_debug(output_folder, file_path + "_ra", chat_result[1].chat_history[0]["content"], Mode.UPDATE)
   return chat_result[1].chat_history[-1]["content"]

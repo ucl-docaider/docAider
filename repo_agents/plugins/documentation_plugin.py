@@ -7,9 +7,10 @@ from repo_documentation.utils import save_cache, write_file_docs
 from typing import Annotated
 
 class DocumentationPlugin:
-  def __init__(self, output_folder="./docs_output") -> None:
-    self.output_folder = output_folder
-    self.ast_helper = ASTAgent(os.getenv("ROOT_FOLDER"))
+  def __init__(self) -> None:
+    self.root_folder = os.path.abspath(os.getenv("ROOT_FOLDER"))
+    self.output_folder = os.path.join(self.root_folder, "docs_output")
+    self.ast_helper = ASTAgent()
     self.cache = DocsCache()
 
   @kernel_function(
@@ -25,11 +26,9 @@ class DocumentationPlugin:
     """
     file_content = self.get_file_content(file_path)
     documentation = mac.multi_agent_documentation_generation(file_path)
-    root_folder = os.path.abspath(os.getenv("ROOT_FOLDER"))
-    output_folder = os.path.join(root_folder, "docs_output")
     output_path = write_file_docs(
-      output_folder,
-      root_folder,
+      self.output_folder,
+      self.root_folder,
       file_path,
       documentation
     )

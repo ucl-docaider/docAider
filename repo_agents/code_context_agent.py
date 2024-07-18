@@ -16,6 +16,7 @@ from semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.azure_chat_
 from semantic_kernel.functions.kernel_arguments import KernelArguments
 from repo_agents.plugins.code_context_plugin import CodeContextPlugin
 from repo_agents.prompt import CODE_CONTEXT_PROMPT
+from repo_documentation.utils import Mode, save_prompt_debug
 from typing import Annotated
 
 class CodeContextAgent:
@@ -55,6 +56,9 @@ class CodeContextAgent:
     Returns the code context explanation of a source file.
     """
     message = CODE_CONTEXT_PROMPT.format(file_path=file_path)
+    # Save prompt text for debug
+    output_folder = os.path.join(os.getenv("ROOT_FOLDER"), "docs_output")
+    save_prompt_debug(output_folder, file_path + "_code_context", message, Mode.UPDATE)
     
     self.history.add_message({
       "role": "user",
