@@ -5,7 +5,7 @@ from typing import Annotated
 
 class CodeContextPlugin:
   def __init__(self) -> None:
-    self.ast_helper = ASTAgent(os.getenv("ROOT_FOLDER"))
+    self.ast_helper = ASTAgent()
 
   @kernel_function(
     name="get_file_content",
