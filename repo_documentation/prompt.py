@@ -6,84 +6,109 @@ Now you need to generate a document for "{file_name}".
 The content of the code is as follows:
 {file_content}
 
-Please note any part of the content you generate SHOULD NOT CONTAIN Markdown hierarchical heading and divider syntax.
+You must obey the structure and format that will be provided below. 
 
-The standard format is as follows (If a section does not have any information, you can skip it and move to the next one):
+The output you produce will be placed within another HTML document, so you should not include any additional HTML tags in your response.
 
-# {file_name}
+Please generate the documentation using the following HTML structure and CSS classes:
 
-## ClassDef NameOfClass
+<h1>{file_name}</h1>
+<div class="class-section">
+    <h2>ClassDef NameOfClass</h2>
+    <p>The function of the class is XXX. (Only code name and one sentence function description are required)</p>
 
-The function of the class is XXX. (Only code name and one sentence function description are required)
+    <h3>Attributes:</h3>
+    <ul class="attribute-list">
+        <li><code>attribute1</code> (<code>type</code>): Description of the first attribute.</li>
+    </ul>
 
-**Attributes**:
+    <h3>Functions:</h3>
+    <ul class="function-list">
+        <li>
+            <code>function_name1</code>(<code>param1</code>: <code>type</code>) -> <code>return_type</code>
+            <ul>
+                <li>Parameters:
+                    <ul>
+                        <li><code>param1</code> (<code>type</code>): Description of the first parameter.</li>
+                    </ul>
+                </li>
+                <li>Returns:
+                    <ul>
+                        <li><code>return_type</code>: Description of the return value.</li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ul>
 
-- `attribute1` (`type`): Description of the first attribute.
+    <h3>Called_functions:</h3>
+    <ul class="called-functions-list">
+        <li><code>function1</code>(<code>param1</code>: <code>type</code>) -> <code>return_type</code>: Description of
+            what function1 does and what function1 returns.</li>
+    </ul>
 
-**Functions**:
+    <h3>Code Description:</h3>
+    <p>The description of this class. (Detailed and CERTAIN code analysis and description)</p>
 
-- `function_name1`(`param1`: `type`) -> `return_type`
-    - Parameters:
-        - `param1` (`type`): Description of the first parameter.
-    - Returns:
-        - `return_type`: Description of the return value.
+    <h3>Note:</h3>
+    <p>Points to note about the use of the code according to the returns</p>
 
-**Called_functions**:
-
-- `function1`(`param1`: `type`) -> `return_type`: Description of what function1 does and what function1 returns.
-
-**Code Description**: The description of this class. (Detailed and CERTAIN code analysis and description)
-
-**Note**: Points to note about the use of the code according to the returns
-
-**Input Example**: 
-
-```
+    <h3>Input Example:</h3>
+    <pre><code>
 Provide an input example for a specified data type (e.g., list, double, int) and include a detailed explanation.
-```
+Remove any leading/trailing whitespaces from the output.
+        </code></pre>
 
-**Output Example**:
-
-```
+    <h3>Output Example:</h3>
+    <pre><code>
 Provide an output example for a specified data type (e.g., list, double, int) and include a detailed explanation.
-```
+Remove any leading/trailing whitespaces from the output.
+         </code></pre>
+</div>
 
+<div class="function-section">
+    <h2>FunctionDef NameOfFunction</h2>
+    <p>The function of the function is XXX. (Only code name and one sentence function description are required)</p>
 
+    <h3>Parameters:</h3>
+    <ul class="parameter-list">
+        <li><code>param1</code> (<code>type</code>): Description of the first parameter.</li>
+    </ul>
 
-## FunctionDef NameOfFunction (functions that do not belong to a class but are still present in the file)
+    <h3>Returns:</h3>
+    <ul class="return-list">
+        <li><code>return_type</code>: Description of the return value.</li>
+    </ul>
 
-The function of the function is XXX. (Only code name and one sentence function description are required)
+    <h3>Called_functions:</h3>
+    <ul class="called-functions-list">
+        <li><code>function1</code>(<code>param1</code>: <code>type</code>) -> <code>return_type</code>: Description of
+            what function1 does and what function1 returns.</li>
+    </ul>
 
-**Parameters**:
+    <h3>Code Description:</h3>
+    <p>The description of this function. (Detailed and CERTAIN code analysis and description)</p>
 
-- `param1` (`type`): Description of the first parameter.
+    <h3>Note:</h3>
+    <p>Points to note about the use of the code according to the returns</p>
 
-**Returns**:
-
-- `return_type`: Description of the return value.
-
-**Called_functions**:
-
-- `function1`(`param1`: `type`) -> `return_type`: Description of what function1 does and what function1 returns.
-
-**Code Description**: The description of this function. (Detailed and CERTAIN code analysis and description)
-
-**Note**: Points to note about the use of the code according to the returns
-
-**Input Example**: 
-
-```
+    <h3>Input Example:</h3>
+    <pre><code>
 Provide an input example for a specified data type (e.g., list, double, int) and include a detailed explanation.
-```
+Remove any leading/trailing whitespaces from the output.
+    </code></pre>
 
-**Output Example**: 
-
-```
+    <h3>Output Example:</h3>
+    <pre><code>
 Provide an output example for a specified data type (e.g., list, double, int) and include a detailed explanation.
-```
+Remove any leading/trailing whitespaces from the output.
+    </code></pre>
+</div>
 
 Please generate a detailed explanation document for this object based on the code of the target object itself. For the section Called_functions, considering the additional documentation for the functions and classes called within the file:
 {additional_docs}.
+
+Remember to only use the HTML tags provided as shown in the template above. This structure will ensure that the documentation is properly formatted.
 """
 
 DOCUMENTATION_UPDATE_PROMPT = """You are an AI documentation assistant. Your task is to update the existing documentation based on the provided changes in the code. 

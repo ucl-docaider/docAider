@@ -32,16 +32,22 @@ def get_documentation(file_path,
         str: The documentation retrieved from the assistant.
     """
     prompt_message = DOCUMENTATION_PROMPT.format(
+        root_folder=root_folder,
         file_name=os.path.basename(file_path),
         file_content=file_content,
-        root_folder=root_folder,
         additional_docs=additional_docs
     )
+    
     initiate_chat(user, assistant, prompt_message)
+    
+    clean_out = assistant.last_message()['content'].replace('```html', '').replace('```', '').strip()
+    
     if save_debug:
         utils.save_prompt_debug(
             output_dir, file_path, prompt_message, utils.Mode.CREATE)
-    return assistant.last_message()['content']
+        utils.save_response_debug(
+            output_dir, file_path, clean_out, utils.Mode.CREATE)
+    return clean_out
 
 
 def get_updated_documentation(file_path,
