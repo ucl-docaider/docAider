@@ -1,8 +1,13 @@
-<div class="file-card">
-    <details>
-        <summary id={id}>{file_name}</summary>
-        <div class="content">
-            {content}
-        </div>
-    </details>
+<div class="file-card" id="file-{id}">
+    <summary id={id}>
+        <span class="title">{file_name}</span>
+        <span class="actions">
+            <button onclick="copyFileContents('file-{id}')" title="Copy">&#x2398; Copy</button>
+            <button onclick="closeFileCard('file-{id}')">&#10005;</button>
+        </span>
+    </summary>
+
+    <div class="content">
+        {content}
+    </div>
 </div>

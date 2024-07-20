@@ -1,78 +1,262 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>simple-users Repo Documentation</title>
-        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-        <style>
-            body {
-                font-family: 'Roboto', sans-serif;
-                line-height: 1.6;
-                color: #333333;
-                background-color: #f8f9fa;
-                margin: 0;
-                padding: 0;
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>simple-users Documentation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0px 20px;
+            transition: margin-left 0.3s ease;
+        }
+
+        header {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        h1,
+        h2 {
+            color: #4a90e2;
+        }
+
+        pre {
+            background-color: #f1f1f1;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: 'Courier New', Courier;
+            color: crimson;
+            background-color: #f1f1f1;
+            padding: 2px 3px;
+            font-size: 105%;
+        }
+
+        #sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            width: 300px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            box-sizing: border-box;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s ease;
+            z-index: 1001;
+        }
+
+        #sidebar-toggle {
+            position: fixed;
+            left: 10px;
+            top: 10px;
+            z-index: 1002;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        @media (min-width: 768px) {
+            #sidebar {
+                left: 0;
             }
+
             .container {
-                max-width: 1200px;
-                margin: 0 auto;
-                padding: 20px;
+                margin-left: 270px;
             }
-            header {
-                background-color: #ffffff;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                position: sticky;
-                top: 0;
-                z-index: 1000;
+
+            #sidebar-toggle {
+                display: none;
             }
+        }
+
+        @media (max-width: 767px) {
+            .container {
+                margin-left: 0;
+            }
+
             nav {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 4px 20px;
+                flex-direction: column;
+                align-items: flex-start;
             }
+
             nav ul {
-                list-style-type: none;
-                padding: 0;
-                display: flex;
+                margin-top: 10px;
             }
-            nav ul li {
-                margin-right: 20px;
+        }
+
+        .floating-buttons {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .floating-button {
+            margin: 5px;
+            padding: 10px 15px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .floating-button:hover {
+            background-color: #3a7bc8;
+        }
+
+        @media (max-width: 767px) {
+            .floating-buttons {
+                right: 10px;
+                bottom: 10px;
             }
-            nav ul li a {
-                text-decoration: none;
-                color: #333333;
-                font-weight: 500;
+
+            .floating-button {
+                padding: 8px 12px;
+                font-size: 14px;
             }
-            h1, h2 {
-                color: #4a90e2;
-            }
-            .file-card {
-                background-color: #ffffff;
-                border-radius: 8px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                margin-bottom: 20px;
-                overflow: hidden;
-            }
-            .file-card summary {
-                padding: 15px;
-                background-color: #4a90e2;
-                color: #ffffff;
-                font-weight: bold;
-                cursor: pointer;
-            }
-            .file-card .content {
-                padding: 20px;
-            }
-            pre {
-                background-color: #f1f3f5;
-                border-radius: 4px;
-                padding: 15px;
-                overflow-x: auto;
-            }
-            code {
-                font-family: 'Courier New', Courier, monospace;
-            }
-        </style>
-    </head>
+        }
+
+        .file-card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            display: none;
+        }
+
+        .file-card.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0px);
+        }
+
+        .file-card summary {
+            padding: 15px;
+            /* Adjusted for buttons */
+            background-color: #4a90e2;
+            color: #ffffff;
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            list-style: none;
+        }
+
+        .file-card summary button {
+            background-color: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 5px 10px;
+            margin-left: 5px;
+            border-radius: 6px;
+        }
+
+        .file-card summary button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: background-color 0.25s ease;
+        }
+
+        .file-card .content {
+            padding: 4px 20px 8px 20px;
+            transition: height 0.3s ease;
+        }
+
+        .modern-toc {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            white-space: nowrap;
+        }
+
+        .modern-toc ul {
+            list-style-type: none;
+            padding-left: 10px;
+        }
+
+        .modern-toc li {
+            margin: 8px 0;
+        }
+
+        .modern-toc a {
+            text-decoration: none;
+            color: #0066cc;
+            transition: color 0.3s ease;
+        }
+
+        .modern-toc a:hover {
+            color: #004080;
+            text-decoration: underline;
+        }
+
+        .modern-toc details {
+            margin-bottom: 10px;
+        }
+
+        .modern-toc summary {
+            cursor: pointer;
+            font-weight: bold;
+            color: #444;
+            transition: color 0.3s ease;
+        }
+
+        .modern-toc summary:hover {
+            color: #0066cc;
+        }
+
+        .modern-toc details>ul {
+            margin-top: 8px;
+            border-left: 1px solid #ddd;
+            padding-left: 10px;
+        }
+
+        .modern-toc details>ul>li {
+            position: relative;
+        }
+
+        .modern-toc details>ul>li::before {
+            content: "";
+            position: absolute;
+            top: 10px;
+            left: -10px;
+            width: 10px;
+            height: 1px;
+            background-color: #ddd;
+        }
+    </style>
+</head>

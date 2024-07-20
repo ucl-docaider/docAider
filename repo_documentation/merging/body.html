@@ -1,23 +1,25 @@
     <body>
-        <header>
-            <nav>
-                <h1>{project_title}</h1>
+        <button id="sidebar-toggle">☰</button>
+
+        <div id="sidebar">
+            <div style="padding: 10px 0px 0px 20px">
+                <h2>Files</h2>
+            </div>
+            <hr>
+            <div class="modern-toc">
                 <ul>
-                    <li><a href="#files">Files</a></li>
-                    <li><a href="#documentation">Documentation</a></li>
+                    {table_of_contents}
                 </ul>
-            </nav>
-        </header>
-    
+            </div>
+        </div>
+
         <div class="container">
-            <h2 id="files">Files</h2>
-            <ul>
-                {table_of_contents}
-            </ul>
-        
             <h2 id="documentation">Documentation</h2>
-        
             {documentation_content}
+        </div>
+
+        <div class="floating-buttons">
+            <button id="scroll-to-top" class="floating-button">↑ Top</button>
         </div>
         {script}
     </body>

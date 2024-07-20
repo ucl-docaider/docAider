@@ -10,6 +10,8 @@ You must obey the structure and format that will be provided below.
 
 The output you produce will be placed within another HTML document, so you should not include any additional HTML tags in your response.
 
+If a section does not have any information or is not applicable, you can skip it and move to the next one.
+
 Please generate the documentation using the following HTML structure and CSS classes:
 
 <h1>{file_name}</h1>
@@ -54,16 +56,10 @@ Please generate the documentation using the following HTML structure and CSS cla
     <p>Points to note about the use of the code according to the returns</p>
 
     <h3>Input Example:</h3>
-    <pre><code>
-Provide an input example for a specified data type (e.g., list, double, int) and include a detailed explanation.
-Remove any leading/trailing whitespaces from the output.
-        </code></pre>
+    <pre><code>Provide an input example for a specified data type (e.g., list, double, int) and include a detailed explanation.</code></pre>
 
     <h3>Output Example:</h3>
-    <pre><code>
-Provide an output example for a specified data type (e.g., list, double, int) and include a detailed explanation.
-Remove any leading/trailing whitespaces from the output.
-         </code></pre>
+    <pre><code>Provide an output example for a specified data type (e.g., list, double, int) and include a detailed explanation.</code></pre>
 </div>
 
 <div class="function-section">
@@ -80,7 +76,7 @@ Remove any leading/trailing whitespaces from the output.
         <li><code>return_type</code>: Description of the return value.</li>
     </ul>
 
-    <h3>Called_functions:</h3>
+    <h3>Called Functions:</h3>
     <ul class="called-functions-list">
         <li><code>function1</code>(<code>param1</code>: <code>type</code>) -> <code>return_type</code>: Description of
             what function1 does and what function1 returns.</li>
@@ -93,22 +89,17 @@ Remove any leading/trailing whitespaces from the output.
     <p>Points to note about the use of the code according to the returns</p>
 
     <h3>Input Example:</h3>
-    <pre><code>
-Provide an input example for a specified data type (e.g., list, double, int) and include a detailed explanation.
-Remove any leading/trailing whitespaces from the output.
-    </code></pre>
+    <pre><code>Provide an input example for a specified data type (e.g., list, double, int) and include a detailed explanation.</code></pre>
 
     <h3>Output Example:</h3>
-    <pre><code>
-Provide an output example for a specified data type (e.g., list, double, int) and include a detailed explanation.
-Remove any leading/trailing whitespaces from the output.
-    </code></pre>
+    <pre><code>Provide an output example for a specified data type (e.g., list, double, int) and include a detailed explanation.</code></pre>
 </div>
 
-Please generate a detailed explanation document for this object based on the code of the target object itself. For the section Called_functions, considering the additional documentation for the functions and classes called within the file:
+Please generate a detailed explanation document for this object based on the code of the target object itself. For the section Called Functions, considering the additional documentation for the functions and classes called within the file:
 {additional_docs}.
 
 Remember to only use the HTML tags provided as shown in the template above. This structure will ensure that the documentation is properly formatted.
+Make sure that the <pre><code>...</code></pre> tags have no extra spaces or newlines at the beginning or end of the code block.
 """
 
 DOCUMENTATION_UPDATE_PROMPT = """You are an AI documentation assistant. Your task is to update the existing documentation based on the provided changes in the code. 
