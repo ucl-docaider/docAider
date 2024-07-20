@@ -55,11 +55,14 @@ jobs:
           git fetch origin ${{ github.head_ref }}
           git checkout ${{ github.head_ref }}
 
+      - name: Get changed files
+        id: get_changed_files
+        run: |
+          changed_files=$(git diff --name-only main...${{ github.head_ref }} | tr '\\n' ',' | sed 's/,/, /g' | sed 's/, $//')
+          echo "changed_files=$changed_files" >> $GITHUB_ENV
+
       - name: Run Docker Compose
         run: docker-compose up --build --detach
-        env: 
-          name: gpt
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       - name: Set safe.directory in repo-copilot container
         run: docker exec repo-copilot git config --global --add safe.directory /workspace
@@ -73,10 +76,14 @@ jobs:
           git config --local user.email "github-actions@github.com"
           git config --local user.name "github-actions"
           git add .
-          git diff-index --quiet HEAD || (git commit -m "Documentation Updated" && git pull --rebase)
-          git push
+          if [ -n "$changed_files" ]; then
+            git commit -m "Documentation Updated for $changed_files"
+            git pull --rebase
+            git push
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          changed_files: ${{ env.changed_files }}
 """
 
 update_comments_workflow_content = """
@@ -91,7 +98,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: GPT
     permissions:
-      contents: write 
+      contents: write
+      issues: read
+      pull-requests: read
     name: PR comment
     if: ${{ github.event.issue.pull_request }} && startsWith(github.event.comment.body, 'Documentation ')
 
@@ -102,8 +111,10 @@ jobs:
           python-version: '3.10'
 
       - name: Get PR branch
-        uses: xt0rted/pull-request-comment-branch@v1
+        uses: xt0rted/pull-request-comment-branch@v2
         id: comment-branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout PR branch
         uses: actions/checkout@v3
@@ -148,9 +159,6 @@ jobs:
 
       - name: Run Docker Compose
         run: docker-compose up --build --detach
-        env: 
-          name: gpt
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       - name: Set safe.directory in repo-copilot container
         run: docker exec repo-copilot git config --global --add safe.directory /workspace
