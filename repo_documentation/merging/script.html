@@ -1,0 +1,164 @@
+<script>
+    // Hide all file-cards when the page loads
+    window.addEventListener('load', function () {
+        document.querySelectorAll('.file-card').forEach(card => {
+            card.style.display = 'none';
+        });
+        adjustSidebarWidth();
+    });
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            console.log('Link clicked:', this.getAttribute('href'));
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                console.log('Target found, scrolling');
+                target.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            } else {
+                console.log('Target not found');
+            }
+        });
+    });
+
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const container = document.querySelector('.container');
+
+    sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+    });
+
+    function checkWindowSize() {
+        if (window.innerWidth >= 768) {
+            sidebar.classList.add('active');
+            container.style.marginLeft = '270px';
+        } else {
+            sidebar.classList.remove('active');
+            container.style.marginLeft = '0';
+        }
+    }
+
+    window.addEventListener('resize', checkWindowSize);
+    checkWindowSize();
+
+    // Scroll to Top functionality
+    const scrollToTopButton = document.getElementById('scroll-to-top');
+    scrollToTopButton.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+
+    // Show/hide scroll to top button based on scroll position
+    window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 50) {
+            scrollToTopButton.style.display = 'block';
+        } else {
+            scrollToTopButton.style.display = 'none';
+        }
+    });
+
+    // Initially hide the scroll to top button
+    scrollToTopButton.style.display = 'none';
+
+    document.querySelectorAll('.copy-button').forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent the details from toggling
+            const targetId = e.target.getAttribute('data-target');
+            const content = document.querySelector(`#${targetId} + .content`).innerText;
+            navigator.clipboard.writeText(content).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        });
+    });
+
+    function adjustSidebarWidth() {
+        const sidebar = document.querySelector('#sidebar');
+        const toc = document.querySelector('.modern-toc');
+
+        // Reset the width to auto to get the full content width
+        sidebar.style.width = 'auto';
+
+        // Get the full content width
+        const contentWidth = toc.scrollWidth;
+
+        // Set the width to the content width, with a minimum of 300px and a maximum of 40% of viewport width
+        const newWidth = Math.max(270, Math.min(contentWidth + 60, window.innerWidth * 0.4));
+        sidebar.style.width = newWidth + 'px';
+    }
+
+    document.querySelectorAll('.modern-toc details').forEach(detail => {
+        detail.addEventListener('toggle', adjustSidebarWidth);
+    });
+    window.addEventListener('resize', adjustSidebarWidth);
+
+    function showFile(fileId) {
+        // Hide all file-cards and remove active class
+        document.querySelectorAll('.file-card').forEach(card => {
+            card.style.display = 'none';
+            card.classList.remove('active'); // Ensure the card is not active
+        });
+
+        const selectedCard = document.getElementById('file-' + fileId);
+        if (selectedCard) {
+            selectedCard.style.display = 'block';
+            setTimeout(() => {
+                selectedCard.classList.add('active');
+            }, 10);
+
+            const details = selectedCard.querySelector('details');
+            if (details) {
+                details.open = true;
+            }
+        }
+    }
+
+    function closeFileCard(cardId) {
+        const card = document.getElementById(cardId);
+        console.log('Closing card:', card);
+        if (card) {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.display = 'none';
+                card.classList.remove('active');
+            }, 500);
+        }
+    }
+
+    function copyFileContents(cardId) {
+        const card = document.querySelector(`#${cardId}`);
+        const content = card.querySelector('.content').textContent;
+        const copyButton = card.querySelector('button[title="Copy"]');
+
+        navigator.clipboard.writeText(content).then(() => {
+            const originalText = copyButton.innerHTML;
+            copyButton.innerHTML = 'Saved to clipboard!';
+            copyButton.disabled = true;
+
+            setTimeout(() => {
+                copyButton.innerHTML = originalText;
+                copyButton.disabled = false;
+            }, 3000);
+
+            console.log('Content copied:', content);
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+            copyButton.innerHTML = 'Failed to copy';
+
+            setTimeout(() => {
+                copyButton.innerHTML = originalText;
+            }, 3000);
+        });
+    }
+</script>
