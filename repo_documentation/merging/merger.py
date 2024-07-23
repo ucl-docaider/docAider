@@ -1,5 +1,4 @@
 import os
-from datetime import datetime
 
 EXTENSION = '.html'
 
@@ -16,22 +15,7 @@ with open('../repo_documentation/merging/script.html', 'r', encoding='utf-8') as
     script = f.read()
 
 
-class TemplateDto:
-    def __init__(self, project_title, repo_url, project_description, report_bug_url, feature_request_url):
-        self.project_title = project_title
-        self.repo_url = repo_url
-        self.project_description = project_description
-        self.report_bug_url = report_bug_url
-        self.feature_request_url = feature_request_url
-
-
-def create_documentation(docs_folder, dto: TemplateDto):
-    head_path = '/repo_documentation/merging/head.html'
-    body_path = '/repo_documentation/merging/body.html'
-
-    # Get the current date and time
-    current_datetime = datetime.now().strftime("%d/%m/%Y %H:%M")
-
+def create_documentation(docs_folder):
     # Generate table of contents
     files = []
     for root, _, _files in os.walk(docs_folder):
@@ -52,14 +36,8 @@ def create_documentation(docs_folder, dto: TemplateDto):
 
     # Replace placeholders in the template
     filled_template = body.format(
-        project_title=dto.project_title,
-        repo_url=dto.repo_url,
-        project_description=dto.project_description,
-        report_bug_url=dto.report_bug_url,
-        feature_request_url=dto.feature_request_url,
         table_of_contents=table_of_contents,
         documentation_content=documentation_content,
-        generation_date=current_datetime,
         script=script
     )
 
@@ -110,8 +88,8 @@ def get_table_of_contents(tree, prefix=""):
     for file in files:
         id = clean_path(prefix + file)
         link = os.path.basename(file).replace(EXTENSION, '')
-        table_of_contents += f'<li><a href="javascript:void(0);" onclick="showFile(\'{id}\')">🐍 {link}</a></li>\n'
-
+        table_of_contents += f'<li><a href="javascript:void(0);" onclick="showFile(\'{
+            id}\')">🐍 {link}</a></li>\n'
 
     table_of_contents += "</ul>\n"
     return table_of_contents
@@ -149,14 +127,3 @@ def to_tree(files):
         else:
             current.append(parts[-1])
     return tree
-
-
-"""
-TODO
-- Add a search bar (file_name)
-- Add created with 'Repo-Copilot' in the footer (link to repo)
-
-Hard TODO
-- Add dark and light mode
-- Folow the tree structure of the files (folder/file)
-"""

@@ -16,8 +16,6 @@ from semantic_kernel.functions.kernel_arguments import KernelArguments
 from repo_agents.plugins.github_info_plugin import GithubInfoPlugin
 from repo_agents.plugins.documentation_plugin import DocumentationPlugin
 from typing import Annotated
-from repo_documentation.merging.merger import TemplateDto, create_documentation
-
 
 class GitRepoAgent:
   """
@@ -77,18 +75,6 @@ class GitRepoAgent:
     """
     documentation_helper = DocumentationPlugin()
     documentation_helper.generate_all()
-
-    if os.getenv("FORMAT") == "html":
-      root_folder = os.path.abspath(os.getenv("ROOT_FOLDER"))
-      output_folder = os.path.join(root_folder, "docs_output")
-      dto = TemplateDto(
-          project_title=os.path.basename(root_folder),
-          repo_url='http://github.com',
-          project_description='Generated documentation for the repository',
-          report_bug_url='http://github.com/issues',
-          feature_request_url='http://github.com/feature_requests'
-      )
-      create_documentation(output_folder, dto)
   
 # Test this agent
 # Note: nested async functions are problematic. (code_context_explanation is never awaited)

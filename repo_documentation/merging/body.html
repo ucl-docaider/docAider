@@ -1,26 +1,25 @@
-    <body>
-        <button id="sidebar-toggle">☰</button>
+<body>
+    <button id="sidebar-toggle">☰</button>
 
-        <div id="sidebar">
-            <div style="padding: 10px 0px 0px 20px">
-                <h2>Files</h2>
-            </div>
-            <hr>
-            <div class="modern-toc">
-                <ul>
-                    {table_of_contents}
-                </ul>
-            </div>
+    <div id="sidebar">
+        <h2 style="padding-left: 10px;">Files</h2>
+        <hr>
+        <div class="modern-toc">
+            <ul>
+                {table_of_contents}
+            </ul>
         </div>
+    </div>
 
-        <div class="container">
-            <h2 id="documentation">Documentation</h2>
-            {documentation_content}
-        </div>
+    <div class="container">
+        <h2 id="documentation">Documentation</h2>
+        {documentation_content}
+    </div>
 
-        <div class="floating-buttons">
-            <button id="scroll-to-top" class="floating-button">↑ Top</button>
-        </div>
-        {script}
-    </body>
+    <div class="floating-buttons">
+        <button id="scroll-to-top" class="floating-button">↑ Top</button>
+    </div>
+    {script}
+</body>
+
 </html>
