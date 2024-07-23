@@ -15,6 +15,7 @@ from autogen_utils import utils as autogen_utils
 from repo_documentation import utils
 from cache.document import sha256_hash
 import argparse
+from repo_documentation.merging.merger import create_documentation
 
 class ChangeType(Enum):
 	ADDED = 'A'
@@ -40,6 +41,8 @@ class DocumentationUpdate():
 			abs_file_path = os.path.join(self.root_folder, self.file_path)
 			print(f"File path: {abs_file_path}")
 			self.update_documentation_based_on_comment(abs_file_path, self.comment, curr_branch_commit)
+			if os.getenv("FORMAT") == "html":
+				create_documentation
 		else:
 			print("Updating documentation based on branch changes...")
 			# 1. Get the latest commit of the current branch and the main branch
@@ -93,7 +96,9 @@ class DocumentationUpdate():
 				# 6e. If the file has been deleted
 				elif change_type == ChangeType.DELETED:
 					self._handle_deleted(path)
-				
+
+			if os.getenv("FORMAT") == "html":
+				create_documentation(self.output_dir)	
 			total = round(time.time() - start_time, 3)
 			print(f"Total time taken to execute doc update: {total}s.")
 
@@ -243,16 +248,15 @@ class DocumentationUpdate():
 		 												 file_path, curr_branch_commit)
 
 		# Update the documentation based on the diffs and additional docs
-	
-		# Map the functions to their new, updated content
-		updated_functions = {}
-		for func in filtered:
-			updated_functions[func] = self.graph[func]['content']
+
+
+		additional_docs = autogen_utils.get_additional_docs_path(file_path, self.graph, self.bfs_explore)
   
 		# Update the documentation based on the diffs and additional docs
 		updated_docs = autogen_utils.get_updated_parent_documentation(
 			file_path=file_path,
-			updated_functions=updated_functions,
+			updated_functions=filtered,
+			additional_docs=additional_docs,
 			new_content=new_content,
 			functions=functions,
 			parent_content=parent_content,
@@ -320,7 +324,7 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	repo_path = "./../../users/"
-	branch = "testing5"
+	branch = "testing2"
 	file_path = args.file
 	comment = args.comment
 

@@ -147,6 +147,8 @@ Please make sure to update the following functions in the file accordingly.
 {functions}
 File content:
 {parent_content}
+These are the content of the functions that have been updated as well as additional callee functions that are dependent on the updated functions:
+{additional_docs}
 Old documentation:
 {old_parent_docs}
 (Note:
