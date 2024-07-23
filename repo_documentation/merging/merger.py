@@ -22,6 +22,7 @@ def create_documentation(docs_folder):
         for file in _files:
             if file.endswith(EXTENSION) and not file.startswith('index'):
                 path = os.path.relpath(os.path.join(root, file), docs_folder)
+                print(path)
                 files.append((root, path))
 
     # Sort by basename
@@ -29,6 +30,8 @@ def create_documentation(docs_folder):
 
     # Get table of contents
     tree = to_tree([path for _, path in files])
+    print(f"Tree: {tree}")
+    print(f"Files: {files}")
     table_of_contents = get_table_of_contents(tree)
 
     # Get the documentation file-cards
@@ -111,19 +114,16 @@ def get_documentation_content(files):
     return documentation_content
 
 
+
 def to_tree(files):
-    tree = {}
+    tree = {'files': []}
     for path in files:
-        parts = path.split('\\')
+        parts = path.split(os.sep)
         current = tree
         for part in parts[:-1]:
             if part not in current:
-                current[part] = {}
+                current[part] = {'files': []}
             current = current[part]
-        if isinstance(current, dict):
-            if 'files' not in current:
-                current['files'] = []
+        if parts[-1]:
             current['files'].append(parts[-1])
-        else:
-            current.append(parts[-1])
     return tree

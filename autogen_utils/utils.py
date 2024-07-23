@@ -96,6 +96,7 @@ def get_updated_documentation(file_path,
 
 def get_updated_parent_documentation(file_path,
                              updated_functions,
+                             additional_docs,
                              new_content,
                              functions,
                              parent_content,
@@ -123,12 +124,10 @@ def get_updated_parent_documentation(file_path,
         str: The content of the last message from the assistant.
     """
     # Convert the updated functions to a string
-    updated_function_contents = ""
-    for func, content in updated_functions.items():
-        updated_function_contents += f"- Function {func}:\n{content}\n"
-    
+
     prompt_message = PARENT_UPDATE.format(
-        updated_function_contents=updated_function_contents,
+        updated_function_contents=updated_functions,
+        additional_docs=additional_docs,
         new_content=new_content,
         path=file_path,
         functions=functions,
