@@ -4,7 +4,7 @@ sys.path.append(parent_dir)
 from dotenv import load_dotenv
 load_dotenv(dotenv_path="../.env")
 
-from repo_agents.git_repo_agent import GitRepoAgent
+from repo_agents.multi_agent_generation.git_repo_agent import GitRepoAgent
 from repo_documentation.merging.merger import create_documentation
 
 def run_generate_documentation():
