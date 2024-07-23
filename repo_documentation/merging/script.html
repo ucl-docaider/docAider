@@ -106,20 +106,19 @@
         // Hide all file-cards and remove active class
         document.querySelectorAll('.file-card').forEach(card => {
             card.style.display = 'none';
-            card.classList.remove('active'); // Ensure the card is not active
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.classList.remove('active');
         });
 
         const selectedCard = document.getElementById('file-' + fileId);
         if (selectedCard) {
             selectedCard.style.display = 'block';
             setTimeout(() => {
-                selectedCard.classList.add('active');
+                selectedCard.style.opacity = '1';
+                selectedCard.style.transform = 'translateY(0)';
+                selectedCard.classList.add('active'); // Add active class to start the opacity and transform transition
             }, 10);
-
-            const details = selectedCard.querySelector('details');
-            if (details) {
-                details.open = true;
-            }
         }
     }
 
