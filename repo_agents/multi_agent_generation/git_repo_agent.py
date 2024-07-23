@@ -1,8 +1,8 @@
 import os, sys
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 sys.path.append(parent_dir)
 from dotenv import load_dotenv
-load_dotenv(dotenv_path="../.env")
+load_dotenv(dotenv_path="../../.env")
 import azure_openai_settings as ai_service_settings
 from semantic_kernel import Kernel
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
@@ -79,7 +79,7 @@ class GitRepoAgent:
 # Test this agent
 # Note: nested async functions are problematic. (code_context_explanation is never awaited)
 if __name__ == "__main__":
-  copilot = GitRepoAgent()
+  #copilot = GitRepoAgent()
   dg = DocumentationPlugin()
   # If you want to chat with git repo agent, use the following code:
   """print("Hello! I am your Github repo copilot.")
@@ -95,4 +95,4 @@ if __name__ == "__main__":
       break
     asyncio.run(copilot.chat_with_agent(user_input))"""
 
-  dg.generate_documentation_for_file("absolute-file-path")
+  dg.generate_documentation_for_file("/Users/chengqike/Desktop/summer_project/repo-copilot/samples/data_processor.py")

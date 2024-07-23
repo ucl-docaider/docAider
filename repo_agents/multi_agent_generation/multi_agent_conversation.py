@@ -2,7 +2,7 @@ import os
 import asyncio
 from autogen import ConversableAgent, register_function
 import azure_openai_settings as ai_service_settings
-from repo_agents.code_context_agent import CodeContextAgent
+from repo_agents.multi_agent_generation.code_context_agent import CodeContextAgent
 from repo_agents.prompt import DOCUMENTATION_PROMPT_HTML, DOCUMENTATION_PROMPT_MD, REVIEWER_PROMPT
 from repo_documentation.utils import Mode, save_prompt_debug
 from typing import Annotated

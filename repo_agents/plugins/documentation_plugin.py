@@ -1,5 +1,5 @@
 import os
-import repo_agents.multi_agent_conversation as mac
+import repo_agents.multi_agent_generation.multi_agent_conversation as mac
 from repo_agents.ast_agent import ASTAgent
 from semantic_kernel.functions import kernel_function
 from cache.docs_cache import DocsCache
