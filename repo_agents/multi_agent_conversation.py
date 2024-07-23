@@ -3,7 +3,7 @@ import asyncio
 from autogen import ConversableAgent, register_function
 import azure_openai_settings as ai_service_settings
 from repo_agents.code_context_agent import CodeContextAgent
-from repo_agents.prompt import DOCUMENTATION_PROMPT, REVIEWER_PROMPT
+from repo_agents.prompt import DOCUMENTATION_PROMPT_HTML, DOCUMENTATION_PROMPT_MD, REVIEWER_PROMPT
 from repo_documentation.utils import Mode, save_prompt_debug
 from typing import Annotated
 
@@ -58,25 +58,49 @@ register_function(
 
 def multi_agent_documentation_generation(file_path) -> str:
   output_folder = os.path.join(os.getenv("ROOT_FOLDER"), "docs_output")
-  chat_result = agent_manager.initiate_chats(
-    [
-      {
-        "recipient": documentation_generation_agent,
-        "message": DOCUMENTATION_PROMPT.format(
-          file_path=file_path,
-          file_name=os.path.basename(file_path)
-        ),
-        "max_turns": 2,
-        "summary_method": "last_msg",
-      },
-      {
-        "recipient": review_agent,
-        "message": REVIEWER_PROMPT,
-        "max_turns": 1,
-        "summary_method": "reflection_with_llm",
-      }
-    ]
-  )
+
+  if os.getenv("FORMAT") == "html":
+    chat_result = agent_manager.initiate_chats(
+      [
+        {
+          "recipient": documentation_generation_agent,
+          "message": DOCUMENTATION_PROMPT_HTML.format(
+            file_path=file_path,
+            file_name=os.path.basename(file_path)
+          ),
+          "max_turns": 2,
+          "summary_method": "last_msg",
+        },
+        {
+          "recipient": review_agent,
+          "message": REVIEWER_PROMPT,
+          "max_turns": 1,
+          "summary_method": "reflection_with_llm",
+        }
+      ]
+    )
+  elif os.getenv("FORMAT") == "md":
+    chat_result = agent_manager.initiate_chats(
+      [
+        {
+          "recipient": documentation_generation_agent,
+          "message": DOCUMENTATION_PROMPT_MD.format(
+            file_path=file_path,
+            file_name=os.path.basename(file_path)
+          ),
+          "max_turns": 2,
+          "summary_method": "last_msg",
+        },
+        {
+          "recipient": review_agent,
+          "message": REVIEWER_PROMPT,
+          "max_turns": 1,
+          "summary_method": "reflection_with_llm",
+        }
+      ]
+    )
+  else:
+    raise ValueError("Invalid documentation format specified.")
   # Save prompt text for debug
   save_prompt_debug(output_folder, file_path + "_dga", chat_result[0].chat_history[2]["content"], Mode.UPDATE)
   save_prompt_debug(output_folder, file_path + "_ra", chat_result[1].chat_history[0]["content"], Mode.UPDATE)

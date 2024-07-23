@@ -3,16 +3,16 @@ from datetime import datetime
 
 EXTENSION = '.html'
 
-with open('repo_documentation/merging/head.html', 'r', encoding='utf-8') as f:
+with open('../repo_documentation/merging/head.html', 'r', encoding='utf-8') as f:
     head = f.read()
 
-with open('repo_documentation/merging/body.html', 'r', encoding='utf-8') as f:
+with open('../repo_documentation/merging/body.html', 'r', encoding='utf-8') as f:
     body = f.read()
 
-with open('repo_documentation/merging/file-card.html', 'r', encoding='utf-8') as f:
+with open('../repo_documentation/merging/file-card.html', 'r', encoding='utf-8') as f:
     file_card_template = f.read()
 
-with open('repo_documentation/merging/script.html', 'r', encoding='utf-8') as f:
+with open('../repo_documentation/merging/script.html', 'r', encoding='utf-8') as f:
     script = f.read()
 
 
@@ -26,6 +26,9 @@ class TemplateDto:
 
 
 def create_documentation(docs_folder, dto: TemplateDto):
+    head_path = '/repo_documentation/merging/head.html'
+    body_path = '/repo_documentation/merging/body.html'
+
     # Get the current date and time
     current_datetime = datetime.now().strftime("%d/%m/%Y %H:%M")
 

@@ -85,7 +85,12 @@ def write_file_docs(output_dir, root_folder, file_path, docs) -> str:
     os.makedirs(target_dir, exist_ok=True)
     
     # Prepare the output file path
-    file_name = f'{os.path.basename(file_path)}.html'
+    if os.getenv("FORMAT") == "html":
+        file_name = f'{os.path.basename(file_path)}.html'
+    elif os.getenv("FORMAT") == "md":
+        file_name = f'{os.path.basename(file_path)}.md'
+    else:
+        raise ValueError("Invalid documentation format specified.")
     path = os.path.join(target_dir, file_name)
     
     print(f'Saving documentation to {path}')
