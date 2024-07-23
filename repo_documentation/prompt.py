@@ -106,24 +106,27 @@ DOCUMENTATION_UPDATE_PROMPT = """You are an AI documentation assistant. Your tas
 
 Now you need to update the document for "{file_name}".
 
-**Old Documentation**:
+Old Documentation:
 {old_file_docs}
 
-**Old Code Content**:
+Old Code Content:
 {old_file_content}
 
-**New Code Content**:
+New Code Content:
 {new_file_content}
 
-**Diff between Old and New Code**:
+Diff between Old and New Code**:
 {diff}
 
-**Changes in the Functions**:
+Changes in the Functions:
 {changes}
 
 Please update the documentation accordingly, ensuring it accurately reflects the changes. Provide a comprehensive and clear description for any modified or new functions/classes.
 
-**Note**: DO NOT CHANGE ANYTHING IN THE OLD DOCUMENTATION THAT HAS NOT BEEN AFFECTED BY THE CODE CHANGES.
+(Note:
+1. DO NOT CHANGE ANYTHING IN THE OLD DOCUMENTATION THAT HAS NOT BEEN AFFECTED BY THE CODE CHANGES.
+2. FOLLOW THE FORMAT OF THE OLD DOCUMENTATION FOR CONSISTENCY.)
+3. DO NOT CHANGE THE FORMAT OF THE DOCUMENTATION.)
 """
 
 USR_PROMPT = """You are a documentation generation assistant for Python programs. Keep in mind that your audience is document readers, so use a deterministic tone to generate precise content and don't let them know you're provided with code snippet and documents. AVOID ANY SPECULATION and inaccurate descriptions! Now, provide the documentation for the target object in a professional way."""
@@ -131,10 +134,10 @@ USR_PROMPT = """You are a documentation generation assistant for Python programs
 
 PARENT_UPDATE = """
 
-**The following functions:**
+The following functions:
 {updated_function_contents}
 
-**In the file below:**
+In the file below:
 {new_content}
 
 Have been updated. These changes influence the current file on the path: 
@@ -146,8 +149,10 @@ File content:
 {parent_content}
 Old documentation:
 {old_parent_docs}
-••Note:••: DO NOT CHANGE ANYTHING IN THE OLD DOCUMENTATION THAT HAS NOT BEEN AFFECTED BY THE CODE CHANGES.
-
+(Note:
+1. DO NOT CHANGE ANYTHING IN THE OLD DOCUMENTATION THAT HAS NOT BEEN AFFECTED BY THE CODE CHANGES.
+2. FOLLOW THE FORMAT OF THE OLD DOCUMENTATION FOR CONSISTENCY.)
+3. DO NOT CHANGE THE FORMAT OF THE DOCUMENTATION.)
 """
 
 COMENT_UPDATE = """The user has requested an update for the documentation in the file {abs_file_path} with the following comment:
@@ -157,5 +162,8 @@ Please update the documentation accordingly. The current content of the file is 
 The old documentation is as follows:
 {old_file_docs}
 
-Please provide the updated documentation content. DO NOT CHANGE ANYTHING IN THE OLD DOCUMENTATION THAT HAS NOT BEEN MENTIONED IN THE COMMENT.
+Please provide the updated documentation content. (Note:
+1. DO NOT CHANGE ANYTHING IN THE OLD DOCUMENTATION THAT HAS NOT BEEN MENTIONED IN THE COMMENT.
+2. FOLLOW THE FORMAT OF THE OLD DOCUMENTATION FOR CONSISTENCY.)
+3. DO NOT CHANGE THE FORMAT OF THE DOCUMENTATION.)
 """

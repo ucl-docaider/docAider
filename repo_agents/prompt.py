@@ -109,7 +109,7 @@ First you can use the code context explainer to get the code context.
 Then based on the code contextual explanation, generate a documentation for the source code. 
 The purpose of the documentation is to help developers and beginners understand the function and specific usage of the code.
 Please note any part of the content you generate SHOULD NOT CONTAIN Markdown hierarchical heading and divider syntax.
-The generated documentation MUST in HTML format as provided in the template below.
+The generated documentation MUST BE in HTML format as provided in the template below.
 The file path is: {file_path}
 
 The standard format is as follows:
@@ -118,7 +118,6 @@ The standard format is as follows:
 2. If you are confused about any part, feel free to add notes or comments;
 3. If you have any suggestion to the code, also add concise comments.)
 
-HTML Template:
 <h1>{file_name}</h1>
 
 <h2> Source Code </h2>
@@ -168,13 +167,11 @@ HTML Template:
 <p>Points to note about the use of the code according to the returns</p>
 
 <h3>Input Example:</h3>
-
 <pre><code>
 Provide an input example for a specified data type (e.g., list, double, int) and include a detailed explanation.
 </code></pre>
 
 <h3>Output Example:</h3>
-
 <pre><code>
 Provide an output example for a specified data type (e.g., list, double, int) and include a detailed explanation.
 </code></pre>
@@ -208,13 +205,11 @@ Provide an output example for a specified data type (e.g., list, double, int) an
 <p>Points to note about the use of the code according to the returns</p>
 
 <h3>Input Example:</h3>
-
 <pre><code>
 Provide an input example for a specified data type (e.g., list, double, int) and include a detailed explanation.
 </code></pre>
 
 <h3>Output Example:</h3>
-
 <pre><code>
 Provide an output example for a specified data type (e.g., list, double, int) and include a detailed explanation.
 </code></pre>

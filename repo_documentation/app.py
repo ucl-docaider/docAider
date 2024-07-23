@@ -9,7 +9,7 @@ sys.path.append(os.path.abspath(
 from code2flow.code2flow import utils as graph_utils
 from cache.docs_cache import DocsCache
 from autogen_utils import utils as autogen_utils
-from repo_documentation.merging.merger import TemplateDto, create_documentation
+from repo_documentation.merging.merger import create_documentation
 
 
 class RepoDocumentation():
@@ -72,14 +72,7 @@ class RepoDocumentation():
         utils.save_cache(self.output_dir, cache)
 
         # 8. Generate the final documentation
-        dto = TemplateDto(
-            project_title=os.path.basename(self.root_folder),
-            repo_url='http://github.com',
-            project_description='Generated documentation for the repository',
-            report_bug_url='http://github.com/issues',
-            feature_request_url='http://github.com/feature_requests'
-        )
-        create_documentation(self.output_dir, dto)
+        create_documentation(self.output_dir)
 
         total = round(time.time() - start_time, 3)
         print(f'Generated documentation ({
