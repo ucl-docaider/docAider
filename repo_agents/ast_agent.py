@@ -1,6 +1,6 @@
 import os
 from code2flow.code2flow import utils as graph_utils
-from autogen_utils import utils as autogen_utils
+from repo_documentation.utils import get_additional_docs_calls
 
 class ASTAgent:
   """
@@ -19,7 +19,7 @@ class ASTAgent:
     Returns callee functions in a file
     """
     calls = self.file_to_calls[file_path]
-    callee_function_info = autogen_utils.get_additional_docs_calls(calls, self.graph, self.bfs_explore)
+    callee_function_info = get_additional_docs_calls(calls, self.graph, self.bfs_explore)
     return callee_function_info
   
   def get_file_call_dict(self) -> dict:
