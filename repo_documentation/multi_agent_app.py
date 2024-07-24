@@ -9,7 +9,8 @@ from repo_documentation.merging.merger import create_documentation
 
 def run_generate_documentation():
   """
-  Invoke this function to trigger the doc gen process.
+  Invoke this function to trigger the doc gen process (multi-agent pattern).
+  Tradeoff: Expensive (multi-agent conversation consumes more tokens), more accurate (more detailed documentation)
   Ensure you have all environment variables set up correctly. Check `.env_example` file to find out what they are.
   """
   start_time = time.time()

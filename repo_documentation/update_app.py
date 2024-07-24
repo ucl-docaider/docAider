@@ -151,7 +151,7 @@ class DocumentationUpdate():
 													 file_path, current_branch_commit)
 
 		# 2. Prepare additional context for LLM
-		additional_docs = autogen_utils.get_additional_docs_path(
+		additional_docs = utils.get_additional_docs_path(
 			file_path, self.graph, self.bfs_explore)
 
 		# 3. Generate the documentation for the file
@@ -204,7 +204,7 @@ class DocumentationUpdate():
 			self.graph, filtered, file_path)
 
 		# 5. Prepare additional context for LLM
-		additional_docs = autogen_utils.get_additional_docs_path(
+		additional_docs = utils.get_additional_docs_path(
 			file_path, self.graph, self.bfs_explore)
 
 		if additional_functions_info:
@@ -250,7 +250,7 @@ class DocumentationUpdate():
 		# Update the documentation based on the diffs and additional docs
 
 
-		additional_docs = autogen_utils.get_additional_docs_path(file_path, self.graph, self.bfs_explore)
+		additional_docs = utils.get_additional_docs_path(file_path, self.graph, self.bfs_explore)
   
 		# Update the documentation based on the diffs and additional docs
 		updated_docs = autogen_utils.get_updated_parent_documentation(

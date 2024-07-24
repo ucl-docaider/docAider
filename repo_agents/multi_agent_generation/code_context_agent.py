@@ -15,7 +15,7 @@ from semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.azure_chat_
 )
 from semantic_kernel.functions.kernel_arguments import KernelArguments
 from repo_agents.plugins.code_context_plugin import CodeContextPlugin
-from repo_agents.prompt import CODE_CONTEXT_PROMPT
+from repo_agents.multi_agent_generation.prompt import CODE_CONTEXT_PROMPT
 from repo_documentation.utils import Mode, save_prompt_debug
 from typing import Annotated
 
