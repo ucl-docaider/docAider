@@ -24,4 +24,6 @@ def run_generate_documentation():
   print(f"Documentation generation completed in {total}s.")
 
 # Test it
-run_generate_documentation()
+#run_generate_documentation()
+da = DocumentationAgent()
+da.generate_documentation_for_file("/Users/chengqike/Desktop/summer_project/repo-copilot/samples/utils.py", save_debug=True)
