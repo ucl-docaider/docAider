@@ -5,13 +5,6 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv(dotenv_path="../../.env")
 
-# Determine the file format based on the environment variable
-FORMAT = os.getenv('FORMAT')
-if FORMAT == 'md':
-    EXTENSION = '.md'
-else:
-    EXTENSION = '.html'
-
 # Define the extensions for HTML and Markdown files
 HTML_EXTENSION = '.html'
 MD_EXTENSION = '.md'
@@ -34,7 +27,7 @@ def create_documentation(docs_folder):
     files = []
     for root, _, _files in os.walk(docs_folder):
         for file in _files:
-            if file.endswith(EXTENSION) and not file.startswith('index'):
+            if file.endswith(MD_EXTENSION) and not file.startswith('index'):
                 path = os.path.relpath(os.path.join(root, file), docs_folder)
                 print(path)
                 files.append((root, path))
@@ -70,7 +63,7 @@ def create_file_card(file_path: str, docs):
     # Clean the path to create a valid HTML id
     id = clean_path(file_path)
     # Remove file extensions for display purposes
-    file_name = file_path.replace('\\', '/').replace(HTML_EXTENSION, '').replace(MD_EXTENSION, '')
+    file_name = file_path.replace('\\', '/').replace(MD_EXTENSION, '')
     # Format the file card template with the id and content
     return file_card_template.format(id=id, file_name=file_name, content=docs)
 
@@ -103,7 +96,7 @@ def get_table_of_contents(tree, prefix=""):
     # Then handle files
     for file in files:
         id = clean_path(prefix + file)
-        link = os.path.basename(file).replace(HTML_EXTENSION, '').replace(MD_EXTENSION, '')
+        link = os.path.basename(file).replace(MD_EXTENSION, '')
         table_of_contents += f'<li><a href="javascript:void(0);" onclick="showFile(\'{id}\')">🐍 {link}</a></li>\n'
 
     table_of_contents += "</ul>\n"
@@ -111,7 +104,7 @@ def get_table_of_contents(tree, prefix=""):
 
 def clean_path(path):
     # Clean the path to create a valid HTML id
-    return path.replace(HTML_EXTENSION, '').replace(MD_EXTENSION, '') \
+    return path.replace(MD_EXTENSION, '') \
         .replace('\\', '/') \
         .replace('/', '-') \
         .replace('.', '-')
@@ -123,10 +116,7 @@ def get_documentation_content(files):
         file_path = os.path.join(root, basename)
         with open(file_path, 'r', encoding='utf-8') as f:
             # Convert Markdown files to HTML
-            if basename.endswith(MD_EXTENSION):
-                content = markdown.markdown(f.read(), extensions=['fenced_code'])
-            else:
-                content = f.read()
+            content = markdown.markdown(f.read(), extensions=['fenced_code'])
             # Create file card for each file
             documentation_content += create_file_card(path, content)
     return documentation_content
