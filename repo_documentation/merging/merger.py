@@ -1,7 +1,22 @@
 import os
+import markdown
+from dotenv import load_dotenv
 
-EXTENSION = '.html'
+# Load environment variables from .env file
+load_dotenv(dotenv_path="../../.env")
 
+# Determine the file format based on the environment variable
+FORMAT = os.getenv('FORMAT')
+if FORMAT == 'md':
+    EXTENSION = '.md'
+else:
+    EXTENSION = '.html'
+
+# Define the extensions for HTML and Markdown files
+HTML_EXTENSION = '.html'
+MD_EXTENSION = '.md'
+
+# Load HTML template parts
 with open('../repo_documentation/merging/head.html', 'r', encoding='utf-8') as f:
     head = f.read()
 
@@ -13,7 +28,6 @@ with open('../repo_documentation/merging/file-card.html', 'r', encoding='utf-8')
 
 with open('../repo_documentation/merging/script.html', 'r', encoding='utf-8') as f:
     script = f.read()
-
 
 def create_documentation(docs_folder):
     # Generate table of contents
@@ -46,20 +60,19 @@ def create_documentation(docs_folder):
 
     # Write the filled template to the output file
     output = head + filled_template
-    output_file = os.path.join(docs_folder, f'index{EXTENSION}')
+    output_file = os.path.join(docs_folder, f'index{HTML_EXTENSION}')
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write(output)
 
     print(f"Final documentation has been generated in {output_file}")
 
-
 def create_file_card(file_path: str, docs):
+    # Clean the path to create a valid HTML id
     id = clean_path(file_path)
-    file_name = file_path.replace('\\', '/').replace('.html', '')
-    return file_card_template.format(id=id,
-                                     file_name=file_name,
-                                     content=docs)
-
+    # Remove file extensions for display purposes
+    file_name = file_path.replace('\\', '/').replace(HTML_EXTENSION, '').replace(MD_EXTENSION, '')
+    # Format the file card template with the id and content
+    return file_card_template.format(id=id, file_name=file_name, content=docs)
 
 def get_table_of_contents(tree, prefix=""):
     table_of_contents = "<ul>\n"
@@ -90,30 +103,33 @@ def get_table_of_contents(tree, prefix=""):
     # Then handle files
     for file in files:
         id = clean_path(prefix + file)
-        link = os.path.basename(file).replace(EXTENSION, '')
-        table_of_contents += f'<li><a href="javascript:void(0);" onclick="showFile(\'{
-            id}\')">🐍 {link}</a></li>\n'
+        link = os.path.basename(file).replace(HTML_EXTENSION, '').replace(MD_EXTENSION, '')
+        table_of_contents += f'<li><a href="javascript:void(0);" onclick="showFile(\'{id}\')">🐍 {link}</a></li>\n'
 
     table_of_contents += "</ul>\n"
     return table_of_contents
 
-
 def clean_path(path):
-    return path.replace(EXTENSION, '') \
+    # Clean the path to create a valid HTML id
+    return path.replace(HTML_EXTENSION, '').replace(MD_EXTENSION, '') \
         .replace('\\', '/') \
         .replace('/', '-') \
         .replace('.', '-')
-
 
 def get_documentation_content(files):
     documentation_content = ""
     for root, path in files:
         basename = os.path.basename(path)
-        with open(os.path.join(root, basename), 'r', encoding='utf-8') as f:
-            documentation_content += create_file_card(path, f.read())
+        file_path = os.path.join(root, basename)
+        with open(file_path, 'r', encoding='utf-8') as f:
+            # Convert Markdown files to HTML
+            if basename.endswith(MD_EXTENSION):
+                content = markdown.markdown(f.read(), extensions=['fenced_code'])
+            else:
+                content = f.read()
+            # Create file card for each file
+            documentation_content += create_file_card(path, content)
     return documentation_content
-
-
 
 def to_tree(files):
     tree = {'files': []}
