@@ -1,15 +1,11 @@
-import time, os, sys, git
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-sys.path.append(parent_dir)
-from dotenv import load_dotenv
-load_dotenv(dotenv_path="../../.env")
+import os, git
 from enum import Enum
 
 from repo_agents.documentation_update.update_assistant import UpdateAssistant
 from repo_documentation import utils as doc_utils
 from repo_agents.documentation_update import git_utils
 from cache.document import sha256_hash
-from repo_documentation.merging.merger import create_documentation
+from repo_documentation.merging.merger import create_documentation_index
 
 class ChangeType(Enum):
   ADDED = 'A'
@@ -65,9 +61,9 @@ class DocumentationUpdateAgent:
         path = self.ua.get_file_path(diff)
         # Attempt to get the cached documentation for the file
         cached_doc = self.cache.get(path)
-        change_type = ChangeType(diff.change_type)
         new_commit_content = git_utils.get_file_commit_content(self.root_folder, path, branch_latest_commit)
 
+        change_type = ChangeType(diff.change_type)
         # Generate new documentation if the file is not cached
         if change_type == ChangeType.ADDED:
           self.ua.create_documentation_for_file(path, branch_latest_commit)
@@ -90,4 +86,4 @@ class DocumentationUpdateAgent:
         elif change_type == ChangeType.DELETED:
           self.ua.delete_documentation_for_file(path)
 
-      create_documentation(self.output_folder)
+      create_documentation_index() # Create index page of documentation files

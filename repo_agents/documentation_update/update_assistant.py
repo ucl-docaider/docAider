@@ -24,7 +24,7 @@ class UpdateAssistant:
     file_content = doc_utils.read_file_content(file_path)
     old_file_docs = self._get_old_file_docs(file_path)
     prompt = UPDATE_BY_COMMENT_PROMPT.format(
-      abs_file_path=file_path,
+      file_path=file_path,
       comment=comment,
       file_content=file_content,
       old_file_docs=old_file_docs,
@@ -38,12 +38,12 @@ class UpdateAssistant:
     # Update cache with new documentation
     self._write_docs_and_cache(file_path, new_content, updated_documentation)
 
-  def create_documentation_for_file(self, file_path, current_branch_commit) -> None:
+  def create_documentation_for_file(self, file_path, branch_latest_commit) -> None:
     """
     Create a new documentation for the file.
     Used when the `change_type` of the file is `ADDED`.
     """
-    file_content = git_utils.get_file_commit_content(self.root_folder, file_path, current_branch_commit)
+    file_content = git_utils.get_file_commit_content(self.root_folder, file_path, branch_latest_commit)
     callee_functions = self.ast_agent.get_additional_docs_path(file_path)
     prompt = DOCUMENTATION_PROMPT.format(
       file_name=os.path.basename(file_path),
@@ -151,8 +151,8 @@ class UpdateAssistant:
     return ast_utils.get_function_changes(path, old_content, new_content)
   
   def get_parents_count(self, path, changes):
-    filtered = ast_utils.filter_changes(changes)
-    parent_dependencies = code2flow_utils.get_parent_dependencies(self.ast_agent.graph, filtered, path)
+    filtered_changes = ast_utils.filter_changes(changes)
+    parent_dependencies = code2flow_utils.get_parent_dependencies(self.ast_agent.graph, filtered_changes, path)
     return len(parent_dependencies)
   
   def get_file_path(self, diff):

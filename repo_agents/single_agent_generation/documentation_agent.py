@@ -30,7 +30,11 @@ class DocumentationAgent:
       file_content=file_content,
       callee_functions=callee_functions
     )
+    # Save the prompt message for debug
+    if self.save_debug:
+      doc_utils.save_prompt_debug(self.output_folder, file_path, prompt, doc_utils.Mode.CREATE)
 
+    # Generate documentation
     documentation = asyncio.run(self.chat_completion_agent.generate_response(prompt))
     # Save the documentation
     output_path = doc_utils.write_file_docs(
@@ -41,10 +45,6 @@ class DocumentationAgent:
     )
     # Save the cache
     self.cache.add(file_path, file_content, output_path)
-
-    # Save the prompt message for debug
-    if self.save_debug:
-      doc_utils.save_prompt_debug(self.output_folder, file_path, prompt, doc_utils.Mode.CREATE)
   
   def generate_all_documentation(self) -> None:
     """
@@ -56,6 +56,6 @@ class DocumentationAgent:
       if file_path == 'EXTERNAL':  # Skip all external functions
         continue
       # Generate documentation for the file
-      asyncio.run(self.generate_documentation_for_file(file_path))
+      self.generate_documentation_for_file(file_path)
     # Save cache
     doc_utils.save_cache(self.output_folder, self.cache)

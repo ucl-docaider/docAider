@@ -15,7 +15,7 @@ from autogen_utils import utils as autogen_utils
 from repo_documentation import utils
 from cache.document import sha256_hash
 import argparse
-from repo_documentation.merging.merger import create_documentation
+from repo_documentation.merging.merger import create_documentation_index
 
 class ChangeType(Enum):
 	ADDED = 'A'
@@ -41,7 +41,7 @@ class DocumentationUpdate():
 			abs_file_path = os.path.join(self.root_folder, self.file_path)
 			print(f"File path: {abs_file_path}")
 			self.update_documentation_based_on_comment(abs_file_path, self.comment, curr_branch_commit)
-			create_documentation(self.output_dir)
+			create_documentation_index()
 		else:
 			print("Updating documentation based on branch changes...")
 			# 1. Get the latest commit of the current branch and the main branch
@@ -96,7 +96,7 @@ class DocumentationUpdate():
 				elif change_type == ChangeType.DELETED:
 					self._handle_deleted(path)
 
-			create_documentation(self.output_dir)	
+			create_documentation_index()	
 			total = round(time.time() - start_time, 3)
 			print(f"Total time taken to execute doc update: {total}s.")
 

@@ -29,9 +29,8 @@ class ASTAgent:
   
   def get_additional_docs_path(self, file_path):
     additional_docs = ""
-    file_to_calls = code2flow_utils.get_file_to_functions(self.graph)
-    if file_path in file_to_calls:
-      calls = file_to_calls[file_path]
+    if file_path in self.file_to_calls:
+      calls = self.file_to_calls[file_path]
       additional_docs += self.get_additional_docs_calls(calls)
     return additional_docs
   

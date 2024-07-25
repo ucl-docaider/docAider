@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv(dotenv_path="../.env")
 
 from repo_agents.multi_agent_generation.git_repo_agent import GitRepoAgent
-from repo_documentation.merging.merger import create_documentation
+from repo_documentation.merging.merger import create_documentation_index
 
 def run_generate_documentation():
   """
@@ -17,9 +17,7 @@ def run_generate_documentation():
   gra = GitRepoAgent()
   gra.generate_all_documentation()
   total = round(time.time() - start_time, 3)
-  root_folder = os.path.abspath(os.getenv("ROOT_FOLDER"))
-  output_folder = os.path.join(root_folder, "docs_output")
-  create_documentation(output_folder)
+  create_documentation_index() # Create index page of documentation files
   print(f"Documentation generation completed in {total}s.")
 
 # Test it

@@ -2,7 +2,7 @@ CODE_CONTEXT_PROMPT = """
 First you need to get the content of this file (source code): {file_path}.
 Then you need to get the information of the callee function in the same file path.
 The information of the callee function can help you understand the context of the APIs.
-Your task is to generate a brief explanation for the Python file.
+Your task is to generate a brief explanation for the code.
 
 Please use the following output template:
 
@@ -30,9 +30,6 @@ The standard format is as follows:
 3. If you have any suggestion to the code, also add concise comments.)
 
 # {file_name}
-
-## Source Code
-`Put the file content here.`
 
 ## ClassDef NameOfClass
 
@@ -105,10 +102,13 @@ Provide an output example for a specified data type (e.g., list, double, int) an
 """
 
 REVIEWER_PROMPT = """
+The file content (source code):
+{file_content}
+(-Source code ends-)
+
 This is the generated documentation for the source code. Please review it and improve the documentation quality.
 (Note:
 1. DO NOT CHANGE the structure of the documentation; 
 2. DO NOT CHANGE the format of the documentation;
-3. DO NOT CHANGE values in the input/output examples;
-4. After you are done with all checks of quality and accuracy, PLEASE REMOVE THE "SOURCE CODE" BLOCK.)
+3. DO NOT CHANGE values in the input/output examples.
 """
