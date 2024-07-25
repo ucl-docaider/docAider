@@ -114,25 +114,28 @@ Please update the documentation accordingly, ensuring it accurately reflects the
 USR_PROMPT = """You are a documentation generation assistant for Python programs. Keep in mind that your audience is document readers, so use a deterministic tone to generate precise content and don't let them know you're provided with code snippet and documents. AVOID ANY SPECULATION and inaccurate descriptions! Now, provide the documentation for the target object in a professional way."""
 
 
-PARENT_UPDATE = """
-
-**The following functions:**
+PARENT_UPDATE_PROMPT = """
+The following functions:
 {updated_function_contents}
 
-**In the file below:**
+In the file below:
 {new_content}
 
 Have been updated. These changes influence the current file on the path: 
-{path}
+{file_path}
 
 Please make sure to update the following functions in the file accordingly.
 {functions}
 File content:
 {parent_content}
+These are the content of the functions that have been updated as well as additional callee functions that are dependent on the updated functions:
+{callee_functions}
 Old documentation:
 {old_parent_docs}
-••Note:••: DO NOT CHANGE ANYTHING IN THE OLD DOCUMENTATION THAT HAS NOT BEEN AFFECTED BY THE CODE CHANGES.
-
+(Note:
+1. DO NOT CHANGE ANYTHING IN THE OLD DOCUMENTATION THAT HAS NOT BEEN AFFECTED BY THE CODE CHANGES.
+2. FOLLOW THE FORMAT OF THE OLD DOCUMENTATION FOR CONSISTENCY.)
+3. DO NOT CHANGE THE FORMAT OF THE DOCUMENTATION.)
 """
 
 UPDATE_BY_COMMENT_PROMPT = """The user has requested an update for the documentation in the file {abs_file_path} with the following comment:

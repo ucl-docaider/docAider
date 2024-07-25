@@ -56,6 +56,6 @@ class DocumentationAgent:
       if file_path == 'EXTERNAL':  # Skip all external functions
         continue
       # Generate documentation for the file
-      asyncio.run(self.generate_documentation_for_file(file_path, save_debug=True))
+      asyncio.run(self.generate_documentation_for_file(file_path))
     # Save cache
     doc_utils.save_cache(self.output_folder, self.cache)

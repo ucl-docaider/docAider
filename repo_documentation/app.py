@@ -25,5 +25,5 @@ def run_generate_documentation():
 
 # Test it
 #run_generate_documentation()
-da = DocumentationAgent()
-da.generate_documentation_for_file("/Users/chengqike/Desktop/summer_project/repo-copilot/samples/utils.py", save_debug=True)
+da = DocumentationAgent(save_debug=True)
+da.generate_documentation_for_file("/Users/chengqike/Desktop/summer_project/repo-copilot/samples/utils.py")
