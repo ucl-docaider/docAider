@@ -1,9 +1,7 @@
-import os, sys, json
+import os, json
 from enum import Enum
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), './../')))
 
 from cache.docs_cache import DocsCache
-from code2flow.code2flow import utils as code2flow_utils
 
 class Mode(Enum):
     CREATE = 1

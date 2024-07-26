@@ -83,23 +83,7 @@ class GitRepoAgent:
     documentation_helper = DocumentationPlugin()
     documentation_helper.generate_all()
   
-# Test this agent
-# Note: nested async functions are problematic. (code_context_explanation is never awaited)
+# Note: Be careful with the nested async functions. (code_context_explanation is never awaited)
+# Run this agent
 if __name__ == "__main__":
-  #copilot = GitRepoAgent()
-  dg = DocumentationPlugin()
-  # If you want to chat with git repo agent, use the following code:
-  """print("Hello! I am your Github repo copilot.")
-  print("Due to current AST analysis performs locally, we do not support relative paths.")
-  print("Instead, you need to provide the absolute path of your file.")
-  print("Note: the `samples` folder has the files for testing purpose.")
-  print("I can help you find Github information, for example, you can ask: Show me the content of the file XXX in the repo XXX")
-  print("See my plugin file to find out what functions I can do.")
-  print("To terminate this conversation, you can say 'exit'.")
-  while True:
-    user_input = input("User > ")
-    if user_input == "exit":
-      break
-    asyncio.run(copilot.chat_with_agent(user_input))"""
-
-  dg.generate_documentation_for_file("/Users/chengqike/Desktop/summer_project/repo-copilot/samples/data_processor.py")
+  pass
