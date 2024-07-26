@@ -1,5 +1,5 @@
 import os
-import repo_agents.multi_agent_generation.multi_agent_conversation as mac
+import repo_agents.multi_agent_generation.generation_conversation as gc
 from repo_agents.ast_agent import ASTAgent
 from semantic_kernel.functions import kernel_function
 from cache.docs_cache import DocsCache
@@ -25,7 +25,7 @@ class DocumentationPlugin:
     Generates documentation for a file.
     """
     file_content = read_file_content(file_path)
-    documentation = mac.multi_agent_documentation_generation(file_path)
+    documentation = gc.multi_agent_documentation_generation(file_path)
     output_path = write_file_docs(
       self.output_folder,
       self.root_folder,

@@ -148,3 +148,8 @@ The old documentation is as follows:
 
 Please provide the updated documentation content. DO NOT CHANGE ANYTHING IN THE OLD DOCUMENTATION THAT HAS NOT BEEN MENTIONED IN THE COMMENT.
 """
+
+UPDATE_REVIEW_PROMPT = """
+Please consider the chat history messages and perform self-check on the documentation content.
+"""
+# Do prompt engineering here
