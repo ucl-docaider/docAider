@@ -1,9 +1,5 @@
 import os
 import markdown
-from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv(dotenv_path="../../.env")
 
 # Define the extensions for HTML and Markdown files
 HTML_EXTENSION = '.html'

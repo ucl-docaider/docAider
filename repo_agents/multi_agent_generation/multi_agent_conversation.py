@@ -4,7 +4,7 @@ from autogen import ConversableAgent, register_function
 import azure_openai_settings as ai_service_settings
 from repo_agents.multi_agent_generation.code_context_agent import CodeContextAgent
 from repo_agents.multi_agent_generation.prompt import DOCUMENTATION_PROMPT, REVIEWER_PROMPT
-from repo_documentation.utils import Mode, save_prompt_debug
+from repo_documentation.utils import Mode, save_prompt_debug, read_file_content
 from typing import Annotated
 
 """
@@ -15,18 +15,20 @@ Review agent: checks the quality of generated documentation and improve it
 Agent manager: is the mediator of the conversation
 """
 
+root_folder = os.path.abspath(os.getenv("ROOT_FOLDER"))
+output_folder = os.path.join(root_folder, "docs_output")
 code_context_agent = CodeContextAgent()
 
 documentation_generation_agent = ConversableAgent(
   name="documentation_generation_agent",
-  system_message="You are an AI documentation assistant, and your task is to generate documentation for the code.",
+  system_message="You are an AI documentation assistant, and your task is to generate code level documentation documentation for the code.",
   llm_config=ai_service_settings.autogen_llm_config,
   human_input_mode="NEVER"
 )
 
 review_agent = ConversableAgent(
   name="documentation_reviewer",
-  system_message="You are a documentation reviewer who can check the quality of the generated documentation and improve it if necessary.",
+  system_message="You are a documentation reviewer for code level documentation who can check the quality of the generated documentation and improve it ONLY if necessary.",
   llm_config=ai_service_settings.autogen_llm_config,
   human_input_mode="NEVER"
 )
@@ -57,12 +59,14 @@ register_function(
 )
 
 def multi_agent_documentation_generation(file_path) -> str:
-  output_folder = os.path.join(os.getenv("ROOT_FOLDER"), "docs_output")
+  file_content = read_file_content(file_path)
 
   chat_result = agent_manager.initiate_chats(
     [
       {
         "recipient": documentation_generation_agent,
+        # Context: the prompt, including instructions and doc template,
+        # Carryover: the output of the code context agent.
         "message": DOCUMENTATION_PROMPT.format(
           file_path=file_path,
           file_name=os.path.basename(file_path)
@@ -72,13 +76,15 @@ def multi_agent_documentation_generation(file_path) -> str:
       },
       {
         "recipient": review_agent,
-        "message": REVIEWER_PROMPT,
+        # Context: the source code,
+        # Carryover: the output of the doc gen agent.
+        "message": REVIEWER_PROMPT.format(file_content=file_content),
         "max_turns": 1,
         "summary_method": "reflection_with_llm",
       }
     ]
   )
   # Save prompt text for debug
-  save_prompt_debug(output_folder, file_path + "_dga", chat_result[0].chat_history[2]["content"], Mode.UPDATE)
-  save_prompt_debug(output_folder, file_path + "_ra", chat_result[1].chat_history[0]["content"], Mode.UPDATE)
+  save_prompt_debug(output_folder, file_path + "_generation_agent", chat_result[0].chat_history[2]["content"], Mode.CREATE)
+  save_prompt_debug(output_folder, file_path + "_reviewer_agent", chat_result[1].chat_history[0]["content"], Mode.CREATE)
   return chat_result[1].chat_history[-1]["content"]
