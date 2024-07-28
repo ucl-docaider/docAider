@@ -317,12 +317,13 @@ class DocumentationUpdate():
 if __name__ == "__main__":
 	# Parse arguments
 	parser = argparse.ArgumentParser(description='Update documentation based on PR comment')
+	parser.add_argument('--branch', type=str, help='The branch of the file to update')
 	parser.add_argument('--file', type=str, help='The path of the file to update')
 	parser.add_argument('--comment', type=str, help='The comment to base the update on')
 	args = parser.parse_args()
 
-	repo_path = "./../../users/"
-	branch = "testing"
+	repo_path = "/workspace"
+	branch = args.branch
 	file_path = args.file
 	comment = args.comment
 
