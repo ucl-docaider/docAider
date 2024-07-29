@@ -14,8 +14,8 @@ class TestDocumentationGenerator(unittest.TestCase):
     def setUp(self):
         self.sample_files = [
             ('root', 'file1.md'),
-            ('root\\folder1', 'file2.md'),
-            ('root\\folder1\\subfolder', 'file3.md'),
+            ('root/folder1', 'file2.md'),
+            ('root/folder1/subfolder', 'file3.md'),
         ]
         self.sample_tree = {
             'files': ['file1.md'],
@@ -47,7 +47,7 @@ class TestDocumentationGenerator(unittest.TestCase):
         mock_get_content.assert_called()
 
     def test_create_file_card(self):
-        file_path = "folder\\file.md"
+        file_path = "folder/file.md"
         docs = "<p>Sample content</p>"
         result = merger.create_file_card(file_path, docs)
         self.assertIn('<div class="file-card"', result)
@@ -82,8 +82,8 @@ class TestDocumentationGenerator(unittest.TestCase):
     def test_to_tree(self):
         files = [
             'file1.md',
-            'folder1\\file2.md',
-            'folder1\\subfolder\\file3.md'
+            'folder1/file2.md',
+            'folder1/subfolder/file3.md'
         ]
         result = merger.to_tree(files)
         self.assertEqual(result, self.sample_tree)
