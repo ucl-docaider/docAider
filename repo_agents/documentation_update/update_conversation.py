@@ -46,7 +46,7 @@ def multi_agent_documentation_update(prompt) -> str:
         # Carryover: The output of the assistant agent
         "message": UPDATE_REVIEW_PROMPT,
         "max_turns": 1,
-        "summary_method": "reflection_with_llm",
+        "summary_method": "last_msg",
       }
     ]
   )

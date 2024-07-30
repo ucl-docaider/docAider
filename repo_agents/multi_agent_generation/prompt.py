@@ -19,82 +19,51 @@ Callee function information:
 DOCUMENTATION_PROMPT = """
 First you can use the code context explainer to get the code context.
 Then based on the code contextual explanation, generate a documentation for the source code. 
-The purpose of the documentation is to help developers and beginners understand the function and specific usage of the code.
-Please note any part of the content you generate SHOULD NOT CONTAIN Markdown hierarchical heading and divider syntax.
+The purpose of the documentation is to help developers and beginners understand the function and specific usage of the code. Include detailed description for every class and function in the file.
+Please add notes for any part that you are confused about or if you have any suggestions to the code.
 The file path is: {file_path}
-
-The standard format is as follows:
-(Note:
-1. If a section does not have any information, you can skip it and move to the next one;
-2. If you are confused about any part, feel free to add notes or comments;
-3. If you have any suggestion to the code, also add concise comments.)
 
 # {file_name}
 
+## Overview:
+PROVIDE DETAILED OVERVIEW of the entire file, explaining its purpose, key components, and any important relationships or interactions between classes and functions.
+
 ## ClassDef NameOfClass
 
-The function of the class is XXX. (Only code name and one sentence function description are required)
+PROVIDE DETAILED DESCRIPTION of the Class, including a detailed analysis in plain text (including all details).
+(Detailed and CERTAIN code analysis)
 
-**Attributes**:
+**Attributes (for classes)**:
 
-- `attribute1` (`type`): Description of the first attribute.
+- `attribute` (`type`): Description of the attribute.
 
-**Functions**:
+## FunctionDef NameOfFunction 
 
-- `function_name1`(`param1`: `type`) -> `return_type`
-    - Parameters:
-        - `param1` (`type`): Description of the first parameter.
-    - Returns:
-        - `return_type`: Description of the return value.
-
-**Called_functions**:
-
-- `function1`(`param1`: `type`) -> `return_type`: Description of what function1 does and what function1 returns.
-
-**Code Description**: The description of this class. (Detailed and CERTAIN code analysis and description)
-
-**Note**: Points to note about the use of the code according to the returns
-
-**Input Example**: 
-
-```
-Provide an input example for a specified data type (e.g., list, double, int) and include a detailed explanation.
-```
-
-**Output Example**:
-
-```
-Provide an output example for a specified data type (e.g., list, double, int) and include a detailed explanation.
-```
-
-
-## FunctionDef NameOfFunction (functions that do not belong to a class but are still present in the file)
-
-The function of the function is XXX. (Only code name and one sentence function description are required)
+PROVIDE A DETAILED DESCRIPTION of the function, including its functionality, key components and key details.
+(Detailed and CERTAIN code analysis)
 
 **Parameters**:
 
-- `param1` (`type`): Description of the first parameter.
+- `param1` (`type`): Description of the parameter.
 
 **Returns**:
 
 - `return_type`: Description of the return value.
 
-**Called_functions**:
+## Called_functions:
+PROVIDE DETAILED DESCRIPTION of what this called function does, including explanation of the interaction and the context in which it is used.
 
-- `function1`(`param1`: `type`) -> `return_type`: Description of what function1 does and what function1 returns.
+**Note**: INCLUDE any important considerations, usage notes, or potential pitfalls relevant to this class or function.
 
-**Code Description**: The description of this function. (Detailed and CERTAIN code analysis and description)
-
-**Note**: Points to note about the use of the code according to the returns
-
-**Input Example**: 
+## Examples:
+Provide OUTPUT/INPUT EXAMPLES FOR EACH FUNCTION/CLASS.
+**Input Examples**: 
 
 ```
-Provide an input example for a specified data type (e.g., list, double, int) and include a detailed explanation.
+Provide an input examples for a specified data type (e.g., list, double, int) and include a detailed explanation.
 ```
 
-**Output Example**: 
+**Output Example**:
 
 ```
 Provide an output example for a specified data type (e.g., list, double, int) and include a detailed explanation.
@@ -106,9 +75,17 @@ The file content (source code):
 {file_content}
 (-Source code ends-)
 
-This is the generated documentation for the source code. Please review it and improve the documentation quality.
-(Note:
-1. DO NOT CHANGE the structure of the documentation; 
-2. DO NOT CHANGE the format of the documentation;
-3. DO NOT CHANGE values in the input/output examples.
+This is the generated documentation for the source code. Please check its quality and accuracy, and provide suggestions for improvement.
+Note: Do not change the documentation, your task is to review and comment it.
+Please use the following output template:
+`Generated documentation`
+(-Documentation ends-)
+
+Reviewer agent comments:
+`Put your comments and suggestions for improvement here`
+"""
+
+REVISOR_PROMPT = """
+This is the code-level documentation and review agent's comments. Please improve the documentation according to the comments.
+Your output should be a formal markdown documentation. 
 """

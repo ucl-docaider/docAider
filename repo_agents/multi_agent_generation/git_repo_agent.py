@@ -86,4 +86,7 @@ class GitRepoAgent:
 # Note: Be careful with the nested async functions. (code_context_explanation is never awaited)
 # Run this agent
 if __name__ == "__main__":
-  pass
+  documentation_helper = DocumentationPlugin()
+  documentation_helper.generate_documentation_for_file(
+    "file-path"
+  )

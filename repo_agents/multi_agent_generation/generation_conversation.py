@@ -3,7 +3,7 @@ import asyncio
 from autogen import ConversableAgent, register_function
 import azure_openai_settings as ai_service_settings
 from repo_agents.multi_agent_generation.code_context_agent import CodeContextAgent
-from repo_agents.multi_agent_generation.prompt import DOCUMENTATION_PROMPT, REVIEWER_PROMPT
+from repo_agents.multi_agent_generation.prompt import DOCUMENTATION_PROMPT, REVIEWER_PROMPT, REVISOR_PROMPT
 from repo_documentation.utils import Mode, save_prompt_debug, read_file_content
 from typing import Annotated
 
@@ -11,7 +11,8 @@ from typing import Annotated
 Multi-agent conversation pattern: sequential chats
 Code context agent: provides description and explanation for code context (optional)
 Documentation generation agent: generates documentation for the code
-Review agent: checks the quality of generated documentation and improve it
+Review agent: checks the quality of generated documentation and provides improvement suggestions
+Revise agent: Revises the documentation based on the reviewer's comments
 Agent manager: is the mediator of the conversation
 """
 
@@ -29,6 +30,13 @@ documentation_generation_agent = ConversableAgent(
 review_agent = ConversableAgent(
   name="documentation_reviewer",
   system_message="You are a documentation reviewer who can check the quality of the generated documentation and improve it if necessary.",
+  llm_config=ai_service_settings.autogen_llm_config,
+  human_input_mode="NEVER"
+)
+
+revise_agent = ConversableAgent(
+  name="documentation_revisor",
+  system_message="You are a documentation revisor who can revise the documentation based on the review agent's comments",
   llm_config=ai_service_settings.autogen_llm_config,
   human_input_mode="NEVER"
 )
@@ -80,11 +88,20 @@ def multi_agent_documentation_generation(file_path) -> str:
         # Carryover: the output of the doc gen agent.
         "message": REVIEWER_PROMPT.format(file_content=file_content),
         "max_turns": 1,
-        "summary_method": "reflection_with_llm",
-      }
+        "summary_method": "last_msg",
+      },
+      {
+        "recipient": revise_agent,
+        # Context: None,
+        # Carryover: the documentation.
+        "message": REVISOR_PROMPT,
+        "max_turns": 1,
+        "summary_method": "last_msg",
+      },
     ]
   )
   # Save prompt text for debug
   save_prompt_debug(output_folder, file_path + "_generation_agent", chat_result[0].chat_history[2]["content"], Mode.CREATE)
   save_prompt_debug(output_folder, file_path + "_reviewer_agent", chat_result[1].chat_history[0]["content"], Mode.CREATE)
-  return chat_result[1].chat_history[-1]["content"]
+  save_prompt_debug(output_folder, file_path + "_revisor_agent", chat_result[2].chat_history[0]["content"], Mode.CREATE)
+  return chat_result[2].chat_history[-1]["content"]
