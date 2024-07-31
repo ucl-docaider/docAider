@@ -10,10 +10,10 @@ The content of the file (source code) is as follows:
 `Put the file content here.`
 
 Explanation of Every Class and Function:
-`Provide a detailed and thorough description of EVERY class AND function, including their purpose, functionality, and any important implementation details.`
+`Provide a detailed and thorough description of every class and function, including their purpose, functionality, and any important implementation details.`
 
 Input/Ouput Examples:
-PROVIDE INPUT AND OUTPUT EXAMPLES for EACH class AND function in the file, with detailed explanations.
+Provide input and output examples for each class and function in the file, with detailed explanations.
 
 Called functions information:
 `Provide detailed information about called functions, including how each function interacts with other parts of the code, any relationships or dependencies, and the context in which these functions are used.`
@@ -22,48 +22,36 @@ Called functions information:
 
 DOCUMENTATION_PROMPT = """
 First you can use the code context explainer to get the code context.
-Then based on the code contextual explanation, generate a documentation for the source code based on the STANDARD FORMAT. DO NOT SKIP ANY SECTION OR SUBSECTION of the STANDARD FORMAT.
-The purpose of the documentation is to help developers and beginners understand the function and specific usage of the code. INCLUDE DETAILED description for every CLASS and FUNCTION in the file.
-Please ADD NOTES for any part that you are confused aboutt or if you have any suggestions to the code.
+Then based on the code contextual explanation, generate a documentation for the source code based on the Standard Markdown Format. DO NOT SKIP any section or subsection of the Standard Format.
+The purpose of the documentation is to help developers and beginners understand the function and specific usage of the code. INCLUDE DETAILED description for EVERY CLASS and FUNCTION in the file.
+Please add notes for any part that you are confused aboutt or if you have any suggestions to the code.
 
 The file path is: {file_path}
 
-The STANDARD FORMAT is as follows:
+The Standard Markdown Format is as follows:
 
 # {file_name}
 
 ## Overview:
 PROVIDE DETAILED OVERVIEW of the entire file, explaining its purpose, key components, and any important relationships or interactions between classes and functions.
 
-## ClassDef NameOfClass
+## ClassDef NameOfClass or FunctionDef NameOfFunction 
 
-PROVIDE DETAILED DESCRIPTION of the Class, including a detailed analysis in plain text (including all details).
+PROVIDE DETAILED DESCRIPTION of the Class or Function, including a detailed analysis in plain text (including all details).
 (Detailed and CERTAIN code analysis)
 
-**Attributes (for classes)**:
-
-- `attribute` (`type`): Description of the attribute.
-
-## FunctionDef NameOfFunction 
-
-PROVIDE A DETAILED DESCRIPTION of the function, including its functionality, key components and key details.
+### Method NameOfMethod (method BELONGING to a class)
+PROVIDE A DETAILED DESCRIPTION of the Method, including its functionality, key components and key details.
 (Detailed and CERTAIN code analysis)
 
 **Parameters**:
 
-- `param1` (`type`): Description of the parameter.
-
 **Returns**:
 
-- `return_type`: Description of the return value.
+**Note**: INCLUDE any important considerations, usage notes, or potential pitfalls relevant to this class or Method.
 
-## Called_functions:
-PROVIDE DETAILED DESCRIPTION of what this called function does, including explanation of the interaction and the context in which it is used.
-
-**Note**: INCLUDE any important considerations, usage notes, or potential pitfalls relevant to this class or function.
-
-## Examples:
-Provide OUTPUT/INPUT EXAMPLES FOR EACH FUNCTION/CLASS.
+#### Examples:
+Provide output/input examples for EACH METHOD.
 **Input Examples**: 
 
 ```
@@ -76,18 +64,59 @@ Provide an input examples for a specified data type (e.g., list, double, int) an
 Provide an output example for a specified data type (e.g., list, double, int) and include a detailed explanation.
 ```
 
+## FunctionDef NameOfFunction (functions that DOES NOT BELONG to a class but are still present in the file)
+
+PROVIDE A DETAILED DESCRIPTION of the function, including its functionality, key components and key details.
+(Detailed and CERTAIN code analysis)
+
+**Parameters**:
+
+**Returns**:
+
+**Note**: INCLUDE any important considerations, usage notes, or potential pitfalls relevant to this class or function.
+
+### Examples:
+Provide output/input examples for each FUNCTION.
+**Input Examples**: 
+
+```
+Provide an input examples for a specified data type (e.g., list, double, int) and include a detailed explanation.
+```
+
+**Output Example**:
+
+```
+Provide an output example for a specified data type (e.g., list, double, int) and include a detailed explanation.
+```
+
+## Called_functions:
+PROVIDE DETAILED DESCRIPTION of what every called functions does, including explanation of the interaction and the context in which it is used.
 """
 
 REVIEWER_PROMPT = """
+
+This is the generated documentation for the source code. Please check its quality and accuracy, and provide suggestions for improvement. Your Suggestions HAVE TO BE specific and clear, so that the revisor can EASILY understand and implement them WITHOUT the knowledge of codebase.
+Note: 
+1. DO NOT change the documentation, your task is to review and provide suggestions for it.
+2. Your suggestions should not contain REMOVE/DELETE instructions.
+3. Your suggestions may involve ADDING Function Description for missing functions, Input/Output examples for missing functions to the ##Examples section, or improving the clarity of the documentation.
+Please use the following output template:
+`Generated documentation`
+(-Documentation ends-)
+
+Reviewer agent sugesstions:
+`Put your comments and suggestions for improvement here`
+
+
+"""
+
+
+REVISOR_PROMPT = """
 The file content (source code):
 {file_content}
 (-Source code ends-)
 
-This is the generated documentation for the source code. Please review it and improve the documentation quality, ONLY IF NEEDED. You SHOULD NOT ADD ANY comments or notes ABOUT QUALITY to the documentation.
-DO NOT DELETE/REMOVE ANY PART OF THE Context that is passed to you.
-INSERT "INPUT AND OUTPUT" EXAMPLES, if it is MISSING for a specific function, in the same format as the existing examples;
-RETURN THE IMPROVED DOCUMENTATION IN THE SAME FORMAT AS THE GENERATED DOCUMENTATION.
+This is the code-level documentation for the source code and Reviewer agent's comments. Please IMPROVE the documentation according to the SUGGESTIONS, which involves adding missing function descriptions, input/output examples, or improving the clarity of the documentation. 
+DO NOT DELETE/REMOVE any part of the existing documentation.
+Your output should be the SAME FORMAT as the existing documentation, with the necessary improvements. 
 """
-
-
-USR_PROMPT = """You are a documentation generation assistant for Python programs. Keep in mind that your audience is document readers, so use a deterministic tone to generate precise content and don't let them know you're provided with code snippet and documents. AVOID ANY SPECULATION and inaccurate descriptions! Now, provide the documentation for the target object in a professional way."""
