@@ -1,0 +1,48 @@
+doctype html
+html(lang='en')
+
+    head
+
+        meta(charset='utf-8')
+        meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
+        meta(name='description', content='')
+        meta(name='author', content='')
+
+        title Repo-Copilot
+
+        link(rel='icon', type='image/x-icon', href='assets/favicon.ico')
+
+        include includes/css.pug
+
+    body
+
+        include includes/navbar.pug
+
+        // Page Header
+        header.masthead(style="background-image: url('assets/img/about-bg.jpg')")
+            .container.position-relative.px-4.px-lg-5
+                .row.gx-4.gx-lg-5.justify-content-center
+                    .col-md-10.col-lg-8.col-xl-7
+                        .page-heading
+                            h1 Our Amazing Partners
+                            span.subheading Those who have helped us along the way.
+
+        // Main Content
+        section#partners
+            .container
+                .row
+                    .col-lg-4.mb-5
+                        .card.h-100
+                            .card-body
+                                h4.card-title University College London (UCL)
+                                img.card-img-top(src='assets/ucl.png', alt='Partner 1')
+                               
+                    .col-lg-4.mb-5
+                        .card.h-100
+                            .card-body
+                                h4.card-title Microsoft Coorporation
+                            img.card-img-top(src='assets/microsoft.png', alt='Partner 2')
+
+
+        include includes/footer.pug
+        include includes/scripts.pug

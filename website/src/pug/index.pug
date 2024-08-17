@@ -1,0 +1,42 @@
+doctype html
+html(lang='en')
+
+  head
+
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
+    meta(name='description', content='')
+    meta(name='author', content='')
+
+    title Repo-Copilot
+
+    link(rel='icon', type='image/x-icon', href='assets/favicon.ico')
+
+    include includes/css.pug
+
+  body
+
+    include includes/navbar.pug
+
+    // Page Header
+    header.masthead(style="background-image: url('assets/img/home-bg.jpg')")
+      .container.position-relative.px-4.px-lg-5
+        .row.gx-4.gx-lg-5.justify-content-center
+          .col-md-10.col-lg-8.col-xl-7
+            .site-heading
+              h1 Repo-Copilot
+              span.subheading Automated Documentation Maintenance for Open-source GitHub Repositories
+
+    // Main Content
+    section
+      .container.px-4.px-lg-5
+        .row.gx-4.gx-lg-5.justify-content-center
+          .col-lg-10
+            h2.section-heading.text-center
+              span Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
+            p.text-center.lead.mb-5
+              | Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
+          
+    include includes/footer.pug
+
+    include includes/scripts.pug
