@@ -1,21 +1,20 @@
-import os
-import markdown
+import os, markdown
 
 # Define the extensions for HTML and Markdown files
 HTML_EXTENSION = '.html'
 MD_EXTENSION = '.md'
 
 # Load HTML template parts
-with open('repo_documentation/merging/head.html', 'r', encoding='utf-8') as f:
+with open('../repo_documentation/merging/head.html', 'r', encoding='utf-8') as f:
     head = f.read()
 
-with open('repo_documentation/merging/body.html', 'r', encoding='utf-8') as f:
+with open('../repo_documentation/merging/body.html', 'r', encoding='utf-8') as f:
     body = f.read()
 
-with open('repo_documentation/merging/file-card.html', 'r', encoding='utf-8') as f:
+with open('../repo_documentation/merging/file-card.html', 'r', encoding='utf-8') as f:
     file_card_template = f.read()
 
-with open('repo_documentation/merging/script.html', 'r', encoding='utf-8') as f:
+with open('../repo_documentation/merging/script.html', 'r', encoding='utf-8') as f:
     script = f.read()
 
 def create_documentation_index():

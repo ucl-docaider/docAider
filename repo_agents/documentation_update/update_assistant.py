@@ -36,9 +36,9 @@ class UpdateAssistant:
     
     # Generate updated documentation
     # Single agent:
-    # updated_documentation = asyncio.run(self.chat_completion_agent.generate_response(prompt))
+    updated_documentation = asyncio.run(self.chat_completion_agent.generate_response(prompt))
     # Multi agent: An assistant agent and a review agent
-    updated_documentation = update_conversation.multi_agent_documentation_update(prompt)
+    # updated_documentation = update_conversation.multi_agent_documentation_update(prompt)
     # Update cache with new documentation
     self._write_docs_and_cache(file_path, new_content, updated_documentation)
 
@@ -60,9 +60,9 @@ class UpdateAssistant:
 
     # Generate new documentation
     # Single agent:
-    # documentation = asyncio.run(self.chat_completion_agent.generate_response(prompt))
+    documentation = asyncio.run(self.chat_completion_agent.generate_response(prompt))
     # Multi agent: An assistant agent and a review agent
-    documentation = update_conversation.multi_agent_documentation_update(prompt)
+    # documentation = update_conversation.multi_agent_documentation_update(prompt)
     # Update cache with new documentation
     self._write_docs_and_cache(file_path, file_content, documentation)
 
@@ -99,9 +99,9 @@ class UpdateAssistant:
       
     # Generate updated documentation
     # Single agent:
-    # updated_documentation = asyncio.run(self.chat_completion_agent.generate_response(prompt))
+    updated_documentation = asyncio.run(self.chat_completion_agent.generate_response(prompt))
     # Multi agent: An assistant agent and a review agent
-    updated_documentation = update_conversation.multi_agent_documentation_update(prompt)
+    # updated_documentation = update_conversation.multi_agent_documentation_update(prompt)
     # Update cache with new documentation
     self._write_docs_and_cache(file_path, new_content, updated_documentation)
 
@@ -139,9 +139,9 @@ class UpdateAssistant:
 
     # Generate updated parent documentation
     # Single agent:
-    # updated_parent_documentation = asyncio.run(self.chat_completion_agent.generate_response(prompt))
+    updated_parent_documentation = asyncio.run(self.chat_completion_agent.generate_response(prompt))
     # Multi agent: An assistant agent and a review agent
-    updated_parent_documentation = update_conversation.multi_agent_documentation_update(prompt)
+    # updated_parent_documentation = update_conversation.multi_agent_documentation_update(prompt)
     # Update cache with updated parent documentation
     self._write_docs_and_cache(file_path, new_content, updated_parent_documentation)
 
