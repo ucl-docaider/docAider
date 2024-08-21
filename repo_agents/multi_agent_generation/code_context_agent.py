@@ -7,7 +7,7 @@ load_dotenv(dotenv_path="../../.env")
 import azure_openai_settings as ai_service_settings
 from semantic_kernel import Kernel
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
-from semantic_kernel.connectors.ai.function_call_behavior import FunctionCallBehavior
+from semantic_kernel.connectors.ai.function_choice_behavior import FunctionChoiceBehavior
 from semantic_kernel.connectors.ai.chat_completion_client_base import ChatCompletionClientBase
 from semantic_kernel.contents.chat_history import ChatHistory
 from semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.azure_chat_prompt_execution_settings import (
@@ -38,7 +38,14 @@ class CodeContextAgent:
       tool_choice="auto",
       temperature=0
     )
+    """
+    Semantic kernel v1.1.*:
     self.execution_settings.function_call_behavior = FunctionCallBehavior.EnableFunctions(auto_invoke=True, filters={})
+    """
+    # Semantic kernel v1.2.0 and above:
+    # The `FunctionCallBehavior` class is deprecated. Use `FunctionChoiceBehavior` instead.
+    self.execution_settings.function_choice_behavior = FunctionChoiceBehavior.Auto(auto_invoke=True, filters={})
+    
     # Create a history of the conversation
     self.history = ChatHistory()
     self.history.add_system_message(

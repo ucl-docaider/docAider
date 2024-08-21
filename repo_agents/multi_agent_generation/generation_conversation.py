@@ -22,21 +22,21 @@ code_context_agent = CodeContextAgent()
 
 documentation_generation_agent = ConversableAgent(
   name="documentation_generation_agent",
-  system_message="You are an AI documentation assistant, and your task is to generate code level documentation documentation for the code.",
+  system_message="You are an AI documentation assistant, and your task is to generate documentation for the code.",
   llm_config=ai_service_settings.autogen_llm_config,
   human_input_mode="NEVER"
 )
 
 review_agent = ConversableAgent(
   name="documentation_reviewer",
-  system_message="You are a documentation reviewer for code level documentation who can check the quality of the generated documentation and improve it.",
+  system_message="You are a documentation reviewer who can check the quality of the generated documentation and improve it if necessary.",
   llm_config=ai_service_settings.autogen_llm_config,
   human_input_mode="NEVER"
 )
 
 revise_agent = ConversableAgent(
   name="documentation_revisor",
-  system_message="You are a documentation revisor who can revise the documentation based on the review agent's sugggestions",
+  system_message="You are a documentation revisor who can revise the documentation based on the review agent's comments",
   llm_config=ai_service_settings.autogen_llm_config,
   human_input_mode="NEVER"
 )
@@ -86,7 +86,7 @@ def multi_agent_documentation_generation(file_path) -> str:
         "recipient": review_agent,
         # Context: the source code,
         # Carryover: the output of the doc gen agent.
-        "message": REVIEWER_PROMPT,
+        "message": REVIEWER_PROMPT.format(file_content=file_content),
         "max_turns": 1,
         "summary_method": "last_msg",
       },
@@ -94,7 +94,7 @@ def multi_agent_documentation_generation(file_path) -> str:
         "recipient": revise_agent,
         # Context: None,
         # Carryover: the documentation.
-        "message": REVISOR_PROMPT.format(file_content=file_content),
+        "message": REVISOR_PROMPT,
         "max_turns": 1,
         "summary_method": "last_msg",
       },

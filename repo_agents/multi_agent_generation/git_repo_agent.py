@@ -2,11 +2,11 @@ import os, sys
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 sys.path.append(parent_dir)
 from dotenv import load_dotenv
-load_dotenv(dotenv_path="./.env")
+load_dotenv(dotenv_path="../../.env")
 import azure_openai_settings as ai_service_settings
 from semantic_kernel import Kernel
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
-from semantic_kernel.connectors.ai.function_call_behavior import FunctionCallBehavior
+from semantic_kernel.connectors.ai.function_choice_behavior import FunctionChoiceBehavior
 from semantic_kernel.connectors.ai.chat_completion_client_base import ChatCompletionClientBase
 from semantic_kernel.contents.chat_history import ChatHistory
 from semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.azure_chat_prompt_execution_settings import (
@@ -35,7 +35,14 @@ class GitRepoAgent:
       tool_choice="auto",
       temperature=0
     )
+    """
+    Semantic kernel v1.1.*:
     self.execution_settings.function_call_behavior = FunctionCallBehavior.EnableFunctions(auto_invoke=True, filters={})
+    """
+    # Semantic kernel v1.2.0 and above:
+    # The `FunctionCallBehavior` class is deprecated. Use `FunctionChoiceBehavior` instead.
+    self.execution_settings.function_choice_behavior = FunctionChoiceBehavior.Auto(auto_invoke=True, filters={})
+    
     # Create a history of the conversation
     self.history = ChatHistory()
     self.history.add_system_message(
@@ -76,23 +83,10 @@ class GitRepoAgent:
     documentation_helper = DocumentationPlugin()
     documentation_helper.generate_all()
   
-# Test this agent
-# Note: nested async functions are problematic. (code_context_explanation is never awaited)
+# Note: Be careful with the nested async functions. (code_context_explanation is never awaited)
+# Run this agent
 if __name__ == "__main__":
-  #copilot = GitRepoAgent()
-  dg = DocumentationPlugin()
-  # If you want to chat with git repo agent, use the following code:
-  """print("Hello! I am your Github repo copilot.")
-  print("Due to current AST analysis performs locally, we do not support relative paths.")
-  print("Instead, you need to provide the absolute path of your file.")
-  print("Note: the `samples` folder has the files for testing purpose.")
-  print("I can help you find Github information, for example, you can ask: Show me the content of the file XXX in the repo XXX")
-  print("See my plugin file to find out what functions I can do.")
-  print("To terminate this conversation, you can say 'exit'.")
-  while True:
-    user_input = input("User > ")
-    if user_input == "exit":
-      break
-    asyncio.run(copilot.chat_with_agent(user_input))"""
-
-  dg.generate_documentation_for_file("/Users/chengqike/Desktop/summer_project/repo-copilot/samples/data_processor.py")
+  documentation_helper = DocumentationPlugin()
+  documentation_helper.generate_documentation_for_file(
+    "file-path"
+  )

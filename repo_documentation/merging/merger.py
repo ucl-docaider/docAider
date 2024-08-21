@@ -18,7 +18,9 @@ with open('repo_documentation/merging/file-card.html', 'r', encoding='utf-8') as
 with open('repo_documentation/merging/script.html', 'r', encoding='utf-8') as f:
     script = f.read()
 
-def create_documentation(docs_folder):
+def create_documentation_index():
+    root_folder = os.path.abspath(os.getenv("ROOT_FOLDER"))
+    docs_folder = os.path.join(root_folder, "docs_output")
     # Generate table of contents
     files = []
     for root, _, _files in os.walk(docs_folder):

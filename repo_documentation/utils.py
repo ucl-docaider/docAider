@@ -1,9 +1,7 @@
-import os, sys, json
+import os, json
 from enum import Enum
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), './../')))
 
 from cache.docs_cache import DocsCache
-from code2flow.code2flow import utils as code2flow_utils
 
 class Mode(Enum):
     CREATE = 1
@@ -92,47 +90,6 @@ def write_file_docs(output_dir, root_folder, file_path, docs) -> str:
     with open(path, 'w', encoding='utf-8') as file:
         file.write(docs)
     return path
-
-def get_additional_docs_path(file_path, graph, bfs_explore):
-    additional_docs = ""
-    file_to_calls = code2flow_utils.get_file_to_functions(graph)
-    if file_path in file_to_calls:
-        calls = file_to_calls[file_path]
-        additional_docs += get_additional_docs_calls(calls, graph, bfs_explore)
-    return additional_docs
-
-def get_additional_docs_calls(calls, graph, bfs_explore, max_depth=5):
-    additional_docs = ""
-    processed_callees = set()
-
-    for call_name in calls:
-        call = graph[call_name]
-        if 'EXTERNAL' in call['file_name']:
-            continue
-        queue = [(call_name, 0)]
-        visited = set()
-
-        while queue:
-            current_call, depth = queue.pop(0)
-            if depth > max_depth:
-                continue
-            if current_call in visited:
-                continue
-            visited.add(current_call)
-
-            caller_file = graph[current_call]['file_name']
-
-            for callee in bfs_explore.get(current_call, []):
-                callee_call = graph[callee]
-                callee_file = callee_call['file_name']
-
-                if 'EXTERNAL' not in callee_file and callee not in processed_callees and caller_file != callee_file:
-                    additional_docs += f"\nFunction/Class {callee_call['name']}:\n{callee_call['content']}\n"
-                    processed_callees.add(callee)
-                if depth < max_depth and callee not in visited:
-                    queue.append((callee, depth + 1))
-
-    return additional_docs
 
 def __get_project_relative_path(output_dir, file_path):
     project_relative_path = os.path.relpath(file_path, output_dir)
