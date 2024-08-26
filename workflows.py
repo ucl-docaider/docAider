@@ -62,14 +62,14 @@ jobs:
           echo "changed_files=$changed_files" >> $GITHUB_ENV
 
       - name: Run Docker Compose
-        run: docker-compose up --build --detach
+        run: docker compose up --build --detach
         
-      - name: Set safe.directory in repo-copilot container
-        run: docker exec repo-copilot git config --global --add safe.directory /workspace
+      - name: Set safe.directory in docAider container
+        run: docker exec docAider git config --global --add safe.directory /workspace
 
       - name: Run update documentation script
         run: |
-          docker exec repo-copilot python3 /repo-copilot/repo_documentation/update_app.py --branch "${{ github.head_ref }}"
+          docker exec docAider python3 /docAider/repo_documentation/update_app.py --branch "${{ github.head_ref }}"
 
       - name: Commit and push if changes in repository
         run: |
@@ -158,16 +158,16 @@ jobs:
           GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
 
       - name: Run Docker Compose
-        run: docker-compose up --build --detach
+        run: docker compose up --build --detach
         
-      - name: Set safe.directory in repo-copilot container
-        run: docker exec repo-copilot git config --global --add safe.directory /workspace
+      - name: Set safe.directory in docAider container
+        run: docker exec docAider git config --global --add safe.directory /workspace
 
       - name: Update Documentation
         run: |
           git fetch origin ${{ steps.comment-branch.outputs.head_ref }}
           git checkout ${{ steps.comment-branch.outputs.head_ref }}
-          docker exec repo-copilot python3 /repo-copilot/repo_documentation/update_app.py --branch "${{ steps.comment-branch.outputs.head_ref }}" --file "/workspace/$FILE_PATH" --comment "$COMMENT_BODY"
+          docker exec docAider python3 /docAider/repo_documentation/update_app.py --branch "${{ steps.comment-branch.outputs.head_ref }}" --file "/workspace/$FILE_PATH" --comment "$COMMENT_BODY"
         env:
           FILE_PATH: ${{ steps.extract.outputs.file_path }}
           COMMENT_BODY: ${{ steps.extract.outputs.comment_body }}

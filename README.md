@@ -1,6 +1,6 @@
-# repo-copilot
+# docAider
 
-`repo-copilot` leverages Semantic Kernel and Autogen to automate the process of generating and reviewing code documentation for your repository through a multi-agent approach. Additionally, with its integrated workflows, `repo-copilot` streamlines the documentation update process, ensuring it is both efficient and user-friendly.
+`docAider` leverages Semantic Kernel and Autogen to automate the process of generating and reviewing code documentation for your repository through a multi-agent approach. Additionally, with its integrated workflows, `docAider` streamlines the documentation update process, ensuring it is both efficient and user-friendly.
 
 ## Getting Started
 
@@ -12,9 +12,9 @@ Add the following `Dockerfile` to your repository:
 version: "3.8"
 
 services:
-  repo-copilot:
-    image: zenawang/repo-copilot:v1
-    container_name: repo-copilot
+  docAider:
+    image: zenawang/docaider:v1
+    container_name: docAider
     volumes:
       - .:/workspace
     working_dir: /workspace
@@ -41,24 +41,24 @@ GITHUB_ACCESS_TOKEN="YOUR_GITHUB_ACCESS_TOKEN"
 ROOT_FOLDER="/workspace"
 ```
 
-## Run repo-copilot
+## Run docAider
 
-### Activate repo-copilot Image
+### Activate docAider Image
 
-To activate the `repo-copilot` Docker image and ensure it continues running (do not terminate it), use the following command:
+To activate the `docAider` Docker image and ensure it continues running (do not terminate it), use the following command:
 
 ```
 docker compose up --build
 ```
 
-This command will build and start the `repo-copilot` container. It will keep running in the foreground, so you can interact with it as needed.
+This command will build and start the `docAider` container. It will keep running in the foreground, so you can interact with it as needed.
 
 ### Generate documentation
 
 To generate documentation for your repository, run the following command. This process is typically done once to create initial documentation:
 
 ```
-docker exec repo-copilot python3 /repo-copilot/repo_documentation/multi_agent_app.py
+docker exec docAider python3 /docAider/repo_documentation/multi_agent_app.py
 ```
 
 During execution, you can observe the interaction between multiple agents in the terminal output. The `CodeContextAgent` provides explanations for code contexts, the `documentation_generation_agent` generates documentation for specified code files, and the `review_agent` reviews and enhances the generated documentation. The `agent_manager` orchestrates the interactions between these agents, ensuring a seamless workflow from context explanation to documentation generation and review.
@@ -76,7 +76,7 @@ Additionally, the `call_graph.json,` `cache.json`, and `graph.png` files are gen
 To set up workflows (update-docs.yml and update-comments.yml) for automatic documentation updates, run:
 
 ```
-docker exec repo-copilot python3 /repo-copilot/setup_workflows.py
+docker exec docAider python3 /docAider/setup_workflows.py
 ```
 
 Note: Remember to manually push the generated documentation and workflows to the repository, preferably to the main branch.
