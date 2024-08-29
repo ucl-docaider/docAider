@@ -2,20 +2,18 @@ doctype html
 html(lang='en')
 
     head
-
         meta(charset='utf-8')
         meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
         meta(name='description', content='')
         meta(name='author', content='')
 
-        title Repo-Copilot
+        title docAider
 
         link(rel='icon', type='image/x-icon', href='assets/favicon.ico')
 
         include includes/css.pug
 
     body
-
         include includes/navbar.pug
 
         // Page Header
@@ -25,19 +23,30 @@ html(lang='en')
                     .col-md-10.col-lg-8.col-xl-7
                         .page-heading
                             h1 Documentation Update
-                            span.subheading Repo-Copilot's Documentation Update.
+                            span.subheading docAider's Documentation Update.
 
-        section
+        main.mb-4
             .container.px-4.px-lg-5
-                .row.gx-4.gx-lg-5.justify-content-center
-                    h2.margin-bottom-10 Repo-Copilot's Documentation Update
-                    .row.gx-4.gx-lg-5.justify-content-center.margin-top-10
+                .row.gx-4.gx-lg-5.justsify-content-center
+                    .col-md-10
                         p 
-                        | Lorem ipsum dolor sit amet, consectetur adipisicing elit. Saepe nostrum ullam eveniet pariatur voluptates odit, fuga atque ea nobis sit soluta odio, adipisci quas excepturi maxime quae totam ducimus consectetur?
+                            | Documentation updates in docAider are triggered when a developer opens a Pull Request (PR). The system compares the changes between the last main commit and the branch commit, identifying any modifications that require updates to the documentation. This process involves two specialized agents: an update agent and a reviewer agent. The updating agent receives the old documentation along with the code changes, and then updates the documentation accordingly. The reviewing agent checks the newly updated documentation, making improvements as necessary to ensure accuracy and comprehensiveness.
+                        
+                        h4 Recursive Update
                         p
-                        | Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius praesentium recusandae illo eaque architecto error, repellendus iusto reprehenderit, doloribus, minus sunt. Numquam at quae voluptatum in officia voluptas voluptatibus, minus!
+                            | To maintain consistency and accuracy across all related documentation when a class/function in a file is changed, the Documentation Update feature performs the update recursively. If a class/function is modified, the system will automatically update the documentation for all dependent files. This includes the documentation of source files that use the changed class/function, as well as the documentation of files that use functions depending on the changed class/function. This recursive updating ensures that all related documentation remains up-to-date with the latest changes in the code.
+                        
+                        h4 Documentation Update on PR Comment
                         p
-                        | Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut consequuntur magnam, excepturi aliquid ex itaque esse est vero natus quae optio aperiam soluta voluptatibus corporis atque iste neque sit tempora!
+                            | Documentation update on PR Comment allows reviewers to trigger the documentation updates on specified files by making a comment in a certain format. The reviewer can specify which file needs an update and provide instructions on what changes should be made. The system will then process this comment and update the documentation as instructed. This feature ensures that precise and targeted documentation updates can be made based on reviewer feedback, improving the overall quality and relevance of the documentation. Furthermore, it removes the need for developers to manually change documentation according to reviewers' comments. To use this feature, a template needs to be used, which is as follows: 
+
+                        ul 
+                            li File_Path: Relative file path to the root folder. For example, if the documentation for a source file is root_folder/utils/utils.py, the file path needs to be utils/utils.py
+                            li Comment: The comment should address the issue and what needs to be changed in the specified file documentation. An important thing to note is when using PR comments to update documentation, users need to provide precise instructions, as LLMs might be confused if the comments are vague or inaccurate.
+
+                        .col
+                            .centered-image-container(style="display: flex; justify-content: center; align-items: center;")
+                                img(src="assets/pr_comment.png", alt="Template and Example of Documentation Update on PR Comment", style="max-width: 60%; height: auto;")
 
         include includes/footer.pug
 

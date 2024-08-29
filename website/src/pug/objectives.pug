@@ -8,7 +8,7 @@ html(lang='en')
         meta(name='description', content='')
         meta(name='author', content='')
 
-        title Repo-Copilot
+        title docAider
 
         link(rel='icon', type='image/x-icon', href='assets/favicon.ico')
 
@@ -25,19 +25,23 @@ html(lang='en')
                     .col-md-10.col-lg-8.col-xl-7
                         .page-heading
                             h1 Objectives
-                            span.subheading Repo-Copilot's Objectives.
+                            span.subheading docAider's Objectives.
 
-        section
+        main.mb-4
             .container.px-4.px-lg-5
                 .row.gx-4.gx-lg-5.justify-content-center
-                    h2.margin-bottom-10 Repo-Copilot's Objectives
-                    .row.gx-4.gx-lg-5.justify-content-center.margin-top-10
+                    .col-md-10
                         p 
-                        | Lorem ipsum dolor sit amet, consectetur adipisicing elit. Saepe nostrum ullam eveniet pariatur voluptates odit, fuga atque ea nobis sit soluta odio, adipisci quas excepturi maxime quae totam ducimus consectetur?
+                            | The goal of docAider to automate the management of open source repositories, including maintaining and updating GitHub documentation. This page outlines the essential requirements crucial for the development, implementation, evaluation, and long-term sustainability of the docAider.
+                        
                         p
-                        | Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius praesentium recusandae illo eaque architecto error, repellendus iusto reprehenderit, doloribus, minus sunt. Numquam at quae voluptatum in officia voluptas voluptatibus, minus!
-                        p
-                        | Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut consequuntur magnam, excepturi aliquid ex itaque esse est vero natus quae optio aperiam soluta voluptatibus corporis atque iste neque sit tempora!
+                
+                            | Requirements 
+
+                        ul 
+                            li Understand LLM/SLM, Microsoft Semantic Kernel, Microsoft Autogen and Windows AI Studio: The system should inetegrate these tools when developing the solution.
+                            li Automate Documentation Maintenance - The system should automatically and accurately check and update GitHub documentation to ensure it is current and accurate.
+                            li Open Source Repository Management: The final solution should help automate the overall management of open source repositories
 
         include includes/footer.pug
 

@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Clone website repository
-        run: git clone https://github.com/ucl-repo-copilot/ucl-repo-copilot.github.io.git ../repo-website
+        run: git clone https://github.com/ucl-docaider/ucl-docaider.github.io.git ../repo-website
 
       - name: Install dependencies
         run: cd website && npm ci
@@ -31,7 +31,7 @@ jobs:
           git config --local user.name "github-actions"
           git add .
           if git commit -m "Update website"; then
-            git push https://${{ secrets.TOKEN }}@github.com/ucl-repo-copilot/ucl-repo-copilot.github.io.git HEAD:main
+            git push https://${{ secrets.TOKEN }}@github.com/ucl-docaider/ucl-docaider.github.io.git HEAD:main
           else
             echo "No changes detected, skipping push."
           fi
