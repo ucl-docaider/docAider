@@ -67,7 +67,6 @@ register_function(
 )
 
 def multi_agent_documentation_generation(file_path) -> str:
-<<<<<<< Updated upstream
   file_content = read_file_content(file_path)
 
   chat_result = agent_manager.initiate_chats(
@@ -106,11 +105,3 @@ def multi_agent_documentation_generation(file_path) -> str:
   save_prompt_debug(output_folder, file_path + "_reviewer_agent", chat_result[1].chat_history[0]["content"], Mode.CREATE)
   save_prompt_debug(output_folder, file_path + "_revisor_agent", chat_result[2].chat_history[0]["content"], Mode.CREATE)
   return chat_result[2].chat_history[-1]["content"]
-=======
-  """
-  This function is a placeholder. The implementation has been moved to a celery task
-  in celery_worker.tasks.run_multi_agent_documentation_generation.
-  This function will be removed in a future refactor.
-  """
-  raise NotImplementedError("This has been moved to a celery task. Call 'run_multi_agent_documentation_generation.delay(file_path)' instead.")
->>>>>>> Stashed changes
