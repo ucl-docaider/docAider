@@ -67,7 +67,11 @@ def run_generate_documentation_for_file(file_path: str):
 
 # --- Main execution ---
 if __name__ == "__main__":
-    target_file = os.path.join(_root_folder, "file.py")
+    if len(sys.argv) < 2:
+        print("Usage: python repo_documentation/multi_agent_app.py <file_path>")
+        sys.exit(1)
+        
+    target_file = sys.argv[1]
     if not os.path.exists(target_file):
         print(f"Error: Target file not found at {target_file}")
     else:

@@ -1,0 +1,29 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# Environment
+.env
+.venv*
+venv*
+env*
+
+# Cache
+.cache/
+__pycache__/
+
+# IDE
+.vscode/
+.DS_Store
+
+# Output
+docs_output/
+samples/
+*.pdf
+
+# Aider cache
+.aider.tags.cache.v4/
