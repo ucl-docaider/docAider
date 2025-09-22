@@ -17,7 +17,7 @@ class DocumentationGenerator():
     """
     Initialize a new instance of the DocumentationGenerator class
     """
-    self.llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest", temperature=0, google_api_key=os.getenv("GEMINI_API_KEY"))
+    self.llm = ChatGoogleGenerativeAI(model="gemini-2.5-pro", temperature=0, google_api_key=os.getenv("GEMINI_API_KEY"))
     self.prompt_template = ChatPromptTemplate.from_template(DOCUMENTATION_PROMPT)
     self.chain = self.prompt_template | self.llm
     self.prompt = ""

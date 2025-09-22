@@ -1,6 +1,7 @@
 import time, os, sys
 import markdown
 from weasyprint import HTML
+from google.genai.errors import ClientError
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(parent_dir)
@@ -28,7 +29,19 @@ def run_generate_documentation_for_file(file_path: str):
   
   print(f"Generating documentation for {file_path} using multi-agent system...")
   # This function orchestrates the multi-agent conversation and returns the final markdown.
-  markdown_content = mac.multi_agent_documentation_generation(file_path)
+  
+  wait_times = [1, 2, 4, 8, 16, 32]
+  markdown_content = None
+  for i, wait_time in enumerate(wait_times):
+      try:
+          markdown_content = mac.multi_agent_documentation_generation(file_path)
+          break  # Success
+      except ClientError as e:
+          if "429" in str(e) and i < len(wait_times) - 1:
+              print(f"Rate limit exceeded. Retrying in {wait_time}s...")
+              time.sleep(wait_time)
+          else:
+              raise e
   
   if not markdown_content or "failed to run" in markdown_content:
       print(f"Error: Multi-agent documentation generation failed for {file_path}")

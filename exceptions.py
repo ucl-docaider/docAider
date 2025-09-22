@@ -1,8 +1,8 @@
 class RepoLoadFailed(Exception):
   pass
 
-class SemanticKernelError(Exception):
+class LangChainError(Exception):
   pass
 
-class DocGenByKernelFailed(Exception):
+class DocGenByLangChainFailed(Exception):
   pass
