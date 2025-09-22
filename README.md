@@ -1,64 +1,91 @@
 # docAider
 
-`docAider` leverages Semantic Kernel and Autogen to automate the process of generating and reviewing code documentation for your repository through a multi-agent approach. Additionally, with its integrated workflows, `docAider` streamlines the documentation update process, ensuring it is both efficient and user-friendly.
+This is a modified version of `docAider` that leverages LangChain and Autogen to automate the process of generating and reviewing code documentation for your repository through a multi-agent approach using Gemini. Additionally, with its integrated workflows, `docAider-gemini` streamlines the documentation update process, ensuring it is both efficient and user-friendly. This is built only for a single Python file.
 
 ## Getting Started
 
-### Docker Setup
+# Prequisites
 
-Add the following `Dockerfile` to your repository:
+Docker
+
+### Setup
+
+Run this bash file to setup the RabbitMQ in a Docker container
 
 ```
-version: "3.8"
+# Check if the container is already running
+if [ ! "$(docker ps -q -f name=my-rabbitmq)" ]; then
+    # Check if the container exists but is stopped
+    if [ "$(docker ps -aq -f status=exited -f name=my-rabbitmq)" ]; then
+        # Start the existing container
+        echo "Starting existing my-rabbitmq container..."
+        docker start my-rabbitmq
+    else
+        # Run a new container
+        echo "Running new my-rabbitmq container..."
+        docker run -d -p 5672:5672 -p 15672:15672 --name my-rabbitmq rabbitmq:3-management
+    fi
+else
+    echo "my-rabbitmq container is already running."
+fi
 
-services:
-  docAider:
-    image: zenawang/docaider:v1
-    container_name: docAider
-    volumes:
-      - .:/workspace
-    working_dir: /workspace
-    env_file:
-      - .env
+**2. Build Your Application's Docker Image**
+
+Navigate to the root of your project (`/docAider-gemini/`) where the `Dockerfile` is located and run:
+
+```bash
+docker build -t docaider-app .
+
+**3. Run Your Application Container**
+
+Finally, start your application. It will automatically connect to the RabbitMQ container.
+
+```bash
+docker run --rm -it --name docaider-container --network host docaider-app
+
+**Note on Networking:** I've used `--network host` for simplicity to ensure your application container can easily find RabbitMQ at `localhost`. For production, it's better to create a shared Docker network:
+1.  `docker network create my-app-network`
+2.  Run RabbitMQ with `--network my-app-network`
+3.  Run your app with `--network my-app-network`
+4.  Update your Celery configuration to point to `my-rabbitmq` instead of `localhost`.
+
+Your application container will now start, execute the `entrypoint.sh` script, and run both the Celery worker and the Python app concurrently.
 ```
-
 
 ### Environment Variables
 
 Create a `.env` file in your repository with the following variables:
 
 ```
-GLOBAL_LLM_SERVICE="AzureOpenAI"
-CHAT_DEPLOYMENT_NAME="GPT-4"
-AZURE_OPENAI_API_KEY="YOUR_AZURE_OPENAI_API_KEY"
-AZURE_OPENAI_ENDPOINT="YOUR_AZURE_OPENAI_ENDPOINT"
-AZURE_OPENAI_API_VERSION="2023-03-15-preview"
-API_TYPE="azure"
-BASE_URL="YOUR_BASE_URL"
+GLOBAL_LLM_SERVICE="Gemini"
+GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
+GEMINI_MODEL_ID="YOUR_GEMINI_MODEL(gemini-2.5-flash, gemini-2.5-pro, gemini-1.5-flash)" 
 
-GITHUB_ACCESS_TOKEN="YOUR_GITHUB_ACCESS_TOKEN"
 
-ROOT_FOLDER="/workspace"
+GITHUB_ACCESS_TOKEN="YOUR_GITHUB_PERSONAL_ACCESS_TOKEN"
+
+ROOT_FOLDER="/"
+FORMAT=""
 ```
 
 ## Run docAider
 
 ### Activate docAider Image
 
-To activate the `docAider` Docker image and ensure it continues running (do not terminate it), use the following command:
+To activate the `docAider-gemini` Docker image and ensure it continues running (do not terminate it), use the following command:
 
 ```
 docker compose up --build
 ```
 
-This command will build and start the `docAider` container. It will keep running in the foreground, so you can interact with it as needed.
+This command will build and start the `celery` and `docAider-gemini` containers. It will keep running Celery running in the background and `docAider-gemini` in the foreground, so you can interact with it as needed.
 
 ### Generate documentation
 
 To generate documentation for your repository, run the following command. This process is typically done once to create initial documentation:
 
 ```
-docker exec docAider python3 /docAider/repo_documentation/multi_agent_app.py
+docker exec docAider-gemini python3 /docAider/repo_documentation/multi_agent_app.py
 ```
 
 During execution, you can observe the interaction between multiple agents in the terminal output. The `CodeContextAgent` provides explanations for code contexts, the `documentation_generation_agent` generates documentation for specified code files, and the `review_agent` reviews and enhances the generated documentation. The `agent_manager` orchestrates the interactions between these agents, ensuring a seamless workflow from context explanation to documentation generation and review.
